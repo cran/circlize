@@ -1,0 +1,22 @@
+export(
+	circos.par,
+	circos.initialize,
+	circos.clear,
+	show.index,
+	get.cell.meta.data,
+	circos.trackPlotRegion,
+	circos.updatePlotRegion,
+	circos.points,
+	circos.trackPoints,
+	circos.lines,
+	circos.trackLines,
+	circos.rect,
+	circos.polygon,
+	circos.text,
+	circos.trackText,
+	circos.axis,
+	circos.link,
+	circos.trackHist,
+	circos.initializeWithIdeogram,
+	draw.sector
+)
