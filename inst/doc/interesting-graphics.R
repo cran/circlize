@@ -1,21 +1,23 @@
 ### R code from vignette source 'interesting-graphics.Rnw'
 
 ###################################################
-### code chunk number 1: figclock
+### code chunk number 1: figclock (eval = FALSE)
 ###################################################
-library(circlize)
-factors = letters[1]
-par(mar = c(1, 1, 1, 1))
-circos.par("gap.degree" = 0, "cell.padding" = c(0, 0, 0, 0), "start.degree" = 90)
-circos.initialize(factors = factors, xlim = c(0, 12))
-circos.trackPlotRegion(factors = factors, ylim = c(0, 1), bg.border = NA)
-circos.axis(sector.index = "a", major.at = 0:12, labels = "", direction = "inside",
-    labels.cex = 1.5, major.tick.percentage = 0.3)
-circos.text(1:12, 0.5, 1:12, direction = "horizontal")
-arrows(0, 0, 0, 0.7)    
-arrows(0, 0, 0.4, 0)
-
-circos.clear()
+## library(circlize)
+## factors = letters[1]
+## par(mar = c(1, 1, 1, 1))
+## circos.par("gap.degree" = 0, "cell.padding" = c(0, 0, 0, 0),
+##     "start.degree" = 90)
+## circos.initialize(factors = factors, xlim = c(0, 12))
+## circos.trackPlotRegion(factors = factors, ylim = c(0, 1),
+##     bg.border = NA)
+## circos.axis(sector.index = "a", major.at = 0:12, labels = "",
+##     direction = "inside", labels.cex = 1.5, major.tick.percentage = 0.3)
+## circos.text(1:12, rep(0.5, 12), 1:12, direction = "horizontal")
+## arrows(0, 0, 0, 0.7)    
+## arrows(0, 0, 0.4, 0)
+## 
+## circos.clear()
 
 
 ###################################################
@@ -24,12 +26,14 @@ circos.clear()
 library(circlize)
 factors = letters[1]
 par(mar = c(1, 1, 1, 1))
-circos.par("gap.degree" = 0, "cell.padding" = c(0, 0, 0, 0), "start.degree" = 90)
+circos.par("gap.degree" = 0, "cell.padding" = c(0, 0, 0, 0),
+    "start.degree" = 90)
 circos.initialize(factors = factors, xlim = c(0, 12))
-circos.trackPlotRegion(factors = factors, ylim = c(0, 1), bg.border = NA)
-circos.axis(sector.index = "a", major.at = 0:12, labels = "", direction = "inside",
-    labels.cex = 1.5, major.tick.percentage = 0.3)
-circos.text(1:12, 0.5, 1:12, direction = "horizontal")
+circos.trackPlotRegion(factors = factors, ylim = c(0, 1),
+    bg.border = NA)
+circos.axis(sector.index = "a", major.at = 0:12, labels = "",
+    direction = "inside", labels.cex = 1.5, major.tick.percentage = 0.3)
+circos.text(1:12, rep(0.5, 12), 1:12, direction = "horizontal")
 arrows(0, 0, 0, 0.7)    
 arrows(0, 0, 0.4, 0)
 
@@ -37,38 +41,39 @@ circos.clear()
 
 
 ###################################################
-### code chunk number 3: figdartboard
+### code chunk number 3: figdartboard (eval = FALSE)
 ###################################################
-library(circlize)
-factors = 1:20
-par(mar = c(1, 1, 1, 1))
-circos.par("gap.degree" = 0, "cell.padding" = c(0, 0, 0, 0),
-    start.degree = 360/40, track.margin = c(0, 0), "clock.wise" = FALSE)
-circos.initialize(factors = factors, xlim = c(0, 1))
-circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.col = "black",
-    track.height = 0.15)
-circos.trackText(rep(0.5, 20), rep(0.5, 20),
-    labels = c(13, 4, 18, 1, 20, 5, 12, 9, 14, 11,
-        8, 16, 7, 19, 3, 17, 2, 15, 10, 6),
-    factors = factors, col = "#EEEEEE", font = 2, direction = "horizontal")
-circos.trackPlotRegion(ylim = c(0, 1), factors = factors,
-    bg.col = rep(c("#E41A1C", "#4DAF4A"), 10), bg.border = "#EEEEEE",
-    track.height = 0.05)
-circos.trackPlotRegion(ylim = c(0, 1), factors = factors,
-    bg.col = rep(c("black", "white"), 10), bg.border = "#EEEEEE",
-    track.height = 0.275)
-circos.trackPlotRegion(ylim = c(0, 1), factors = factors,
-    bg.col = rep(c("#E41A1C", "#4DAF4A"), 10), bg.border = "#EEEEEE",
-    track.height = 0.05)
-circos.trackPlotRegion(ylim = c(0, 1), factors = factors, 
-    bg.col = rep(c("black", "white"), 10), bg.border = "#EEEEEE",
-    track.height = 0.375)
-draw.sector(center = c(0, 0), start = 0, end = 360, rou1 = 0.1,
-    col = "#4DAF4A", border = "#EEEEEE")
-draw.sector(center = c(0, 0), start = 0, end = 360, rou1 = 0.05, 
-    col = "#E41A1C", border = "#EEEEEE")
-
-circos.clear()
+## library(circlize)
+## factors = 1:20
+## par(mar = c(1, 1, 1, 1))
+## circos.par("gap.degree" = 0, "cell.padding" = c(0, 0, 0, 0),
+##     start.degree = 360/40, track.margin = c(0, 0), "clock.wise" = FALSE)
+## circos.initialize(factors = factors, xlim = c(0, 1))
+## circos.trackPlotRegion(ylim = c(0, 1), factors = factors,
+##     bg.col = "black", track.height = 0.15)
+## circos.trackText(rep(0.5, 20), rep(0.5, 20),
+##     labels = c(13, 4, 18, 1, 20, 5, 12, 9, 14, 11,
+##         8, 16, 7, 19, 3, 17, 2, 15, 10, 6),
+##     factors = factors, col = "#EEEEEE", font = 2,
+##     direction = "horizontal")
+## circos.trackPlotRegion(ylim = c(0, 1), factors = factors,
+##     bg.col = rep(c("#E41A1C", "#4DAF4A"), 10), bg.border = "#EEEEEE",
+##     track.height = 0.05)
+## circos.trackPlotRegion(ylim = c(0, 1), factors = factors,
+##     bg.col = rep(c("black", "white"), 10), bg.border = "#EEEEEE",
+##     track.height = 0.275)
+## circos.trackPlotRegion(ylim = c(0, 1), factors = factors,
+##     bg.col = rep(c("#E41A1C", "#4DAF4A"), 10), bg.border = "#EEEEEE",
+##     track.height = 0.05)
+## circos.trackPlotRegion(ylim = c(0, 1), factors = factors, 
+##     bg.col = rep(c("black", "white"), 10), bg.border = "#EEEEEE",
+##     track.height = 0.375)
+## draw.sector(center = c(0, 0), start.degree = 0, end.degree = 360,
+##     rou1 = 0.1, col = "#4DAF4A", border = "#EEEEEE")
+## draw.sector(center = c(0, 0), start.degree = 0, end.degree = 360,
+##     rou1 = 0.05, col = "#E41A1C", border = "#EEEEEE")
+## 
+## circos.clear()
 
 
 ###################################################
@@ -80,12 +85,13 @@ par(mar = c(1, 1, 1, 1))
 circos.par("gap.degree" = 0, "cell.padding" = c(0, 0, 0, 0),
     start.degree = 360/40, track.margin = c(0, 0), "clock.wise" = FALSE)
 circos.initialize(factors = factors, xlim = c(0, 1))
-circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.col = "black",
-    track.height = 0.15)
+circos.trackPlotRegion(ylim = c(0, 1), factors = factors,
+    bg.col = "black", track.height = 0.15)
 circos.trackText(rep(0.5, 20), rep(0.5, 20),
     labels = c(13, 4, 18, 1, 20, 5, 12, 9, 14, 11,
         8, 16, 7, 19, 3, 17, 2, 15, 10, 6),
-    factors = factors, col = "#EEEEEE", font = 2, direction = "horizontal")
+    factors = factors, col = "#EEEEEE", font = 2,
+    direction = "horizontal")
 circos.trackPlotRegion(ylim = c(0, 1), factors = factors,
     bg.col = rep(c("#E41A1C", "#4DAF4A"), 10), bg.border = "#EEEEEE",
     track.height = 0.05)
@@ -98,71 +104,71 @@ circos.trackPlotRegion(ylim = c(0, 1), factors = factors,
 circos.trackPlotRegion(ylim = c(0, 1), factors = factors, 
     bg.col = rep(c("black", "white"), 10), bg.border = "#EEEEEE",
     track.height = 0.375)
-draw.sector(center = c(0, 0), start = 0, end = 360, rou1 = 0.1,
-    col = "#4DAF4A", border = "#EEEEEE")
-draw.sector(center = c(0, 0), start = 0, end = 360, rou1 = 0.05, 
-    col = "#E41A1C", border = "#EEEEEE")
+draw.sector(center = c(0, 0), start.degree = 0, end.degree = 360,
+    rou1 = 0.1, col = "#4DAF4A", border = "#EEEEEE")
+draw.sector(center = c(0, 0), start.degree = 0, end.degree = 360,
+    rou1 = 0.05, col = "#E41A1C", border = "#EEEEEE")
 
 circos.clear()
 
 
 ###################################################
-### code chunk number 5: figbagua
+### code chunk number 5: figbagua (eval = FALSE)
 ###################################################
-library(circlize)
-factors = letters[1:8]
-par(mar = c(1, 1, 1, 1))
-circos.par("default.track.height" = 0.15, "start.degree" = 22.5)
-circos.initialize(factors = factors, xlim = c(0, 1))
-
-circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
-    panel.fun = function(x, y) {
-        i = get.cell.meta.data("sector.numeric.index")
-        if(i %in% c(1, 3, 5, 6)) {
-            circos.rect(0,0,1,1, col = "black")
-        } else {
-            circos.rect(0,0,0.45,1, col = "black")
-            circos.rect(0.55,0,1,1, col = "black")
-        }
-    })
-
-circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
-    panel.fun = function(x, y, ...) {
-        i = get.cell.meta.data("sector.numeric.index")
-        if(i %in% c(1, 2, 5, 8)) {
-            circos.rect(0,0,1,1, col = "black")
-        } else {
-            circos.rect(0,0,0.45,1, col = "black")
-            circos.rect(0.55,0,1,1, col = "black")
-        }
-    })
-
-circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA, 
-    panel.fun = function(x, y, ...) {
-        i = get.cell.meta.data("sector.numeric.index")
-        if(i %in% c(1, 4, 5, 8)) {
-            circos.rect(0,0,1,1, col = "black")
-        } else {
-            circos.rect(0,0,0.45,1, col = "black")
-            circos.rect(0.55,0,1,1, col = "black")
-        }
-    })
-
-# draw taiji
-draw.sector(center = c(0, 0), start = -90, end = 90, rou1 = 0.4,
-    col = "black", border = "black")
-draw.sector(center = c(0, 0), start = 90, end = 270, rou1 = 0.4,
-    col = "white", border = "black")
-draw.sector(center = c(0, 0.2), start = 0, end = 360, rou1 = 0.2,
-    col = "white", border = "white")
-draw.sector(center = c(0, -0.2), start = 0, end = 360, rou1 = 0.2,
-    col = "black", border = "black")
-draw.sector(center = c(0, 0.2), start = 0, end = 360, rou1 = 0.05,
-    col = "black", border = "black")
-draw.sector(center = c(0, -0.2), start = 0, end = 360, rou1 = 0.05,    
-    col = "white", border = "white")
-
-circos.clear()
+## library(circlize)
+## factors = letters[1:8]
+## par(mar = c(1, 1, 1, 1))
+## circos.par("default.track.height" = 0.15, "start.degree" = 22.5)
+## circos.initialize(factors = factors, xlim = c(0, 1))
+## 
+## circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
+##     panel.fun = function(x, y) {
+##         i = get.cell.meta.data("sector.numeric.index")
+##         if(i %in% c(2, 5, 7, 8)) {
+##             circos.rect(0,0,1,1, col = "black")
+##         } else {
+##             circos.rect(0,0,0.45,1, col = "black")
+##             circos.rect(0.55,0,1,1, col = "black")
+##         }
+##     })
+## 
+## circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
+##     panel.fun = function(x, y, ...) {
+##         i = get.cell.meta.data("sector.numeric.index")
+##         if(i %in% c(1, 6, 7, 8)) {
+##             circos.rect(0,0,1,1, col = "black")
+##         } else {
+##             circos.rect(0,0,0.45,1, col = "black")
+##             circos.rect(0.55,0,1,1, col = "black")
+##         }
+##     })
+## 
+## circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA, 
+##     panel.fun = function(x, y, ...) {
+##         i = get.cell.meta.data("sector.numeric.index")
+##         if(i %in% c(4, 5, 6, 7)) {
+##             circos.rect(0,0,1,1, col = "black")
+##         } else {
+##             circos.rect(0,0,0.45,1, col = "black")
+##             circos.rect(0.55,0,1,1, col = "black")
+##         }
+##     })
+##     
+## # draw taiji
+## draw.sector(center = c(0, 0), start.degree = -90, end.degree = 90,
+##     rou1 = 0.4, col = "black", border = "black")
+## draw.sector(center = c(0, 0), start.degree = 90, end.degree = 270,
+##     rou1 = 0.4, col = "white", border = "black")
+## draw.sector(center = c(0, 0.2), start.degree = 0, end.degree = 360,
+##     rou1 = 0.2, col = "white", border = "white")
+## draw.sector(center = c(0, -0.2), start.degree = 0, end.degree = 360,
+##     rou1 = 0.2, col = "black", border = "black")
+## draw.sector(center = c(0, 0.2), start.degree = 0, end.degree = 360,
+##     rou1 = 0.05, col = "black", border = "black")
+## draw.sector(center = c(0, -0.2), start.degree = 0, end.degree = 360,
+##     rou1 = 0.05, col = "white", border = "white")
+## 
+## circos.clear()
 
 
 ###################################################
@@ -177,7 +183,7 @@ circos.initialize(factors = factors, xlim = c(0, 1))
 circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
     panel.fun = function(x, y) {
         i = get.cell.meta.data("sector.numeric.index")
-        if(i %in% c(1, 3, 5, 6)) {
+        if(i %in% c(2, 5, 7, 8)) {
             circos.rect(0,0,1,1, col = "black")
         } else {
             circos.rect(0,0,0.45,1, col = "black")
@@ -188,7 +194,7 @@ circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
 circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
     panel.fun = function(x, y, ...) {
         i = get.cell.meta.data("sector.numeric.index")
-        if(i %in% c(1, 2, 5, 8)) {
+        if(i %in% c(1, 6, 7, 8)) {
             circos.rect(0,0,1,1, col = "black")
         } else {
             circos.rect(0,0,0.45,1, col = "black")
@@ -199,27 +205,27 @@ circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
 circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA, 
     panel.fun = function(x, y, ...) {
         i = get.cell.meta.data("sector.numeric.index")
-        if(i %in% c(1, 4, 5, 8)) {
+        if(i %in% c(4, 5, 6, 7)) {
             circos.rect(0,0,1,1, col = "black")
         } else {
             circos.rect(0,0,0.45,1, col = "black")
             circos.rect(0.55,0,1,1, col = "black")
         }
     })
-
+    
 # draw taiji
-draw.sector(center = c(0, 0), start = -90, end = 90, rou1 = 0.4,
-    col = "black", border = "black")
-draw.sector(center = c(0, 0), start = 90, end = 270, rou1 = 0.4,
-    col = "white", border = "black")
-draw.sector(center = c(0, 0.2), start = 0, end = 360, rou1 = 0.2,
-    col = "white", border = "white")
-draw.sector(center = c(0, -0.2), start = 0, end = 360, rou1 = 0.2,
-    col = "black", border = "black")
-draw.sector(center = c(0, 0.2), start = 0, end = 360, rou1 = 0.05,
-    col = "black", border = "black")
-draw.sector(center = c(0, -0.2), start = 0, end = 360, rou1 = 0.05,    
-    col = "white", border = "white")
+draw.sector(center = c(0, 0), start.degree = -90, end.degree = 90,
+    rou1 = 0.4, col = "black", border = "black")
+draw.sector(center = c(0, 0), start.degree = 90, end.degree = 270,
+    rou1 = 0.4, col = "white", border = "black")
+draw.sector(center = c(0, 0.2), start.degree = 0, end.degree = 360,
+    rou1 = 0.2, col = "white", border = "white")
+draw.sector(center = c(0, -0.2), start.degree = 0, end.degree = 360,
+    rou1 = 0.2, col = "black", border = "black")
+draw.sector(center = c(0, 0.2), start.degree = 0, end.degree = 360,
+    rou1 = 0.05, col = "black", border = "black")
+draw.sector(center = c(0, -0.2), start.degree = 0, end.degree = 360,
+    rou1 = 0.05, col = "white", border = "white")
 
 circos.clear()
 

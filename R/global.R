@@ -9,11 +9,12 @@ assign(".TRACK.END.POSITION", 1, envir = .CIRCOS.ENV)
 assign(".CELL.DATA", NULL, envir = .CIRCOS.ENV)
 assign(".CURRENT.TRACK.INDEX", 0, envir = .CIRCOS.ENV)
 assign(".CURRENT.SECTOR.INDEX", NULL, envir = .CIRCOS.ENV)
-.CIRCOS.PAR.DEFAULT = list(start.degree = 0,
+.CIRCOS.PAR.DEFAULT = list(
+    start.degree = 0,
 	gap.degree = 1,
-	track.margin = c(0.01, 0.01),  # top margin and bottom margin
+	track.margin = c(0.01, 0.01),  # top margin and bottom margin, percentage
 	unit.circle.segments = 500,   #to simulate smooth curve
-	cell.padding = c(0.1, 0.1, 0.1, 0.1),
+	cell.padding = c(0.1, 0.1, 0.1, 0.1),  # percentage
 	default.track.height = 0.2,
 	points.overflow.warning = TRUE,
 	canvas.xlim = c(-1, 1),
@@ -30,16 +31,17 @@ assign(".CIRCOS.PAR", .CIRCOS.PAR.DEFAULT, envir = .CIRCOS.ENV)
 # == details
 # Global parameters for the circos layout. Currently supported parameters are:
 #
-# -start.degree            The starting degree which the circle begin to draw. Note this degree is measured
-#     in the standard polar coordinate which means it is anti-clockwise.
-# -gap.degree              Gap between two neighbour sectors. Note there is a gap in front of the first sector.
+# -start.degree            The starting degree from which the circle begin to draw. Note this degree is measured
+#     in the standard polar coordinate which means it is reverse-clockwise.
+# -gap.degree              Gap between two neighbour sectors.
 # -track.margin            Like ``margin`` in Cascading Style Sheets (CSS), it is the blank area
 #     out of the plotting region, also outside of the borders. Since left and right margin are controlled
-#     by ``gap.degree``, only bottom and top margin need to be set. The value for the ``track.margin``
+#     by ``gap.degree``, only bottom and top margin need to be set. And all cells in a same track share the same margins, and
+#     that's why this parameter is called ``track.margin``. The value for the ``track.margin``
 #     is the percentage according to the radius of the unit circle.
-# -unit.circoe.segments    Since curves are simulated by a series of straight lines,
+# -unit.circle.segments    Since curves are simulated by a series of straight lines,
 #     this parameter controls the amout of segments to represent a curve. The minimal length
-#     of the line segmentation is the length of the unit circle / ``unit.circoe.segments``.
+#     of the line segmentation is the length of the unit circle (``2pi``) / ``unit.circoe.segments``.
 # -cell.padding            Padding of the cell. Like ``padding`` in Cascading Style Sheets
 #    (CSS), it is the blank area around the plotting regions, but within the borders.
 #     The paramter has four values, which controls the bottom, left, top and right padding
@@ -48,22 +50,20 @@ assign(".CIRCOS.PAR", .CIRCOS.PAR.DEFAULT, envir = .CIRCOS.ENV)
 #     fourth values are the percentages according to the range of values on x-axis.
 # -default.track.height    The default height of tracks. It is the percentage according to the radius
 #     of the unit circle. The height includes the top and bottom cell paddings but not the margins.
-#     However, the definition would be changed in future version because I think it would be more 
-#     reasonable to include the margins in the track.
-# -points.overflow.warning Since each cell is in fact not a plotting region but only
+# -points.overflow.warning Since each cell is in fact not a real plotting region but only
 #     an ordinary rectangle, it does not eliminate points that are plotted out of
 #     the region. So if some points are out of the plotting region, by default, the 
 #     package would continue drawing the points and print warnings. But in some 
 #     circumstances, draw something out of the plotting region is useful, such as draw
 #     some legend or text. Set this value to ``FALSE`` to turn off the warnings.
-# -canvas.xlim              The coordinate for the canvas. By default, the package draws unit circle, so
-#     the xlim for the canvas would be ``c(-1, 1)``. However, you can set it to a more broad
-#     interval if you want to draw other things out of the circle. By choose proper
+# -canvas.xlim              The coordinate for the canvas. Because the package draw everything (or almost everything) inside the unit circle, so
+#     the default ``canvas.xlim`` and ``canvas.ylim`` for the canvas would be all ``c(-1, 1)``. However, you can set it to a more broad
+#     interval if you want to draw other things out of the circle. By choosing proper
 #     ``canvas.xlim`` and ``canvas.ylim``, you can draw part of the circle. E.g. setting
 #     ``canvas.xlim`` to ``c(0, 1)`` and ``canvas.ylim`` to ``c(0, 1)`` would only draw
 #     circle in the region of (0, pi/2).
 # -canvas.ylim              The coordinate for the canvas. By default it is ``c(-1, 1)``
-# -clock.wise               The order of drawing sectors. Default is ``TRUE``.
+# -clock.wise               The direction of drawing sectors. Default is ``TRUE``.
 #
 # Similar to `graphics::par`, you can get the values of the parameters by specifying the 
 # names of the parameters and you can set the values of the parameters by specifying a
@@ -79,6 +79,7 @@ circos.par = function (...) {
     args = list(...)
     
 	.CIRCOS.PAR = get(".CIRCOS.PAR", envir = .CIRCOS.ENV)
+	par.names = names(.CIRCOS.PAR)
 	
     if(length(args) == 0) {
         return(.CIRCOS.PAR)
@@ -95,10 +96,18 @@ circos.par = function (...) {
     if(sum(is.null(name)) == 0) {
 		o.cell.padding = .CIRCOS.PAR[["cell.padding"]]
         for(i in seq_along(args)) {
+			
+			if(sum(name[i] %in% par.names) == 0) {
+				stop(paste("Wrong element: '", name[i], "' in `circos.par()`", sep = ""))
+			}
+			
 			if(name[i] %in% c("start.degree", "gap.degree", "canvas.xlim", "canvas.ylim", "clock.wise") &&
 			   is.circos.initialized()) {
 				warning(paste("'", name[i], "' can only be modified before `circos.initialize`.\n", sep = ""))
                 next
+			}
+			if(name[i] == "gap.degree" && (args[[ name[i] ]] < 0 || args[[ name[i] ]] >= 360)) {
+				stop("`gap.degree` should be only in [0, 360).\n")
 			}
             .CIRCOS.PAR[[ name[i] ]] = args[[ name[i] ]]
 			
@@ -127,11 +136,11 @@ is.circos.initialized = function() {
 # -xlim    Limitations for values on x-axis
 #
 # == details
-# The function allocates the sectors according the values on x-axis.
+# The function allocates the sectors according to the values on x-axis.
 # The number of sectors are determined by the ``factors`` and the order
 # of sectors are determined by the levels of factors. In this function,
 # the start and end position  for each sector on the circle (measured by degree)
-# are calculated according to the values on a-axis.
+# are calculated according to the values on x-axis.
 #
 # If ``x`` is set, the length of ``x`` must be equal to the length of ``factor``.
 # Then the data range for each sector are calculated from ``x`` and ``factor``.
@@ -139,7 +148,8 @@ is.circos.initialized = function() {
 # If ``xlim`` is set, it should be a vector containing two numbers or a matrix with 2 columns.
 # If ``xlim`` is a vector, it means all sector share the same ``xlim``.
 # If ``xlim`` is a matrix, the number of rows should be equal to the number of categories (number of levels)
-# identified by ``factors``, then each row of ``xlim`` corresponds to the data range for each sector.
+# identified by ``factors``, then each row of ``xlim`` corresponds to the data range for each sector
+# and the order of rows is corresponding to the order of levels of ``factors``.
 #
 # The function finally call `graphics::plot` and be ready to draw.
 circos.initialize = function(factors, x = NULL, xlim = NULL) {
@@ -160,44 +170,52 @@ circos.initialize = function(factors, x = NULL, xlim = NULL) {
     
     # initialize .SECTOR.DATA
     # you can think it as the global x axis configuration
-    # calculate start and end value for each sectors
+    # calculate min and max value for each sectors
     # there are several ways
-    if(is.vector(x)) {
-    
-        if(length(x) != length(factors)) {
-            stop("Length of data and length of factors differ.\n")
-        }
-        start.value = tapply(x, factors, min)
-        end.value = tapply(x, factors, max)
-    } else if(is.vector(xlim)) {
+	# xlim is prior than x
+    if(is.vector(xlim)) {
         if(length(xlim) != 2) {
-            stop("xlim should 2")
+            stop("Since `xlim` is vector, it should have length of 2.\n")
         }    
         
-        start.value = rep(xlim[1], length(le))
-        end.value = rep(xlim[2], length(le))
+        min.value = rep(xlim[1], length(le))
+        max.value = rep(xlim[2], length(le))
     } else if(is.matrix(xlim)) {
         if(dim(xlim)[1] != length(le) || dim(xlim)[2] != 2) {
-            stop()
+            stop("Since `xlim` is a matrix, it should have same number of rows as the length of the level of `factors` and number of columns of 2.\n")
         }
         
-        start.value = apply(xlim, 1, function(x) x[1])
-        end.value = apply(xlim, 1, function(x) x[2])
-    }
+        min.value = apply(xlim, 1, function(x) x[1])
+        max.value = apply(xlim, 1, function(x) x[2])
+    } else if(is.vector(x)) {
+    
+        if(length(x) != length(factors)) {
+            stop("Length of `x` and length of `factors` differ.\n")
+        }
+        min.value = tapply(x, factors, min)
+        max.value = tapply(x, factors, max)
+    } else {
+		stop("You should specify either `x` or `xlim`.\n")
+	}
     
     
     cell.padding = circos.par("cell.padding")
     
-    sector.range = end.value - start.value
-    start.value = start.value - cell.padding[2]*sector.range
-    end.value = end.value + cell.padding[4]*sector.range
+	# range for sectors
+    sector.range = max.value - min.value
+    min.value = min.value - cell.padding[2]*sector.range  # real min value
+    max.value = max.value + cell.padding[4]*sector.range  # real max value
     n.sector = length(le)
     
     sector = vector("list", 5)
-    names(sector) = c("factor", "start.value", "end.value", "start.degree", "end.degree")
+	# for each sector, `start.degree always referto `min.value` and `end.degree` always
+	# refer to `max.value` in a reverse clockwise fasion. So here `start.degree` and 
+	# `end.degree` also correspond to the direction.
+	# So in the polar coordinate, `start.degree` would be larger than `end.degree`
+    names(sector) = c("factor", "min.value", "max.value", "start.degree", "end.degree")
     sector[["factor"]] = le
-    sector[["start.value"]] = start.value
-    sector[["end.value"]] = end.value
+    sector[["min.value"]] = min.value
+    sector[["max.value"]] = max.value
     
     gap.degree = circos.par("gap.degree")
 	start.degree = circos.par("start.degree")
@@ -205,28 +223,44 @@ circos.initialize = function(factors, x = NULL, xlim = NULL) {
     
     # degree per data
     unit = (360 - gap.degree*n.sector) / sum(sector.range)
+	if(unit <= 0) {
+		stop("Maybe your `gap.degree` is too large so that there is no space to allocate sectors.\n")
+	}
     for(i in seq_len(n.sector)) {
 		
 		if(sector.range[i] == 0) {
-			stop(paste("range of the sector (", le[i] ,") cannot be 0.\n", sep = ""))
+			stop(paste("Range of the sector (", le[i] ,") cannot be 0.\n", sep = ""))
 		}
-	
+		
+		# only to ensure value are always increasing or decreasing with the absolute degree value
 		if(clock.wise) {
-			sector[["end.degree"]][i] = -gap.degree + ifelse(i == 1, start.degree, sector[["start.degree"]][i-1])
-			sector[["start.degree"]][i] =  sector[["end.degree"]][i] - sector.range[i]*unit
+			sector[["start.degree"]][i] = -gap.degree + ifelse(i == 1, start.degree, sector[["end.degree"]][i-1])
+			sector[["end.degree"]][i] =  sector[["start.degree"]][i] - sector.range[i]*unit
 		} else {
-			sector[["start.degree"]][i] =  gap.degree + ifelse(i == 1, start.degree, sector[["end.degree"]][i-1])
-			sector[["end.degree"]][i] = sector[["start.degree"]][i] + sector.range[i]*unit   
+			sector[["end.degree"]][i] =  gap.degree + ifelse(i == 1, start.degree, sector[["start.degree"]][i-1])
+			sector[["start.degree"]][i] = sector[["end.degree"]][i] + sector.range[i]*unit   
 		}
     }
+	
+	# gap not draw first
 	if(clock.wise) {
-		for(i in seq_len(n.sector)) {
-			sector[["start.degree"]][i] = sector[["start.degree"]][i] + 360
-			sector[["end.degree"]][i] = sector[["end.degree"]][i] + 360
-		}
+		sector[["start.degree"]] = sector[["start.degree"]] + gap.degree
+		sector[["end.degree"]] = sector[["end.degree"]] + gap.degree
+	} else {
+		sector[["start.degree"]] = sector[["start.degree"]] - gap.degree
+		sector[["end.degree"]] = sector[["end.degree"]] - gap.degree
+	}
+	
+	# from start.degree, degree is increasing in a reverse-clock wise fasion
+	# so, if circos is created clock wise, the forward sector would have large degrees
+	# if circos is created reverse clock wise, the forward sector would have small degrees
+	# just for goodlooking for the degree
+	if(clock.wise) {
+		sector[["start.degree"]] = sector[["start.degree"]] + 360
+		sector[["end.degree"]] = sector[["end.degree"]] + 360
 	}
     
-    sector = as.data.frame(sector)
+    sector = as.data.frame(sector, stringsAsFactors = FALSE)
     .SECTOR.DATA = sector
     
     # initialize .CELL.DATA which contains information of each cell
@@ -243,14 +277,16 @@ circos.initialize = function(factors, x = NULL, xlim = NULL) {
     
     # draw everything in a unit circle
     plot(circos.par("canvas.xlim"), circos.par("canvas.ylim"), type = "n", ann = FALSE, axes = FALSE)
-    return(invisible(sector))
+    
+	# all the information of cells would be visited through `get.cell.meta.data`
+	return(invisible(NULL))
 }
 
 # == title
-# Reset the circos layout parameters
+# Reset the circos layout parameters and internal variables
 #
 # == details
-# The package uses several global variables to trace the plotting procedure.
+# The package uses several global variables (internal) to trace the plotting procedure.
 # If you want to draw a new figure, you must call this function first to reset
 # everything.
 circos.clear = function() {
@@ -277,6 +313,7 @@ get.sector.data = function(sector.index = get.current.sector.index()) {
     return(sector.data)
 }
 
+# numeric index, i.e. 1, 2, 3, ...
 get.current.track.index = function() {
 	.CURRENT.TRACK.INDEX = get(".CURRENT.TRACK.INDEX", envir = .CIRCOS.ENV)
     return(.CURRENT.TRACK.INDEX)   
@@ -297,6 +334,7 @@ get.max.track.index = function() {
     }
 }
 
+# factors name, note it is not numeric index
 get.current.sector.index = function() {
 	.CURRENT.SECTOR.INDEX = get(".CURRENT.SECTOR.INDEX", envir = .CIRCOS.ENV)
     return(.CURRENT.SECTOR.INDEX)   
@@ -309,6 +347,12 @@ set.current.sector.index = function(x) {
     return(invisible(NULL))
 }
 
+# Position where the current track ends (position of the bottom edge - bottom margin)
+# If no track has been created, the position is 1
+# Note there would be a little inconsistence for the definition of track.
+# In the package, the track is the height of cells
+# but in this funciton, track includes the margins. However, it is an internal function
+# and the definition of track would be unified
 get.track.end.position = function(track.index = get.current.track.index()) {
     
     if(track.index == 0) {
@@ -338,6 +382,7 @@ set.cell.data = function(sector.index = get.current.sector.index(), track.index 
     return(invisible(NULL))
 }
 
+# whether cell in sector.index, track.index exists?
 has.cell = function(sector.index, track.index) {
 
 	.CELL.DATA = get(".CELL.DATA", envir = .CIRCOS.ENV)
@@ -354,19 +399,21 @@ has.cell = function(sector.index, track.index) {
 # Label the sector index and the track index of each cell
 #
 # == details
-# Draw the index of the sector and track for each cell on the figure.
-# This function can help you to find the coordinate of cells. 
+# Draw the index of the sector and the track for each cell on the figure.
+# This function can help you to find the coordinates of cells. 
 show.index = function() {
-	.CELL.DATA = get(".CELL.DATA", envir = .CIRCOS.ENV)
-    sectors = names(.CELL.DATA)
-    for(i in seq_along(sectors)) {
-        for(j in seq_along(.CELL.DATA[[ sectors[i] ]])) {
-            d = .CELL.DATA[[ sectors[i] ]][[j]]
-            circos.text(mean(d$xlim), mean(d$ylim), sector.index = sectors[i],
-                        track.index = j, labels = paste(sectors[i], j, sep = ":"), 
-                        direction = "horizontal")
-        }
-    }
+	sectors = get.all.sector.index()
+	max.track.index = get.max.track.index()
+	if(length(sectors) && max.track.index > 0) {
+		for(i in seq_along(sectors)) {
+			for(j in seq_len(max.track.index)) {
+				cell.xlim = get.cell.meta.data("cell.xlim", sector.index = sectors[i], track.index = j)
+				cell.ylim = get.cell.meta.data("cell.ylim", sector.index = sectors[i], track.index = j)
+				circos.text(mean(cell.xlim), mean(cell.ylim), labels = paste(sectors[i], j, sep = ":"),
+				    sector.index = sectors[i], track.index = j, direction = "horizontal")
+			}
+		}
+	}
 }
 
 # == title
@@ -380,64 +427,55 @@ show.index = function() {
 # == details
 # The following meta information for a cell can be obtained:
 #
-# -sector.index         The name for the sector
+# -sector.index         The name (label) for the sector
 # -sector.numeric.index Numeric index for the sector
 # -track.index          Numeric index for the track
 # -xlim                 Minimal and maximal values on the x-axis
 # -ylim                 Minimal and maximal values on the y-axis
-# -xrange               Range of the xlim
-# -yrange               Range of the ylim
+# -xrange               Range of ``xlim``
+# -yrange               Range of ``ylim``
 # -cell.xlim            Minimal and maximal values on the x-axis extended by cell paddings
 # -cell.ylim            Minimal and maximal values on the y-axis extended by cell paddings
-# -xplot                Right and left edge degree for the plotting region in the canvas
-# -yplot                Bottum and top value for the plotting region in the canvas
+# -xplot                Right and left edge degree for the plotting region in the circle.
+#                       The first element corresponds to the start point of values on x-axis (``cell.xlm[1]``)
+#                       and the second element corresponds to the end point of values on x-axis (``cell.xlim[2]``)
+#                       Since x-axis in data coordinate in cells are always reverse clockwise, ``xplot[1]`` is larger
+#                       than ``xplot[2]``.
+# -yplot                Bottom and top value for the plotting region in the canvas. It is the value
+#                       of radius of arc corresponding to top border or bottom border.
+# -cell.start.degree    Same as ``xplot[1]``
+# -cell.end.degree      Same as ``xplot[2]``
+# -cell.bottom.radius   Same as ``yplot[1]``
+# -cell.top.radius      Same as ``yplot[2]``
 # -track.margin         Margin for the cell
 # -cell.padding         Padding for the cell
 #
-# The function would be useful when you use ``panel.fun`` in `circos.initialize` to
-# get the information of the current cell.
+# The function would be useful when you use ``panel.fun`` in `circos.trackPlotRegion` to
+# get detailed information of the current cell.
 get.cell.meta.data = function(name, sector.index = get.current.sector.index(), 
                               track.index = get.current.track.index()) {
 	current.sector.data = get.sector.data(sector.index)
 	current.cell.data = get.cell.data(sector.index, track.index)
-	cell.padding = circos.par("cell.padding")
+	cell.padding = current.cell.data$cell.padding
 	
 	if(length(name) != 1) {
-		stop("``name`` only have length 1.\n")
+		stop("``name`` only should have length of 1.\n")
 	}
 	
 	if(name == "xlim") {
-		xlim = numeric(2)
-		xlim[1] = ((1 + cell.padding[4])*current.cell.data$xlim[1] + cell.padding[2]*current.cell.data$xlim[2]) /
-		          (1 + cell.padding[2] + cell.padding[4])
-		xlim[2] = (cell.padding[4]*current.cell.data$xlim[1] + (1 + cell.padding[2])*current.cell.data$xlim[2]) /
-		          (1 + cell.padding[2] + cell.padding[4])
-		return(xlim)
+		return(current.cell.data$xlim)
 	} else if(name == "ylim") {
-		ylim = numeric(2)
-		ylim[1] = ((1 + cell.padding[3])*current.cell.data$ylim[1] + cell.padding[1]*current.cell.data$ylim[2]) /
-		          (1 + cell.padding[1] + cell.padding[3])
-		ylim[2] = (cell.padding[3]*current.cell.data$ylim[1] + (1 + cell.padding[1])*current.cell.data$ylim[2]) /
-		          (1 + cell.padding[1] + cell.padding[3])
-		return(ylim)
+		return(current.cell.data$ylim)
 	} else if(name == "xrange") {
-		xlim = numeric(2)
-		xlim[1] = ((1 + cell.padding[4])*current.cell.data$xlim[1] + cell.padding[2]*current.cell.data$xlim[2]) /
-		          (1 + cell.padding[2] + cell.padding[4])
-		xlim[2] = (cell.padding[4]*current.cell.data$xlim[1] + (1 + cell.padding[2])*current.cell.data$xlim[2]) /
-		          (1 + cell.padding[2] + cell.padding[4])
+		xlim = current.cell.data$xlim
 		return(xlim[2] - xlim[1])
 	} else if(name == "yrange") {
-		ylim = numeric(2)
-		ylim[1] = ((1 + cell.padding[3])*current.cell.data$ylim[1] + cell.padding[1]*current.cell.data$ylim[2]) /
-		          (1 + cell.padding[1] + cell.padding[3])
-		ylim[2] = (cell.padding[3]*current.cell.data$ylim[1] + (1 + cell.padding[1])*current.cell.data$ylim[2]) /
-		          (1 + cell.padding[1] + cell.padding[3])
+		ylim = current.cell.data$ylim
 		return(ylim[2] - ylim[1])
 	} else if(name == "cell.xlim") {
-		return(current.cell.data$xlim)
+		return(current.cell.data$cell.xlim)
 	} else if(name == "cell.ylim") {
-		return(current.cell.data$ylim)
+		return(current.cell.data$cell.ylim)
 	} else if(name == "sector.numeric.index") {
 		return(which(get.all.sector.index() == sector.index))
 	} else if(name == "sector.index") {
@@ -445,15 +483,29 @@ get.cell.meta.data = function(name, sector.index = get.current.sector.index(),
 	} else if(name == "track.index") {
 		return(track.index)
 	} else if(name == "xplot") {
-		return(current.sector.data[c("start.degree", "end.degree")])
+		x = current.sector.data[c("start.degree", "end.degree")]
+		names(x) = NULL
+		return(x)
 	} else if(name == "yplot") {
 		return(c(current.cell.data$track.start - current.cell.data$track.height, current.cell.data$track.start))
 	} else if(name == "track.margin") {
 		return(current.cell.data$track.margin)
 	} else if(name == "cell.padding") {
 		return(current.cell.data$cell.padding)
+	} else if(name == "cell.start.degree") {
+		x = current.sector.data["start.degree"]
+		names(x) = NULL
+		return(x)
+	} else if(name == "cell.end.degree") {
+		x = current.sector.data["end.degree"]
+		names(x) = NULL
+		return(x)
+	} else if(name == "cell.bottom.radius") {
+		return(current.cell.data$track.start - current.cell.data$track.height)
+	} else if(name == "cell.top.radius") {
+		return(current.cell.data$track.start)
 	} else {
-		stop("Wrong name.\n")
+		stop("Wrong cell meta name.\n")
 	}
 	return(NULL)
 }
