@@ -162,7 +162,7 @@ circos.clear()
 par(mar = c(1, 1, 1, 1), new = TRUE)
     
 circos.par("canvas.xlim" = c(-2, 2), "canvas.ylim" = c(-2, 2),
-    clock.wise = FALSE, start.degree = -90)
+    start.degree = -90)
 circos.initialize(factor(chromosome, levels = chromosome), xlim = xlim)
 circos.trackPlotRegion(factors = factor(chromosome, levels = chromosome),
     ylim = c(0, 1), bg.border = NA, track.height = 0.2)
@@ -190,8 +190,8 @@ for(chr in chromosome) {
     circos.axis(h = 0.5, major.at = major.at, 
         labels = paste(major.at/1000000, "MB", sep = ""), sector.index = chr, 
         labels.cex = 0.4, labels.direction = "vertical_left")
-    cell.xlim = get.cell.meta.data("xlim", sector.index = chr)
-    circos.text(mean(cell.xlim), -0.5, labels = chr, 
+    chr.xlim = get.cell.meta.data("xlim", sector.index = chr)
+    circos.text(mean(chr.xlim), -0.5, labels = chr, 
         sector.index = chr, cex = 0.8)
     circos.link("chr1", 12345678, "chr1", 87654321)
     circos.link("chr1", 22222222, "chr1", 99999999)

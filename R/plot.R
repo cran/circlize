@@ -128,7 +128,7 @@ circos.trackPlotRegion = function(factors = NULL, x = NULL, y = NULL, ylim = NUL
 	if(track.index <= get.max.track.index()) {  # if just update a whole track
 		track.start = get.cell.data(factors[1], track.index)$track.start
 	} else {
-		track.start = get.track.end.position(track.index - 1) - circos.par("track.margin")[1]
+		track.start = get.track.end.position(track.index - 1) - circos.par("track.margin")[2]
     }
 	
     # check whether there is enough space for the new track and whether the new space
@@ -199,7 +199,7 @@ circos.trackPlotRegion = function(factors = NULL, x = NULL, y = NULL, ylim = NUL
 	
     # After the track has been created, the default tract starting position is set
     # just next to the most recently created track
-    set.track.end.position(track.index, track.start - track.height - circos.par("track.margin")[2])
+    set.track.end.position(track.index, track.start - track.height - circos.par("track.margin")[1])
     return(invisible(NULL))
 
 }
@@ -336,6 +336,7 @@ circos.points = function(x, y, sector.index = get.current.sector.index(), track.
 # -col          Points color
 # -cex          Points size
 #
+# == details
 # The function adds points in multiple cells by first splitting data into several parts in which
 # each part corresponds to one factor (sector index) and then add points in cells corresponding
 # to the part of data by calling `circos.points`.
@@ -688,12 +689,13 @@ circos.polygon = function(x, y, sector.index = get.current.sector.index(), track
 # -cex          Font size
 # -col          Font color
 # -font         Font style
+# -...          Pass to `graphics::text`
 #
 # == details
 # The function is similar to `graphics::text`. All you need to note is the ``direction`` settings.
 circos.text = function(x, y, labels, sector.index = get.current.sector.index(), track.index = get.current.track.index(), 
     direction = c("default", "default2", "vertical_left", "vertical_right", "horizontal", "arc"),
-    adj = par("adj"), cex = 1, col = "black", font = par("font")) {
+    adj = par("adj"), cex = 1, col = "black", font = par("font"), ...) {
     
 	if(length(x) != length(y)) {
 		stop("length of x and y differ.\n")
@@ -747,7 +749,7 @@ circos.text = function(x, y, labels, sector.index = get.current.sector.index(), 
 				alpha = alpha - asin(strw[[i]][j]/d[i, 2])*180/pi
 			}
 			dr = reverse.circlize(theta, rep(rou, length(theta)), sector.index, track.index)
-			circos.text(dr[, 1], dr[, 2], labels = chars[[i]], cex = cex[i], col = col[i], font = font[i], adj = c(0.5, 0))
+			circos.text(dr[, 1], dr[, 2], labels = chars[[i]], cex = cex[i], col = col[i], font = font[i], adj = c(0.5, 0), ...)
 			#circos.points(dr[, 1], dr[, 2], pch = 16, cex = 0.8)
 		}
 		
@@ -769,7 +771,7 @@ circos.text = function(x, y, labels, sector.index = get.current.sector.index(), 
 		
 		for(i in seq_along(x)) {
 			text(m[i, 1], m[i, 2], labels = labels[i], srt = srt[i],
-				 cex = cex[i], col = col[i], font = font[i], adj = adj)
+				 cex = cex[i], col = col[i], font = font[i], adj = adj, ...)
 		}
     }
 	
@@ -859,8 +861,8 @@ circos.trackText = function(factors, x, y, labels, track.index = get.current.tra
 # -labels.direction font direction for the axis labels, shoud be in (``default``, ``default2``, ``vertical_left``, ``vertical_right``, ``horizontal``, ``arc``)
 # -direction        whether the axis ticks point to the outside or inside of the circle.
 # -minor.ticks      Number of minor ticks between two close major ticks.
-# -major.tick.percentage Length of the major ticks. It is the percentage to the ylim in the cell.
-# -labels.away.percentage The distance for the axis labels to the major ticks. It is the percentage to the ylim in the cell.
+# -major.tick.percentage Length of the major ticks. It is the percentage to the height of the cell.
+# -labels.away.percentage The distance for the axis labels to the major ticks. It is the percentage to the height of the cell.
 # -lwd              line width for ticks
 #
 # == details
@@ -910,6 +912,9 @@ circos.axis = function(h = "top", major.at = NULL, labels = TRUE, major.tick = T
 	# ticks
 	yrange = get.cell.meta.data("yrange", sector.index, track.index)
 	major.tick.length = yrange * major.tick.percentage
+	
+	op = circos.par("points.overflow.warning")
+	circos.par("points.overflow.warning" = FALSE)
 	for(i in seq_along(major.at)) {
 		
 		if(major.at[i] < xlim2[1] || major.at[i] > xlim2[2]) {
@@ -931,6 +936,8 @@ circos.axis = function(h = "top", major.at = NULL, labels = TRUE, major.tick = T
 				labels.adj = c(1, 0.5)
 			} else if(labels.direction == "vertical_right") {
 				labels.adj = c(0, 0.5)
+			} else if(labels.direction == "horizontal") {
+				labels.adj = c(0.5, 0.5)
 			} else {
 				labels.adj = c(0.5, 0)
 			}
@@ -943,6 +950,8 @@ circos.axis = function(h = "top", major.at = NULL, labels = TRUE, major.tick = T
 				labels.adj = c(0, 0.5)
 			} else if(labels.direction == "vertical_right") {
 				labels.adj = c(1, 0.5)
+			} else if(labels.direction == "horizontal") {
+				labels.adj = c(0.5, 0.5)
 			} else {
 				labels.adj = c(0.5, 1)
 			}
@@ -970,6 +979,9 @@ circos.axis = function(h = "top", major.at = NULL, labels = TRUE, major.tick = T
 			             sector.index = sector.index, track.index = track.index, lwd = lwd)
 		}
 	}
+	
+	circos.par("points.overflow.warning" = op)
+	return(invisible(NULL))
 }
 
 #####################################################################
@@ -1175,11 +1187,12 @@ circos.initializeWithIdeogram = function(file = paste(system.file(package = "cir
 		}
 		circos.rect(d2[1, 2], 0, d2[n, 3], 0.4, sector.index = chr, border = "black")
 		major.at = seq(0, 10^nchar(max(xlim[, 2])), by = 50000000)
-		circos.axis(h = 0.5, major.at = major.at, labels = paste(major.at/1000000, "MB", sep = ""), sector.index = chr, labels.cex = 0.3)
+		circos.axis(h = 0.5, major.at = major.at, labels = paste(major.at/1000000, "MB", sep = ""), sector.index = chr, labels.cex = 0.3, labels.direction = "vertical_right")
 		cell.xlim = get.cell.meta.data("xlim", sector.index = chr)
-		circos.text(mean(cell.xlim), 1.2, labels = gsub("chr", "", chr), sector.index = chr, cex = 0.8)
+		circos.text(mean(cell.xlim), 1.3, labels = gsub("chr", "", chr), sector.index = chr, cex = 1)
 	}
 	circos.par("cell.padding" = o.cell.padding, "points.overflow.warning" = TRUE)
+	return(invisible(NULL))
 }
 
 # == title
