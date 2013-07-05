@@ -23,6 +23,7 @@
 # -n             Number of points to represent a quadratic curve. Because currently I don't know how to 
 #                calculate the length of a quadratic curve, the number of segmentation of the quadratic curve
 #                cannot be calculated now. It should be an odd value because we need the point for the vertex.
+# -top.ratio.low Adjust the height of the lower border of a link (if it is like a belt)
 #
 # == details
 # The link is in fact a quadratic curve.
@@ -34,7 +35,8 @@
 # ``rou`` and ``top.ratio``. See vignette for detailed explaination.
 circos.link = function(sector.index1, point1, sector.index2, point2,
     rou = get.track.end.position(get.current.track.index()), top.ratio = 0.5,
-    col = "black", lwd = par("lwd"), lty = par("lty"), border = NA, n = 501) {
+    col = "black", lwd = par("lwd"), lty = par("lty"), border = NA, n = 101,
+	top.ratio.low = NULL) {
     
     sector.data1 = get.sector.data(sector.index1)
     sector.data2 = get.sector.data(sector.index2)
@@ -51,11 +53,23 @@ circos.link = function(sector.index1, point1, sector.index2, point2,
     } else {
         if(length(point1) == 1) {
 			current.cell.xrange = get.cell.meta.data("xrange", sector.index1, 1)
-            point1 = c(point1, point1 + current.cell.xrange/100)   
+			if(sector.index1 == sector.index2 && point1 > max(point2)) {
+				point1 = c(point1, point1 + current.cell.xrange/100)
+			} else if(sector.index1 == sector.index2 && point1 < min(point2)) {
+				point1 = c(point1, point1 - current.cell.xrange/100)
+			} else {
+				point1 = c(point1, point1 + current.cell.xrange/100)
+			}
         }
         if(length(point2) == 1) {
 			current.cell.xrange = get.cell.meta.data("xrange", sector.index2, 1)
-            point2 = c(point2, point2 + current.cell.xrange/100)  
+			if(sector.index1 == sector.index2 && point2 > max(point1)) {
+				point2 = c(point2, point2 + current.cell.xrange/100)
+			} else if(sector.index1 == sector.index2 && point2 < min(point1)) {
+				point2 = c(point2, point2 - current.cell.xrange/100)
+			} else {
+				point2 = c(point2, point2 + current.cell.xrange/100)
+			}
         }
 		
 		if(sector.index1 == sector.index2) {
@@ -99,7 +113,33 @@ circos.link = function(sector.index1, point1, sector.index2, point2,
         
         d1 = rotate.parabola(theta1 = theta11, theta2 = theta21, rou1 = rou, rou.ratio = top.ratio, n = n)
         d2 = rotate.parabola(theta1 = theta12, theta2 = theta22, rou1 = rou, rou.ratio = top.ratio, n = n)
-
+		
+		if(!is.null(top.ratio.low)) {
+			if(top.ratio.low < top.ratio) {
+				stop("'top.ratio.low' should be larger than 'top.ratio'.\n")
+			}
+			if(quadratic.minus.degree(theta11, theta21) > quadratic.minus.degree(theta12, theta22)) {
+				d2 = rotate.parabola(theta1 = theta12, theta2 = theta22, rou1 = rou, rou.ratio = top.ratio.low, n = n)
+			} else {
+				d1 = rotate.parabola(theta1 = theta11, theta2 = theta21, rou1 = rou, rou.ratio = top.ratio.low, n = n)
+			}
+		} else {
+			al = min(quadratic.minus.degree(theta11, theta12), quadratic.minus.degree(theta21, theta22))
+			th2 = max(quadratic.minus.degree(theta11, theta21), quadratic.minus.degree(theta12, theta22))
+			th1 = min(quadratic.minus.degree(theta11, theta21), quadratic.minus.degree(theta12, theta22))
+			if(quadratic.minus.degree(th2, th1) < 90 &&
+			   al < 5 &&  #alpha
+			   th2 < 45 && th2 < 180 - th1 &&
+			   top.ratio <= 1- 0.05) {
+				
+				if(quadratic.minus.degree(theta11, theta21) > quadratic.minus.degree(theta12, theta22)) {
+					d2 = rotate.parabola(theta1 = theta12, theta2 = theta22, rou1 = rou, rou.ratio = top.ratio+0.05, n = n)
+				} else {
+					d1 = rotate.parabola(theta1 = theta11, theta2 = theta21, rou1 = rou, rou.ratio = top.ratio+0.05, n = n)
+				}		
+			}
+		}
+		
         if(is.points.ordered.on.circle(c(theta11, theta21, theta22, theta12))) {
             d2 = d2[rev(seq_len(nrow(d2))), ]
             r1 = arc.points(theta21, theta22, rou)
@@ -140,7 +180,7 @@ circos.link = function(sector.index1, point1, sector.index2, point2,
 # theta1 is the start point and theta2 is the end point
 rotate.parabola = function(theta1, theta2, rou1, rou2 = rou1, theta = (theta1+theta2)/2, 
     rou = rou1 * abs(cos(degree.minus(theta1, theta2)/2/180*pi))*rou.ratio, rou.ratio = 0.5,
-    n = 501) {
+    n = 101) {
     
     while(theta2 < theta1) {
         theta2 = theta2 + 360
@@ -165,7 +205,8 @@ rotate.parabola = function(theta1, theta2, rou1, rou2 = rou1, theta = (theta1+th
     n.half = (n - 1) / 2
     x = numeric(n)
     y = numeric(n)
-    x = c(n.half:1/n.half, 0, 1:n.half/n.half)*a
+    # x points should be more thick near the vertex
+    x = c((n.half:1)^2/n.half^2, 0, (1:n.half)^2/n.half^2)*a
     y[1:n.half] = sqrt(k*x[1:n.half])
     y[n.half + 1] = 0
     y[1:n.half + n.half + 1] = -sqrt(k*x[1:n.half + n.half + 1])
@@ -271,3 +312,31 @@ degree.seq = function(from, to, length.out = 2, restrict = FALSE) {
 		return(s)
 	}
 }
+
+
+quadratic.mean.degree = function(theta1, theta2) {
+	theta1 = theta1 %% 360
+	theta2 = theta2 %% 360
+	
+	if(abs(theta2 - theta1) > 180) {
+		return((theta2 + theta1)/2 - 180)
+	} else {
+		return((theta2 + theta1)/2)
+	}
+
+}
+
+
+
+quadratic.minus.degree = function(theta1, theta2) {
+	theta1 = theta1 %% 360
+	theta2 = theta2 %% 360
+	
+	if(abs(theta2 - theta1) > 180) {
+		return(abs(theta2 - theta1) - 180)
+	} else {
+		return(abs(theta2 - theta1))
+	}
+
+}
+
