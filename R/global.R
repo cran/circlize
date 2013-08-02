@@ -13,7 +13,7 @@ assign(".CURRENT.SECTOR.INDEX", NULL, envir = .CIRCOS.ENV)
 	gap.degree = 1,
 	track.margin = c(0.01, 0.01),  # top margin and bottom margin, percentage
 	unit.circle.segments = 500,   #to simulate smooth curve
-	cell.padding = c(0.1, 0.1, 0.1, 0.1),  # percentage
+	cell.padding = c(0.02, 1, 0.02, 1),  # percentage
 	default.track.height = 0.2,
 	points.overflow.warning = TRUE,
 	canvas.xlim = c(-1, 1),
@@ -41,12 +41,13 @@ assign(".CIRCOS.PAR", .CIRCOS.PAR.DEFAULT, envir = .CIRCOS.ENV)
 # -unit.circle.segments    Since curves are simulated by a series of straight lines,
 #     this parameter controls the amout of segments to represent a curve. The minimal length
 #     of the line segmentation is the length of the unit circle (``2pi``) / ``unit.circoe.segments``.
+#     More segments means better approximation for the curves while larger size if you generate figures as PDF format.
 # -cell.padding            Padding of the cell. Like ``padding`` in Cascading Style Sheets
 #    (CSS), it is the blank area around the plotting regions, but within the borders.
 #     The paramter has four values, which controls the bottom, left, top and right padding
-#     respectively. The four values are all percentages in which the first and the third padding
-#     values are the percentages according to the range of values on y-axis and the second and
-#     fourth values are the percentages according to the range of values on x-axis.
+#     respectively. The first and the third padding
+#     values are the percentages according to the radius of the unit circle and the second and
+#     fourth values are degrees.
 # -default.track.height    The default height of tracks. It is the percentage according to the radius
 #     of the unit circle. The height includes the top and bottom cell paddings but not the margins.
 # -points.overflow.warning Since each cell is in fact not a real plotting region but only
@@ -140,6 +141,12 @@ is.circos.initialized = function() {
 # -factors Factors which represent the categories of data
 # -x       Data
 # -xlim    Limitations for values on x-axis
+# -sector.width width for each sector. The length of the vector should be either 1 which means
+#          all sectors are having same width or as same as the number of sectors. The value for
+#          the vector is the relative value, and they will be scaled by dividing their summation.
+#          By defautl, it is ``NULL`` which means the width of sectors correspond to the data
+#          range in sectors. If you set the value, you need to notice the width for the sector here
+#          includes its right gap.
 #
 # == details
 # The function allocates the sectors according to the values on x-axis.
@@ -148,8 +155,8 @@ is.circos.initialized = function() {
 # the start and end position  for each sector on the circle (measured by degree)
 # are calculated according to the values on x-axis.
 #
-# If ``x`` is set, the length of ``x`` must be equal to the length of ``factor``.
-# Then the data range for each sector are calculated from ``x`` and ``factor``.
+# If ``x`` is set, the length of ``x`` must be equal to the length of ``factors``.
+# Then the data range for each sector are calculated from ``x`` and ``factors``.
 #
 # If ``xlim`` is set, it should be a vector containing two numbers or a matrix with 2 columns.
 # If ``xlim`` is a vector, it means all sector share the same ``xlim``.
@@ -157,8 +164,13 @@ is.circos.initialized = function() {
 # identified by ``factors``, then each row of ``xlim`` corresponds to the data range for each sector
 # and the order of rows is corresponding to the order of levels of ``factors``.
 #
+# Normally, width of sectors will be calculated internally according to the data range in sectors. But you can
+# still set the width manually. However, it is not always a good idear to change the default sector width since
+# the width can reflect the range of data in sectors. Anyway, in some circumstances, it is useful to manually set
+# the width such as you want to zoom in some part of the sector.
+#
 # The function finally call `graphics::plot` and be ready to draw.
-circos.initialize = function(factors, x = NULL, xlim = NULL) {
+circos.initialize = function(factors, x = NULL, xlim = NULL, sector.width = NULL) {
 
     assign(".SECTOR.DATA", NULL, envir = .CIRCOS.ENV)
 	assign(".TRACK.END.POSITION", 1, envir = .CIRCOS.ENV)
@@ -209,8 +221,6 @@ circos.initialize = function(factors, x = NULL, xlim = NULL) {
     
 	# range for sectors
     sector.range = max.value - min.value
-    min.value = min.value - cell.padding[2]*sector.range  # real min value
-    max.value = max.value + cell.padding[4]*sector.range  # real max value
     n.sector = length(le)
     
     sector = vector("list", 5)
@@ -220,8 +230,6 @@ circos.initialize = function(factors, x = NULL, xlim = NULL) {
 	# So in the polar coordinate, `start.degree` would be larger than `end.degree`
     names(sector) = c("factor", "min.value", "max.value", "start.degree", "end.degree")
     sector[["factor"]] = le
-    sector[["min.value"]] = min.value
-    sector[["max.value"]] = max.value
     
     gap.degree = circos.par("gap.degree")
 	if(length(gap.degree) == 1) {
@@ -233,27 +241,60 @@ circos.initialize = function(factors, x = NULL, xlim = NULL) {
 	start.degree = circos.par("start.degree")
 	clock.wise = circos.par("clock.wise")
     
-    # degree per data
-    unit = (360 - sum(gap.degree)) / sum(sector.range)
-	if(unit <= 0) {
+    if(360 - sum(gap.degree) <= 0) {
 		stop("Maybe your `gap.degree` is too large so that there is no space to allocate sectors.\n")
 	}
-    for(i in seq_len(n.sector)) {
 		
-		if(sector.range[i] == 0) {
-			stop(paste("Range of the sector (", le[i] ,") cannot be 0.\n", sep = ""))
+    if(is.null(sector.width)) {
+		# degree per data
+		unit = (360 - sum(gap.degree)) / sum(sector.range)
+		
+		for(i in seq_len(n.sector)) {
+			
+			if(sector.range[i] == 0) {
+				stop(paste("Range of the sector (", le[i] ,") cannot be 0.\n", sep = ""))
+			}
+			
+			# only to ensure value are always increasing or decreasing with the absolute degree value
+			if(clock.wise) {
+				sector[["start.degree"]][i] = ifelse(i == 1, start.degree, sector[["end.degree"]][i-1] - gap.degree[i-1])
+				sector[["end.degree"]][i] =  sector[["start.degree"]][i] - sector.range[i]*unit
+			} else {
+				sector[["end.degree"]][i] = ifelse(i == 1, start.degree, sector[["start.degree"]][i-1] + gap.degree[i-1])
+				sector[["start.degree"]][i] = sector[["end.degree"]][i] + sector.range[i]*unit   
+			}
+		}
+	} else {
+		if(length(sector.width) == 1) {
+			sector.width = rep(sector.width, n.sector)
+		} else if(length(sector.width) != n.sector) {
+			stop("Since you manually set the width for each sector, the length of `sector.width` should be either 1 or as same as the number of sectors.\n")
 		}
 		
-		# only to ensure value are always increasing or decreasing with the absolute degree value
-		if(clock.wise) {
-			sector[["start.degree"]][i] = ifelse(i == 1, start.degree, sector[["end.degree"]][i-1] - gap.degree[i-1])
-			sector[["end.degree"]][i] =  sector[["start.degree"]][i] - sector.range[i]*unit
-		} else {
-			sector[["end.degree"]][i] = ifelse(i == 1, start.degree, sector[["start.degree"]][i-1] + gap.degree[i-1])
-			sector[["start.degree"]][i] = sector[["end.degree"]][i] + sector.range[i]*unit   
+		sector.width.percentage = sector.width / sum(sector.width)
+		degree.per.sector = 360 * sector.width.percentage - gap.degree
+		
+		if(any(degree.per.sector <= 0)) {
+			stop("Detect some gaps are too large.\n")
 		}
-    }
-	
+		
+		for(i in seq_len(n.sector)) {
+			
+			if(sector.range[i] == 0) {
+				stop(paste("Range of the sector (", le[i] ,") cannot be 0.\n", sep = ""))
+			}
+			
+			
+			# only to ensure value are always increasing or decreasing with the absolute degree value
+			if(clock.wise) {
+				sector[["start.degree"]][i] = ifelse(i == 1, start.degree, sector[["end.degree"]][i-1] - gap.degree[i-1])
+				sector[["end.degree"]][i] =  sector[["start.degree"]][i] - degree.per.sector[i]
+			} else {
+				sector[["end.degree"]][i] = ifelse(i == 1, start.degree, sector[["start.degree"]][i-1] + gap.degree[i-1])
+				sector[["start.degree"]][i] = sector[["end.degree"]][i] + degree.per.sector[i] 
+			}
+		}
+	}
 	# from start.degree, degree is increasing in a reverse-clock wise fasion
 	# so, if circos is created clock wise, the forward sector would have large degrees
 	# if circos is created reverse clock wise, the forward sector would have small degrees
@@ -262,6 +303,15 @@ circos.initialize = function(factors, x = NULL, xlim = NULL) {
 		sector[["start.degree"]] = sector[["start.degree"]] + 360
 		sector[["end.degree"]] = sector[["end.degree"]] + 360
 	}
+	
+	if(any(cell.padding[2] + cell.padding[4] >= sector[["start.degree"]] - sector[["end.degree"]])) {
+		stop("Sumation of cell padding on x-direction are larger than the width of the sectors.\n")
+	}
+	
+	min.value = min.value - cell.padding[2]/(sector[["start.degree"]] - sector[["end.degree"]] - cell.padding[2] - cell.padding[4])*sector.range  # real min value
+    max.value = max.value + cell.padding[4]/(sector[["start.degree"]] - sector[["end.degree"]] - cell.padding[2] - cell.padding[4])*sector.range  # real max value
+    sector[["min.value"]] = min.value
+    sector[["max.value"]] = max.value
     
     sector = as.data.frame(sector, stringsAsFactors = FALSE)
     .SECTOR.DATA = sector

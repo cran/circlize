@@ -53,7 +53,7 @@
 # are the same as that in the latest created cell.
 #
 # Second, it can update a already-created track if the index for the track
-# is specified. If the index is one bigger than the largest current track index. It in fact
+# is specified. If the index is one larger than the largest current track index, it in fact
 # creates the new track. If updating an existed track, those parameters related to the position
 # of the plotting region can not be changed.
 circos.trackPlotRegion = function(factors = NULL, x = NULL, y = NULL, ylim = NULL, force.ylim = TRUE,
@@ -244,20 +244,25 @@ circos.updatePlotRegion = function(sector.index = get.current.sector.index(), tr
 circos.createPlotRegion = function(track.start, track.height = circos.par("default.track.height"),
     sector.index = get.current.sector.index(), track.index = get.current.track.index(), ylim,
     bg.col = NA, bg.border = "black", bg.lty = par("lty"), bg.lwd = par("lwd")) {
-
+	
+	# we do not have such meta for the cell, so we need to calculate them
 	sector.data = get.sector.data(sector.index)
     cell.xlim = c(sector.data["min.value"], sector.data["max.value"])
 	names(cell.xlim) = NULL
 	
 	cell.padding = circos.par("cell.padding")
-	
+
 	xlim = numeric(2)
-	xlim[1] = ((1 + cell.padding[4])*cell.xlim[1] + cell.padding[2]*cell.xlim[2]) / (1 + cell.padding[2] + cell.padding[4])
-	xlim[2] = (cell.padding[4]*cell.xlim[1] + (1 + cell.padding[2])*cell.xlim[2]) / (1 + cell.padding[2] + cell.padding[4])
+	xlim[1] = cell.xlim[1] + (cell.xlim[2] - cell.xlim[1]) / (sector.data["start.degree"] - sector.data["end.degree"]) *cell.padding[2]
+	xlim[2] = cell.xlim[2] - (cell.xlim[2] - cell.xlim[1]) / (sector.data["start.degree"] - sector.data["end.degree"]) *cell.padding[4]
+	
+	if(cell.padding[1] + cell.padding[3] >= track.height) {
+		stop("Sumation of cell padding on y-direction are larger than the width of the cells.\n")
+	}
 	
 	yl = numeric(2)
-	yl[1] = ylim[1] - (ylim[2] - ylim[1])*cell.padding[1]
-    yl[2] = ylim[2] + (ylim[2] - ylim[1])*cell.padding[3]
+	yl[1] = ylim[1] - (ylim[2] - ylim[1])*cell.padding[1] / track.height
+    yl[2] = ylim[2] + (ylim[2] - ylim[1])*cell.padding[3] / track.height
 	
     set.cell.data(sector.index = sector.index,
         track.index = track.index,
@@ -1123,7 +1128,7 @@ circos.trackHist = function(factors, x, track.height = circos.par("default.track
 # -track.height     height for the track
 #
 # == details
-# This is not a full functional function. It jus provides a way to show how to
+# This is not a full functional function. It just provides a way to show how to
 # draw genomics ideogram by this package. How to embed the ideogram into the
 # circos layout is really subjective and should be applied according to specific situation.
 #
@@ -1135,18 +1140,9 @@ circos.trackHist = function(factors, x, track.height = circos.par("default.track
 circos.initializeWithIdeogram = function(file = paste(system.file(package = "circlize"), "/extdata/cytoBand.txt", sep=""),
     chromosome.index = NULL, track.height = 0.1) {
 	
-	d = read.table(file, colClasses = c("factor", "numeric", "numeric", "factor", "factor"))
-
-	chromosome = levels(d[[1]])
-	chromosome.ind = gsub("chr", "", chromosome)
-	chromosome.num = grep("^\\d+$", chromosome.ind, value = TRUE)
-	chromosome.letter = chromosome.ind[!grepl("^\\d+$", chromosome.ind)]
-	chromosome.num = sort(as.numeric(chromosome.num))
-	chromosome.letter = sort(chromosome.letter)
-	chromosome.num = paste("chr", chromosome.num, sep = "")
-	chromosome.letter = paste("chr", chromosome.letter, sep = "")
-	
-	chromosome = c(chromosome.num, chromosome.letter)
+	cytoband = read.cytoband(file)
+	d = cytoband$df
+	chromosome = cytoband$chromosome
 	
 	if(! is.null(chromosome.index)) {
 		chromosome.index = gsub("chr", "", chromosome.index)
@@ -1168,20 +1164,7 @@ circos.initializeWithIdeogram = function(file = paste(system.file(package = "cir
 	for(chr in chromosome) {
 		d2 = d[d[[1]] == chr, ]
 		n = nrow(d2)
-		col = rep("#FFFFFF", n)
-		
-		# color panel is from http://circos.ca/tutorials/course/slides/session-2.pdf, page 42
-		col[d2[[5]] == "gpos100"] = rgb(0, 0, 0, maxColorValue = 255)
-		col[d2[[5]] == "gpos"]    = rgb(0, 0, 0, maxColorValue = 255)
-		col[d2[[5]] == "gpos75"]  = rgb(130, 130, 130, maxColorValue = 255)
-		col[d2[[5]] == "gpos66"]  = rgb(160, 160, 160, maxColorValue = 255)
-		col[d2[[5]] == "gpos50"]  = rgb(200, 200, 200, maxColorValue = 255)
-		col[d2[[5]] == "gpos33"]  = rgb(210, 210, 210, maxColorValue = 255)
-		col[d2[[5]] == "gpos25"]  = rgb(200, 200, 200, maxColorValue = 255)
-		col[d2[[5]] == "gvar"]    = rgb(220, 220, 220, maxColorValue = 255)
-		col[d2[[5]] == "gneg"]    = rgb(255, 255, 255, maxColorValue = 255)
-		col[d2[[5]] == "acen"]    = rgb(217, 47, 39, maxColorValue = 255)
-		col[d2[[5]] == "stalk"]   = rgb(100, 127, 164, maxColorValue = 255)
+		col = cytoband.col(d2[[5]])
 		for(i in seq_len(n)) {
 			circos.rect(d2[i, 2], 0, d2[i, 3], 0.4, sector.index = chr, col = col[i], border = NA)
 		}
