@@ -37,36 +37,37 @@ chromosome
 
 
 ###################################################
-### code chunk number 4: draw-ideogram.Rnw:89-93 (eval = FALSE)
+### code chunk number 4: draw-ideogram.Rnw:89-94 (eval = FALSE)
 ###################################################
 ## cytoband = read.cytoband()  # by default, it reads human cytoband data
+## cytoband = read.cytoband(species = "hg19")  # or download from UCSC
 ## d = cytoband$df
 ## chromosome = cytoband$chromosome
 ## xlim = cbind(rep(0, length(chromosome)), cytoband$chr.len)
 
 
 ###################################################
-### code chunk number 5: draw-ideogram.Rnw:99-101 (eval = FALSE)
+### code chunk number 5: draw-ideogram.Rnw:100-102 (eval = FALSE)
 ###################################################
 ## par(mar = c(1, 1, 1, 1), lwd = 0.5)
 ## circos.par("cell.padding" = c(0, 0, 0, 0))
 
 
 ###################################################
-### code chunk number 6: draw-ideogram.Rnw:116-117 (eval = FALSE)
+### code chunk number 6: draw-ideogram.Rnw:117-118 (eval = FALSE)
 ###################################################
 ## circos.initialize(factors = factor(chromosome, levels = chromosome), xlim = xlim)
 
 
 ###################################################
-### code chunk number 7: draw-ideogram.Rnw:128-130 (eval = FALSE)
+### code chunk number 7: draw-ideogram.Rnw:129-131 (eval = FALSE)
 ###################################################
 ## circos.trackPlotRegion(factors = chromosome, ylim = c(0, 1), bg.border = NA, 
 ##     track.height = 0.1)
 
 
 ###################################################
-### code chunk number 8: draw-ideogram.Rnw:154-192 (eval = FALSE)
+### code chunk number 8: draw-ideogram.Rnw:157-195 (eval = FALSE)
 ###################################################
 ## for(chr in chromosome) {
 ##     # data in `chr`
@@ -109,14 +110,14 @@ chromosome
 
 
 ###################################################
-### code chunk number 9: draw-ideogram.Rnw:208-210 (eval = FALSE)
+### code chunk number 9: draw-ideogram.Rnw:211-213 (eval = FALSE)
 ###################################################
 ## circos.link(sector.index1 = "chr2", point1 = 111111111, sector.index2 = "chr16", 
 ##     point2 = 55555555)
 
 
 ###################################################
-### code chunk number 10: draw-ideogram.Rnw:218-222 (eval = FALSE)
+### code chunk number 10: draw-ideogram.Rnw:221-225 (eval = FALSE)
 ###################################################
 ## # create a new track
 ## circos.trackPlotRegion(ylim = c(0, 1), bg.border = NA)

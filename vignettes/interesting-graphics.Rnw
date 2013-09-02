@@ -13,19 +13,17 @@
 
 \usepackage{Sweave}
 \usepackage{hyperref}
-\setkeys{Gin}{width=0.7\textwidth}
 \begin{document}
 
 \maketitle 
 
-We would show you how to use {\tt circlize} package to draw some rather interesting
-graphcis.
+We would show you how to use {\it circlize} package to draw some rather interesting
+graphics.
 
 The first one is a clock. The key function here is {\tt circos.axis} (figure \ref{fig:clock}).
 The whole circle only contains one sector in which major tick at 0 is overlapping with major tick at 12.
 The two arrows are drawn in the canvas coordinate. An example of the real-time clock is in the {\tt Examples} section of
 the help page of {\tt circos.axis}.
-
 
 <<label=figclock, echo=TRUE, eval=FALSE>>=
 library(circlize)
@@ -43,7 +41,7 @@ arrows(0, 0, 0.4, 0)
 circos.clear()
 @
 
-\begin{figure}[h!]
+\begin{figure}
 \begin{center}
 <<label=figclock, fig = TRUE, echo=FALSE, results=hide>>=
 <<figclock>>
@@ -52,7 +50,6 @@ circos.clear()
 \caption{A clock}
 \label{fig:clock}
 \end{figure}
-
 
 
 The second example is a dartboard. In the figure, tracks are assigned with different height and each cell is initialized with
@@ -104,7 +101,7 @@ circos.clear()
 The third example is Ba-gua (\url{https://en.wikipedia.org/wiki/Ba_gua}). The
 key functions are {\tt circos.rect} and {\tt draw.sector} (figure \ref{fig:bagua}). 
 
-Ba-gua origined about several thousands years ago in China. It is the source of almost all ancient
+Ba-gua is originated from about several thousands years ago in China. It is the source of almost all ancient
 Chinese philosophy. It abstracts the rule of universe into base signs (i.e. - - which is called Yang and {\tt -} which is called Ying).
 And combination of the two basic signs generates the whole system of the universe.
 
@@ -190,11 +187,13 @@ circos.clear()
 \end{figure}
 
 
-Figure \ref{fig:painting} is a circular layout of Keith Haring's doodles. 
+Figure \ref{fig:painting} is a circular layout of Keith Haring's great doodles. 
 The circular transformation is as follows: 1. use {\tt jpeg} package to read RGB
 information for each pixel in the figure; 2. use {\tt circos.rect} to draw
 every pixel into the circle. Source code for generating the figure can be found
 in the demo code of the package.
+
+It is cool, isn't it?
 
 \begin{figure}[h!]
 \centering
