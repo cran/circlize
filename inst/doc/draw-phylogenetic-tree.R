@@ -7,7 +7,7 @@
 ## data(bird.orders)
 ## hc = as.hclust(bird.orders)
 ## labels = hc$labels
-## ct = cutree(hc, 6)
+## ct = cutree(hc, 6)  # cut tree into 6 pieces
 ## n = length(labels)
 ## hc = as.dendrogram(hc)
 

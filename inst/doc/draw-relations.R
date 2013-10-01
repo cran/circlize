@@ -66,18 +66,20 @@ source("src/relation-01-example.R")
 
 
 ###################################################
-### code chunk number 6: draw-relations.Rnw:117-123 (eval = FALSE)
+### code chunk number 6: draw-relations.Rnw:117-125
 ###################################################
-## mat = matrix(sample(1:100, 18, replace = TRUE), 3, 6)
-## rownames(mat) = letters[1:3]
-## colnames(mat) = LETTERS[1:6]
-## 
-## rn = rownames(mat)
-## cn = colnames(mat)
+mat = matrix(sample(1:100, 18, replace = TRUE), 3, 6)
+rownames(mat) = letters[1:3]
+colnames(mat) = LETTERS[1:6]
+
+rn = rownames(mat)
+cn = colnames(mat)
+
+mat
 
 
 ###################################################
-### code chunk number 7: draw-relations.Rnw:129-135 (eval = FALSE)
+### code chunk number 7: draw-relations.Rnw:131-137 (eval = FALSE)
 ###################################################
 ## factors = c(letters[1:3], LETTERS[1:6])
 ## factors = factor(factors, levels = factors)
@@ -88,7 +90,7 @@ source("src/relation-01-example.R")
 
 
 ###################################################
-### code chunk number 8: draw-relations.Rnw:146-182 (eval = FALSE)
+### code chunk number 8: draw-relations.Rnw:148-184 (eval = FALSE)
 ###################################################
 ## par(mar = c(1, 1, 1, 1))
 ## circos.par(cell.padding = c(0, 0, 0, 0), clock.wise = FALSE, 
