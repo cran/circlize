@@ -1,7 +1,7 @@
 ### R code from vignette source 'draw-ideogram.Rnw'
 
 ###################################################
-### code chunk number 1: draw-ideogram.Rnw:34-39
+### code chunk number 1: draw-ideogram.Rnw:38-43
 ###################################################
 library(circlize)
 d = read.table(file = paste(system.file(package = "circlize"),
@@ -11,7 +11,7 @@ head(d)
 
 
 ###################################################
-### code chunk number 2: draw-ideogram.Rnw:56-67
+### code chunk number 2: draw-ideogram.Rnw:60-71
 ###################################################
 chromosome = unique(d[[1]])
 chromosome.ind = gsub("chr", "", chromosome)
@@ -27,7 +27,7 @@ chromosome
 
 
 ###################################################
-### code chunk number 3: draw-ideogram.Rnw:77-82 (eval = FALSE)
+### code chunk number 3: draw-ideogram.Rnw:81-86 (eval = FALSE)
 ###################################################
 ## xlim = matrix(nrow = 0, ncol = 2)
 ## for(chr in chromosome) {
@@ -37,7 +37,7 @@ chromosome
 
 
 ###################################################
-### code chunk number 4: draw-ideogram.Rnw:89-94 (eval = FALSE)
+### code chunk number 4: draw-ideogram.Rnw:93-98 (eval = FALSE)
 ###################################################
 ## cytoband = read.cytoband()  # by default, it reads human cytoband data
 ## cytoband = read.cytoband(species = "mm10")  # or download from UCSC by specifying species version
@@ -47,27 +47,27 @@ chromosome
 
 
 ###################################################
-### code chunk number 5: draw-ideogram.Rnw:103-105 (eval = FALSE)
+### code chunk number 5: draw-ideogram.Rnw:107-109 (eval = FALSE)
 ###################################################
 ## par(mar = c(1, 1, 1, 1), lwd = 0.5)
 ## circos.par("cell.padding" = c(0, 0, 0, 0))
 
 
 ###################################################
-### code chunk number 6: draw-ideogram.Rnw:120-121 (eval = FALSE)
+### code chunk number 6: draw-ideogram.Rnw:124-125 (eval = FALSE)
 ###################################################
 ## circos.initialize(factors = factor(chromosome, levels = chromosome), xlim = xlim)
 
 
 ###################################################
-### code chunk number 7: draw-ideogram.Rnw:132-134 (eval = FALSE)
+### code chunk number 7: draw-ideogram.Rnw:136-138 (eval = FALSE)
 ###################################################
 ## circos.trackPlotRegion(factors = chromosome, ylim = c(0, 1), bg.border = NA, 
 ##     track.height = 0.1)
 
 
 ###################################################
-### code chunk number 8: draw-ideogram.Rnw:160-198 (eval = FALSE)
+### code chunk number 8: draw-ideogram.Rnw:164-202 (eval = FALSE)
 ###################################################
 ## for(chr in chromosome) {
 ##     # data in `chr`
@@ -110,14 +110,14 @@ chromosome
 
 
 ###################################################
-### code chunk number 9: draw-ideogram.Rnw:214-216 (eval = FALSE)
+### code chunk number 9: draw-ideogram.Rnw:218-220 (eval = FALSE)
 ###################################################
 ## circos.link(sector.index1 = "chr2", point1 = 111111111, sector.index2 = "chr16", 
 ##     point2 = 55555555)
 
 
 ###################################################
-### code chunk number 10: draw-ideogram.Rnw:224-228 (eval = FALSE)
+### code chunk number 10: draw-ideogram.Rnw:228-232 (eval = FALSE)
 ###################################################
 ## # create a new track
 ## circos.trackPlotRegion(ylim = c(0, 1), bg.border = NA)
@@ -129,23 +129,5 @@ chromosome
 ### code chunk number 11: figideogram
 ###################################################
 source("src/ideogram-01-simple.R")
-
-
-###################################################
-### code chunk number 12: figgenomic
-###################################################
-source("src/ideogram-02-genomic.R")
-
-
-###################################################
-### code chunk number 13: figtwo
-###################################################
-source("src/ideogram-03-nested.R")
-
-
-###################################################
-### code chunk number 14: figzoom
-###################################################
-source("src/ideogram-04-zoom.R")
 
 

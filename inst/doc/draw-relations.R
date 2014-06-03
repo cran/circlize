@@ -90,7 +90,7 @@ mat
 
 
 ###################################################
-### code chunk number 8: draw-relations.Rnw:148-184 (eval = FALSE)
+### code chunk number 8: draw-relations.Rnw:148-186 (eval = FALSE)
 ###################################################
 ## par(mar = c(1, 1, 1, 1))
 ## circos.par(cell.padding = c(0, 0, 0, 0), clock.wise = FALSE, 
@@ -121,8 +121,10 @@ mat
 ## col = c("#FF000020", "#00FF0020", "#0000FF20")
 ## for(i in seq_len(nrow(mat))) {
 ##     for(j in seq_len(ncol(mat))) {
-##         circos.link(rn[i], c(sum(mat[i, seq_len(j-1)]), sum(mat[i, seq_len(j)])),
-##                     cn[j], c(sum(mat[seq_len(i-1), j]), sum(mat[seq_len(i), j])), 
+##         circos.link(rn[i],
+##                     c(sum(mat[i, seq_len(j-1)]), sum(mat[i, seq_len(j)])),
+##                     cn[j],
+##                     c(sum(mat[seq_len(i-1), j]), sum(mat[seq_len(i), j])), 
 ##                     col = col[i], border = "white")
 ##     }
 ## }

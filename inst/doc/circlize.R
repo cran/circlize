@@ -251,7 +251,7 @@ source("src/intro-16-highlight.R")
 
 
 ###################################################
-### code chunk number 31: circlize.Rnw:1090-1121 (eval = FALSE)
+### code chunk number 31: circlize.Rnw:1127-1158 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## factors = sample(letters[1:6], 100, replace = TRUE)
@@ -293,7 +293,7 @@ source("src/intro-16-combine.R")
 
 
 ###################################################
-### code chunk number 33: circlize.Rnw:1142-1157 (eval = FALSE)
+### code chunk number 33: circlize.Rnw:1179-1194 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -319,7 +319,7 @@ source("src/intro-17-part.R")
 
 
 ###################################################
-### code chunk number 35: circlize.Rnw:1177-1196 (eval = FALSE)
+### code chunk number 35: circlize.Rnw:1214-1233 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -349,7 +349,7 @@ source("src/intro-18-part2.R")
 
 
 ###################################################
-### code chunk number 37: circlize.Rnw:1218-1235 (eval = FALSE)
+### code chunk number 37: circlize.Rnw:1255-1272 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -377,7 +377,7 @@ source("src/intro-19-nested.R")
 
 
 ###################################################
-### code chunk number 39: circlize.Rnw:1254-1277 (eval = FALSE)
+### code chunk number 39: circlize.Rnw:1291-1314 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -411,7 +411,7 @@ source("src/intro-20-seperated.R")
 
 
 ###################################################
-### code chunk number 41: circlize.Rnw:1297-1312 (eval = FALSE)
+### code chunk number 41: circlize.Rnw:1334-1349 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -437,7 +437,7 @@ source("src/intro-21-diffradius.R")
 
 
 ###################################################
-### code chunk number 43: circlize.Rnw:1336-1354 (eval = FALSE)
+### code chunk number 43: circlize.Rnw:1373-1391 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## set.seed(12345)
@@ -466,7 +466,7 @@ source("src/intro-22-outside.R")
 
 
 ###################################################
-### code chunk number 45: circlize.Rnw:1375-1398 (eval = FALSE)
+### code chunk number 45: circlize.Rnw:1412-1435 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## 

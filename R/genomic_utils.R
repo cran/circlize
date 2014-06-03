@@ -2,60 +2,76 @@
 # Read cytoband data
 #
 # == param
-# -file path of the uncompressed cytoband file
+# -cytoband a path of the cytoband file or a data frame that already contains cytoband data
 # -species abbrevations of species. e.g. hg19 for human, mm10 for mouse. If this
 #          value is specified, the function will download cytoBand.txt.gz from
 #          UCSC website automatically.
+# -sort.chr whether chromosome names should be sorted (first sort by numbers then by letters).
 #
 # == details
 # The function read the cytoband data, sort the chromosome names and calculate the length of each chromosome. 
 # By default, it is human hg19 cytoband data.
 #
-# == values
+# You can find the data struture for the cytoband data from http://hgdownload.cse.ucsc.edu/goldenpath/hg19/database/cytoBand.txt.gz
 #
+# == values
 # -df Original data frame for cytoband data
 # -chromosome sorted chromosome names
 # -chr.len length of chromosomes. Order are same as ``chromosome``
-read.cytoband = function(file = paste(system.file(package = "circlize"), "/extdata/cytoBand.txt", sep=""), species = NULL) {
+#
+# There are several cirsumtances when determine the order of chromosomes. Assuming ``chromosome`` is the first clumn in the cytoband data frame,
+# then, if ``cytoband`` is defined as a file path, or ``species`` is set, the order of chromosomes is ``unique(chromosome)`` (with or without sorted depending on ``sort.chr``); If ``cytoband``
+# is set as a data frame and the first column is a factor, the order of chromosomes is ``levels(chromosome)``; If ``cytoband`` is a data frame
+# and the first column is just a character vector, the order of chromosomes is ``unique(chromosome)``. Please not this concept is really
+# important since the order of chromosomes will be used to control the order of sectors when initializing the circos plot.
+read.cytoband = function(cytoband = paste(system.file(package = "circlize"),
+    "/extdata/cytoBand.txt", sep=""), species = NULL, sort.chr = TRUE) {
 	
 	if(!is.null(species)) {
 		url = paste("http://hgdownload.cse.ucsc.edu/goldenPath/", species, "/database/cytoBand.txt.gz", sep = "")
-		file = paste(tempdir(), "/cytoBand.txt.gz", sep = "")
-		e = try(download.file(url, destfile = file, quiet = TRUE), silent = TRUE)
+		cytoband = paste(tempdir(), "/cytoBand.txt.gz", sep = "")
+		e = try(download.file(url, destfile = cytoband, quiet = TRUE), silent = TRUE)
 		if(class(e) == "try-error") {
-			stop("Seems your species name is wrong or you cannot access the internet.\nIf possible, download cytoBand file from\n", url, "\nand use `read.cytoband(file)`.\n")
+			stop("Seems your species name is wrong or UCSC does not provide cytoband data for your species.\nIf possible, download cytoBand file from\n", url, "\nand use `read.cytoband(file)`.\n")
 		}
 	}
 	
-	if(grepl("\\.gz$", file)) {
-		file = gzfile(file)
+	if(is.data.frame(cytoband)) {
+		d = cytoband
+	} else {
+		if(grepl("\\.gz$", cytoband)) {
+			cytoband = gzfile(cytoband)
+		}
+		
+		d = read.table(cytoband, colClasses = c("character", "numeric", "numeric", "character", "character"), sep = "\t")
 	}
 	
-	d = read.table(file, colClasses = c("character", "numeric", "numeric", "character", "character"), sep = "\t")
-	
-	chromosome = unique(d[[1]])
-	chromosome.ind = gsub("chr", "", chromosome)
-	chromosome.num = grep("^\\d+$", chromosome.ind, value = TRUE)
-	chromosome.letter = chromosome.ind[!grepl("^\\d+$", chromosome.ind)]
-	chromosome.num = sort(as.numeric(chromosome.num))
-	chromosome.letter = sort(chromosome.letter)
-	chromosome.num = paste("chr", chromosome.num, sep = "")
-	chromosome.letter = paste("chr", chromosome.letter, sep = "")
+	if(is.factor(d[[1]])) {
+		chromosome = levels(d[[1]])
+	} else {
+		chromosome = unique(d[[1]])
+	}
+	if(sort.chr) {
+		chromosome.ind = gsub("chr", "", chromosome)
+		chromosome.num = as.numeric(grep("^\\d+$", chromosome.ind, value = TRUE))
+		chromosome.letter = chromosome.ind[!grepl("^\\d+$", chromosome.ind)]
+		chromosome = chromosome[ c(order(chromosome.num), order(chromosome.letter) + length(chromosome.num)) ]
+	}
 
-	chromosome = c(chromosome.num, chromosome.letter)
-	
 	chr.len = NULL
+	dnew = NULL
 	for(chr in chromosome) {
 		d2 = d[d[[1]] == chr, ]
 		chr.len = c(chr.len, max(d2[, 3]))
+		dnew = rbind(dnew, d2)
 	}
 	
-	return(list(df = d, chromosome = chromosome, chr.len = chr.len))
+	return(list(df = dnew, chromosome = chromosome, chr.len = chr.len))
 }
 
 
 # == title
-# Assign colors to cytogenetic band according to the Giemsa stain results
+# Assign colors to cytogenetic band (hg19) according to the Giemsa stain results
 #
 # == param
 # -x a vector containing the Giemsa stain results
@@ -78,4 +94,40 @@ cytoband.col = function(x) {
     col = col.panel[x]
     col[is.na(col)] = "#FFFFFF"
     return(col)
+}
+
+# == title
+# generate random genomic data
+#
+# == param
+# -nr  number of rows
+# -nc  number of numeric columns / value columns
+# -fun function to generate random data
+#
+# == details
+# The function will sample positions from human genome. Chromosome names start with "chr"
+# and positions are sorted. The final number of rows may not be exactly as same as ``nr``.
+generateRandomBed = function(nr = 10000, nc = 1, fun = function(k) rnorm(k, 0, 0.5)) {
+	cyto = read.cytoband()
+	chr.len = cyto$chr.len
+	chromosome = cyto$chromosome
+	dl = lapply(seq_along(chr.len), function(i) {
+		k = round(nr*2 * chr.len[i] / sum(chr.len))
+		k = ifelse(k %% 2, k + 1, k)
+		breaks = sort(sample(chr.len[i], k))
+		res = data.frame(chr = rep(chromosome[i], length(breaks)/2),
+						  start = breaks[seq_along(breaks) %% 2 == 1],
+						  start = breaks[seq_along(breaks) %% 2 == 0],
+						  stringsAsFactors = FALSE)
+		for(k in seq_len(nc)) {
+			res = cbind(res, value = fun(length(breaks)/2))
+		}
+		res
+	})
+
+	df = NULL
+	for(i in seq_along(dl)) {
+		df = rbind(df, dl[[i]])
+	}
+	return(df)
 }

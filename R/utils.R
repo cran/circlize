@@ -1,5 +1,5 @@
-# == circlize
-# Return the coordinate in polar coordinate system in a specified cell
+# == title
+# Return the coordinate in polar coordinate system
 #
 # == param
 # -x            Data points on x-axis
@@ -8,7 +8,7 @@
 # -track.index  Index for the track
 #
 # == details
-# Return the coordinate in polar coordinate system in a specified cell
+# This is the core function in the package. It transform data points from data coordinate system to polar coordinate system.
 #
 # == values
 # A matrix with two columns (``theta`` and ``rou``)
@@ -165,4 +165,36 @@ as.radian = function(degree) {
 
 as.degree = function(radian) {
 	return(radian/pi*180)
+}
+
+
+# == title
+# Color interpolation
+#
+# == param
+# -breaks a vector indicating breaks of your data
+# -colors a vector of colors which corresponds to value in ``breaks``.
+# -... pass to `grDevices::colorRamp`
+#
+# == details
+# Colors are interpolated according to break values and corresponding colors
+#
+# == values
+# It returns a function which accepts a vector of numbers and returns interpolated colors.
+colorRamp2 = function(breaks, colors, ...) {
+    if(length(breaks) != length(colors)) {
+        stop("Length of `breaks` should be equal to `colors`.\n")
+    }
+    colors = colors[order(breaks)]
+    breaks = sort(breaks)
+
+    f = colorRamp(colors, ...)
+
+    function(x) {
+        x = ifelse(x < breaks[1], 0,
+                  ifelse(x > breaks[length(breaks)], 1,
+                        (x - breaks[1])/(breaks[length(breaks)] - breaks[1])
+                    ))
+        rgb(f(x), maxColorValue = 255)
+    }
 }
