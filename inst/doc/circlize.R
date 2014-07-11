@@ -75,9 +75,9 @@ source("src/intro-00-correspondence.R")
 ###################################################
 ### code chunk number 9: circlize.Rnw:202-206 (eval = FALSE)
 ###################################################
-## circos.link("a", 0, "b", 0, top.ratio = 0.9)
+## circos.link("a", 0, "b", 0, h = 0.4)
 ## circos.link("c", c(-0.5, 0.5), "d", c(-0.5,0.5), col = "red",
-##     border = "blue", top.ratio = 0.2)
+##     border = "blue", h = 0.2)
 ## circos.link("e", 0, "g", c(-1,1), col = "green", lwd = 2, lty = 2)
 
 
@@ -211,31 +211,25 @@ source("src/intro-12-link.R")
 
 
 ###################################################
-### code chunk number 26: figadjlink
-###################################################
-source("src/intro-13-adjlink.R")
-
-
-###################################################
-### code chunk number 27: fighist
+### code chunk number 26: fighist
 ###################################################
 source("src/intro-14-hist.R")
 
 
 ###################################################
-### code chunk number 28: figheatmap
+### code chunk number 27: figheatmap
 ###################################################
 source("src/intro-15-heatmap.R")
 
 
 ###################################################
-### code chunk number 29: sectorhighlight
+### code chunk number 28: sectorhighlight
 ###################################################
 source("src/intro-16-highlight.R")
 
 
 ###################################################
-### code chunk number 30: circlize.Rnw:1064-1075 (eval = FALSE)
+### code chunk number 29: circlize.Rnw:1043-1054 (eval = FALSE)
 ###################################################
 ## factors = letters[1:3]
 ## circos.initialize(factors = factors, xlim = c(0, 1))
@@ -251,7 +245,7 @@ source("src/intro-16-highlight.R")
 
 
 ###################################################
-### code chunk number 31: circlize.Rnw:1127-1158 (eval = FALSE)
+### code chunk number 30: circlize.Rnw:1106-1137 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## factors = sample(letters[1:6], 100, replace = TRUE)
@@ -287,13 +281,13 @@ source("src/intro-16-highlight.R")
 
 
 ###################################################
-### code chunk number 32: combine
+### code chunk number 31: combine
 ###################################################
 source("src/intro-16-combine.R")
 
 
 ###################################################
-### code chunk number 33: circlize.Rnw:1179-1194 (eval = FALSE)
+### code chunk number 32: circlize.Rnw:1158-1173 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -313,13 +307,13 @@ source("src/intro-16-combine.R")
 
 
 ###################################################
-### code chunk number 34: figpart
+### code chunk number 33: figpart
 ###################################################
 source("src/intro-17-part.R")
 
 
 ###################################################
-### code chunk number 35: circlize.Rnw:1214-1233 (eval = FALSE)
+### code chunk number 34: circlize.Rnw:1193-1212 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -343,13 +337,13 @@ source("src/intro-17-part.R")
 
 
 ###################################################
-### code chunk number 36: figpart2
+### code chunk number 35: figpart2
 ###################################################
 source("src/intro-18-part2.R")
 
 
 ###################################################
-### code chunk number 37: circlize.Rnw:1255-1272 (eval = FALSE)
+### code chunk number 36: circlize.Rnw:1234-1251 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -371,13 +365,13 @@ source("src/intro-18-part2.R")
 
 
 ###################################################
-### code chunk number 38: fignested
+### code chunk number 37: fignested
 ###################################################
 source("src/intro-19-nested.R")
 
 
 ###################################################
-### code chunk number 39: circlize.Rnw:1291-1314 (eval = FALSE)
+### code chunk number 38: circlize.Rnw:1270-1293 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -405,13 +399,13 @@ source("src/intro-19-nested.R")
 
 
 ###################################################
-### code chunk number 40: figseperated
+### code chunk number 39: figseperated
 ###################################################
 source("src/intro-20-seperated.R")
 
 
 ###################################################
-### code chunk number 41: circlize.Rnw:1334-1349 (eval = FALSE)
+### code chunk number 40: circlize.Rnw:1313-1328 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -431,13 +425,13 @@ source("src/intro-20-seperated.R")
 
 
 ###################################################
-### code chunk number 42: figdifrad
+### code chunk number 41: figdifrad
 ###################################################
 source("src/intro-21-diffradius.R")
 
 
 ###################################################
-### code chunk number 43: circlize.Rnw:1373-1391 (eval = FALSE)
+### code chunk number 42: circlize.Rnw:1352-1370 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## set.seed(12345)
@@ -460,13 +454,13 @@ source("src/intro-21-diffradius.R")
 
 
 ###################################################
-### code chunk number 44: figoutside
+### code chunk number 43: figoutside
 ###################################################
 source("src/intro-22-outside.R")
 
 
 ###################################################
-### code chunk number 45: circlize.Rnw:1412-1435 (eval = FALSE)
+### code chunk number 44: circlize.Rnw:1391-1414 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## 
@@ -494,7 +488,7 @@ source("src/intro-22-outside.R")
 
 
 ###################################################
-### code chunk number 46: figlayout
+### code chunk number 45: figlayout
 ###################################################
 source("src/intro-23-layout.R")
 

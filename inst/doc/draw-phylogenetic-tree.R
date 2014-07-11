@@ -8,41 +8,52 @@
 ## hc = as.hclust(bird.orders)
 ## labels = hc$labels
 ## ct = cutree(hc, 6)  # cut tree into 6 pieces
-## n = length(labels)
+## n = length(labels)  # number of bird species
 ## hc = as.dendrogram(hc)
 
 
 ###################################################
-### code chunk number 2: draw-phylogenetic-tree.Rnw:55-67 (eval = FALSE)
+### code chunk number 2: draw-phylogenetic-tree.Rnw:100-120 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
 ## circos.par(cell.padding = c(0, 0, 0, 0))
 ## circos.initialize("a", xlim = c(0, n))
-## maxy = attr(hc, "height")
+## maxy = attr(hc, "height")  # maximum height of the tree
 ## circos.trackPlotRegion(ylim = c(0, 1), bg.border = NA, track.height = 0.3, 
 ##     panel.fun = function(x, y) {
 ##         for(i in seq_len(n)) {
-##             circos.text(i-0.5, 0, labels[i], adj = c(1, 0.5), 
-##                 direction = "vertical_left", col = ct[labels[i]], cex = 0.7)
+##             theta = circlize(i-0.5, 0)[1, "theta"]
+##             if(theta < 90 || theta > 270) {
+##                 text.facing = "clockwise"
+##                 text.adj = c(0, 0.5)
+##             } else {
+##                 text.facing = "reverse.clockwise"
+##                 text.adj = c(1, 0.5)
+##             }
+##             circos.text(i-0.5, 0, labels[i], adj = text.adj, 
+##                 facing = text.facing, col = ct[labels[i]], cex = 0.7)
 ##         }
 ## })
 
 
 ###################################################
-### code chunk number 3: draw-phylogenetic-tree.Rnw:75-117 (eval = FALSE)
+### code chunk number 3: draw-phylogenetic-tree.Rnw:128-175 (eval = FALSE)
 ###################################################
+## # -dend a `dendogram` object
+## # -maxy the maximum height of the tree is a global attribute,
+## #       so here it is set as an argument
 ## circos.dendrogram = function(dend, maxy=attr(dend, "height")) {
 ##     labels = as.character(labels(dend))
-##     x = seq_along(labels) - 0.5
+##     x = seq_along(labels) - 0.5 # leaves are places at x = 0.5, 1.5, ..., n - 0.5
 ##     names(x) = labels
 ##     
-##     is.leaf = function(object) (is.logical(L <- attr(object, "leaf"))) && L
+##     is.leaf = function(object) (is.logical(L = attr(object, "leaf"))) && L
 ##     
 ##     draw.d = function(dend, maxy) {
 ##         leaf = attr(dend, "leaf")
-##         d1 = dend[[1]]
-##         d2 = dend[[2]]
+##         d1 = dend[[1]]  # child tree 1
+##         d2 = dend[[2]]  # child tree 2
 ##         height = attr(dend, 'height')
 ##         midpoint = attr(dend, 'midpoint')
 ##         
@@ -60,10 +71,12 @@
 ##         }
 ##         y2 = attr(d2, "height")
 ##         
+##         # plot the connection line
 ##         circos.lines(c(x1, x1), maxy - c(y1, height), straight = TRUE)
 ##         circos.lines(c(x1, x2), maxy - c(height, height))
 ##         circos.lines(c(x2, x2), maxy - c(y2, height), straight = TRUE)
 ##         
+##         # do it recursively
 ##         if(!is.leaf(d1)) {
 ##             draw.d(d1, maxy)
 ##         }
@@ -77,7 +90,7 @@
 
 
 ###################################################
-### code chunk number 4: draw-phylogenetic-tree.Rnw:122-128 (eval = FALSE)
+### code chunk number 4: draw-phylogenetic-tree.Rnw:180-186 (eval = FALSE)
 ###################################################
 ## circos.trackPlotRegion(ylim = c(0, maxy), bg.border = NA, 
 ##     track.height = 0.4, panel.fun = function(x, y) {

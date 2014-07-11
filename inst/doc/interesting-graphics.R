@@ -1,39 +1,39 @@
 ### R code from vignette source 'interesting-graphics.Rnw'
 
 ###################################################
-### code chunk number 1: figclock (eval = FALSE)
-###################################################
-## library(circlize)
-## factors = letters[1]
-## par(mar = c(1, 1, 1, 1))
-## circos.par("gap.degree" = 0, "cell.padding" = c(0, 0, 0, 0), "start.degree" = 90)
-## circos.initialize(factors = factors, xlim = c(0, 12))
-## circos.trackPlotRegion(factors = factors, ylim = c(0, 1), bg.border = NA)
-## circos.axis(sector.index = "a", major.at = 0:12, labels = "",
-##     direction = "inside", labels.cex = 1.5, major.tick.percentage = 0.3)
-## circos.text(1:12, rep(0.5, 12), 1:12, direction = "horizontal")
-## arrows(0, 0, 0, 0.7)    
-## arrows(0, 0, 0.4, 0)
-## 
-## circos.clear()
-
-
-###################################################
-### code chunk number 2: figclock
+### code chunk number 1: figclock
 ###################################################
 library(circlize)
-factors = letters[1]
+factors = "a"  # any name is fine
 par(mar = c(1, 1, 1, 1))
-circos.par("gap.degree" = 0, "cell.padding" = c(0, 0, 0, 0), "start.degree" = 90)
+circos.par(gap.degree = 0, cell.padding = c(0, 0, 0, 0), start.degree = 90)
 circos.initialize(factors = factors, xlim = c(0, 12))
 circos.trackPlotRegion(factors = factors, ylim = c(0, 1), bg.border = NA)
 circos.axis(sector.index = "a", major.at = 0:12, labels = "",
     direction = "inside", labels.cex = 1.5, major.tick.percentage = 0.3)
-circos.text(1:12, rep(0.5, 12), 1:12, direction = "horizontal")
+circos.text(1:12, rep(0.5, 12), 1:12, facing = "downward")
 arrows(0, 0, 0, 0.7)    
 arrows(0, 0, 0.4, 0)
 
 circos.clear()
+
+
+###################################################
+### code chunk number 2: figclock (eval = FALSE)
+###################################################
+## library(circlize)
+## factors = "a"  # any name is fine
+## par(mar = c(1, 1, 1, 1))
+## circos.par(gap.degree = 0, cell.padding = c(0, 0, 0, 0), start.degree = 90)
+## circos.initialize(factors = factors, xlim = c(0, 12))
+## circos.trackPlotRegion(factors = factors, ylim = c(0, 1), bg.border = NA)
+## circos.axis(sector.index = "a", major.at = 0:12, labels = "",
+##     direction = "inside", labels.cex = 1.5, major.tick.percentage = 0.3)
+## circos.text(1:12, rep(0.5, 12), 1:12, facing = "downward")
+## arrows(0, 0, 0, 0.7)    
+## arrows(0, 0, 0.4, 0)
+## 
+## circos.clear()
 
 
 ###################################################
@@ -42,15 +42,15 @@ circos.clear()
 ## library(circlize)
 ## factors = 1:20
 ## par(mar = c(1, 1, 1, 1))
-## circos.par("gap.degree" = 0, "cell.padding" = c(0, 0, 0, 0),
-##     start.degree = 360/40, track.margin = c(0, 0), "clock.wise" = FALSE)
+## circos.par(gap.degree = 0, cell.padding = c(0, 0, 0, 0),
+##     start.degree = 360/40, track.margin = c(0, 0), clock.wise = FALSE)
 ## circos.initialize(factors = factors, xlim = c(0, 1))
 ## circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.col = "black",
 ##     track.height = 0.15)
 ## circos.trackText(rep(0.5, 20), rep(0.5, 20),
 ##     labels = c(13, 4, 18, 1, 20, 5, 12, 9, 14, 11, 8, 16, 7, 19, 3, 17, 2, 15, 10, 6),
 ##     factors = factors, col = "#EEEEEE", font = 2,
-##     direction = "horizontal")
+##     facing = "downward")
 ## circos.trackPlotRegion(ylim = c(0, 1), factors = factors,
 ##     bg.col = rep(c("#E41A1C", "#4DAF4A"), 10), bg.border = "#EEEEEE", 
 ##     track.height = 0.05)
@@ -77,15 +77,15 @@ circos.clear()
 library(circlize)
 factors = 1:20
 par(mar = c(1, 1, 1, 1))
-circos.par("gap.degree" = 0, "cell.padding" = c(0, 0, 0, 0),
-    start.degree = 360/40, track.margin = c(0, 0), "clock.wise" = FALSE)
+circos.par(gap.degree = 0, cell.padding = c(0, 0, 0, 0),
+    start.degree = 360/40, track.margin = c(0, 0), clock.wise = FALSE)
 circos.initialize(factors = factors, xlim = c(0, 1))
 circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.col = "black",
     track.height = 0.15)
 circos.trackText(rep(0.5, 20), rep(0.5, 20),
     labels = c(13, 4, 18, 1, 20, 5, 12, 9, 14, 11, 8, 16, 7, 19, 3, 17, 2, 15, 10, 6),
     factors = factors, col = "#EEEEEE", font = 2,
-    direction = "horizontal")
+    facing = "downward")
 circos.trackPlotRegion(ylim = c(0, 1), factors = factors,
     bg.col = rep(c("#E41A1C", "#4DAF4A"), 10), bg.border = "#EEEEEE", 
     track.height = 0.05)
@@ -110,9 +110,9 @@ circos.clear()
 ### code chunk number 5: figbagua (eval = FALSE)
 ###################################################
 ## library(circlize)
-## factors = letters[1:8]
+## factors = letters[1:8]  # names are not important here
 ## par(mar = c(1, 1, 1, 1))
-## circos.par("default.track.height" = 0.15, "start.degree" = 22.5, "gap.degree" = 6)
+## circos.par(default.track.height = 0.15, start.degree = 22.5, gap.degree = 6)
 ## circos.initialize(factors = factors, xlim = c(0, 1))
 ## 
 ## circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
@@ -127,7 +127,7 @@ circos.clear()
 ##     })
 ## 
 ## circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
-##     panel.fun = function(x, y, ...) {
+##     panel.fun = function(x, y) {
 ##         i = get.cell.meta.data("sector.numeric.index")
 ##         if(i %in% c(1, 6, 7, 8)) {
 ##             circos.rect(0,0,1,1, col = "black")
@@ -138,7 +138,7 @@ circos.clear()
 ##     })
 ## 
 ## circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA, 
-##     panel.fun = function(x, y, ...) {
+##     panel.fun = function(x, y) {
 ##         i = get.cell.meta.data("sector.numeric.index")
 ##         if(i %in% c(4, 5, 6, 7)) {
 ##             circos.rect(0,0,1,1, col = "black")
@@ -169,9 +169,9 @@ circos.clear()
 ### code chunk number 6: figbagua
 ###################################################
 library(circlize)
-factors = letters[1:8]
+factors = letters[1:8]  # names are not important here
 par(mar = c(1, 1, 1, 1))
-circos.par("default.track.height" = 0.15, "start.degree" = 22.5, "gap.degree" = 6)
+circos.par(default.track.height = 0.15, start.degree = 22.5, gap.degree = 6)
 circos.initialize(factors = factors, xlim = c(0, 1))
 
 circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
@@ -186,7 +186,7 @@ circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
     })
 
 circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
-    panel.fun = function(x, y, ...) {
+    panel.fun = function(x, y) {
         i = get.cell.meta.data("sector.numeric.index")
         if(i %in% c(1, 6, 7, 8)) {
             circos.rect(0,0,1,1, col = "black")
@@ -197,7 +197,7 @@ circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA,
     })
 
 circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA, 
-    panel.fun = function(x, y, ...) {
+    panel.fun = function(x, y) {
         i = get.cell.meta.data("sector.numeric.index")
         if(i %in% c(4, 5, 6, 7)) {
             circos.rect(0,0,1,1, col = "black")

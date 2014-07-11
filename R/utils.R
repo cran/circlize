@@ -12,7 +12,8 @@
 #
 # == values
 # A matrix with two columns (``theta`` and ``rou``)
-circlize = function(x, y, sector.index = get.current.sector.index(), track.index = get.current.track.index()) {
+circlize = function(x, y, sector.index = get.current.sector.index(),
+	track.index = get.current.track.index()) {
     
     sector.data = get.sector.data(sector.index)
     cell.data = get.cell.data(sector.index, track.index)
@@ -136,16 +137,9 @@ check.track.position = function(trace.index, track.start, track.height) {
     }
 }
 
-check.points.position = function(x, y, sector.index = NULL, track.index = NULL) {
-    
-    if(is.null(sector.index)) {
-        sector.index = get.current.sector.index()   
-    }
-
-    if(is.null(track.index)) {
-        track.index = get.current.track.index()
-    }
-    
+check.points.position = function(x, y, sector.index = get.cell.meta.data("sector.index"),
+	track.index = get.cell.meta.data("track.index")) {
+        
     cell.xlim = get.cell.meta.data("cell.xlim", sector.index, track.index)
     cell.ylim = get.cell.meta.data("cell.ylim", sector.index, track.index)
     
@@ -172,29 +166,84 @@ as.degree = function(radian) {
 # Color interpolation
 #
 # == param
-# -breaks a vector indicating breaks of your data
-# -colors a vector of colors which corresponds to value in ``breaks``.
-# -... pass to `grDevices::colorRamp`
+# -breaks A vector indicating numeric breaks
+# -colors A vector of colors which corresponds to values in ``breaks``
+# -transparency a single value in [0, 1]. 0 refers to no transparency and 1 refers to full transparency
 #
 # == details
-# Colors are interpolated according to break values and corresponding colors
+# Colors are interpolated according to break values and corresponding colors. Values exceeds breaks will be assigned with maximum or minimum color.
 #
 # == values
 # It returns a function which accepts a vector of numbers and returns interpolated colors.
-colorRamp2 = function(breaks, colors, ...) {
+colorRamp2 = function(breaks, colors, transparency = 0) {
     if(length(breaks) != length(colors)) {
         stop("Length of `breaks` should be equal to `colors`.\n")
     }
     colors = colors[order(breaks)]
+	colors = col2rgb(colors)
     breaks = sort(breaks)
 
-    f = colorRamp(colors, ...)
+    transparency = ifelse(transparency > 1, 1, ifelse(transparency < 0, 0, transparency))
 
     function(x) {
-        x = ifelse(x < breaks[1], 0,
-                  ifelse(x > breaks[length(breaks)], 1,
-                        (x - breaks[1])/(breaks[length(breaks)] - breaks[1])
+		att = attributes(x)
+        x = ifelse(x < breaks[1], breaks[1],
+                  ifelse(x > breaks[length(breaks)], breaks[length(breaks)],
+                        x
                     ))
-        rgb(f(x), maxColorValue = 255)
+		ibin = .bincode(x, breaks, right = TRUE, include.lowest = TRUE)
+		res_col = character(length(x))
+		for(i in unique(ibin)) {
+			l = ibin == i
+			res_col[l] = .get_color(x[l], breaks[i], breaks[i+1], colors[, i], colors[, i+1], transparency)
+		}
+		attributes(res_col) = att
+		return(res_col)
     }
+}
+
+# x: vector
+# break1 single value
+# break2 single value
+# rgb1 vector with 3 elements
+# rgb2 vector with 3 elements
+.get_color = function(x, break1, break2, rgb1, rgb2, transparency) {
+	res_rgb = NULL
+	for(i in seq_along(x)) {
+		res_rgb = cbind(res_rgb, (x[i] - break2)*(rgb2 - rgb1) / (break2 - break1) + rgb2)
+	}
+	return(rgb(t(res_rgb)/255, alpha = 1-transparency))
+}
+
+# will be considerred in the future
+circos.approx = function(x, y, resolution = 0.1, sector.index = get.cell.meta.data("sector.index"),
+	track.index = get.cell.meta.data("track.index"),
+	approxFun = function(x) sample(x, 1)) {
+	
+	od = order(x)
+	x = x[od]
+	y = y[od]
+	
+	xplot = get.cell.meta.data("xplot", sector.index = sector.index, track.index = track.index)
+	cell.xlim = get.cell.meta.data("cell.xlim", sector.index = sector.index, track.index = track.index)
+	
+	window.size = resolution/(xplot[1] - xplot[2])*(cell.xlim[2] - cell.xlim[1])
+	window = seq(cell.xlim[1], cell.xlim[2], by = window.size)
+	
+	newx = rep(NA, length(x))
+	newy = rep(NA, length(y))
+	
+	for(i in seq_along(window)[-1]) {
+		l = x >= window[i-1] & x < window[i]
+		# if there are points in current window
+		if(sum(l)) {
+			newx[i] = (window[i-1] + window[i])/2
+			newy[i] = approxFun(y[l])
+		}
+	}
+	
+	newx = newx[!is.na(newx)]
+	newy = newy[!is.na(newy)]
+	
+	return(list(x = newx, y = newy))
 }
