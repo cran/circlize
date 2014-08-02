@@ -1,4 +1,5 @@
 
+op = par(no.readonly = TRUE)
 
 set.seed(123)
 mat = matrix(sample(1:100, 18, replace = TRUE), 3, 6)
@@ -46,8 +47,10 @@ circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
 	
 	circos.lines(xlim, c(mean(ylim), mean(ylim)), lty = 3)
 	for(p in seq(0, 1, by = 0.25)) {
-		circos.text(p*(xlim[2] - xlim[1]) + xlim[1], mean(ylim), p, cex = 0.4, adj = c(0.5, -0.2))
+		circos.text(p*(xlim[2] - xlim[1]) + xlim[1], mean(ylim), p, cex = 0.3, adj = c(0.5, -0.2), niceFacing = TRUE)
 	}
-	circos.text(mean(xlim), 1.4, sector.name)
+	circos.text(mean(xlim), 1.5, sector.name, niceFacing = TRUE)
 }, bg.border = NA)
 circos.clear()
+
+par(op)

@@ -3,8 +3,8 @@
 # Plot Chord Diagram
 #
 # == param
-# -mat A table which represents as a numeric matrix
-# -grid.col Colors of grids corresponding to rows/columns. The length of the vector should be either 1 or ``length(union(rownames(mat), colnames(mat)))``.
+# -mat A table which represents as a numeric matrix.
+# -grid.col Grid colors which correspond to matrix rows/columns (or sectors). The length of the vector should be either 1 or ``length(union(rownames(mat), colnames(mat)))``.
 #           It's preferred that ``grid.col`` is a named vector of which names correspond to sectors. 
 #           If it is not a named vector, the order of ``grid.col`` corresponds to order of sectors.
 # -transparency Transparency of link colors, 0 means no transparency and 1 means full transparency.
@@ -12,38 +12,49 @@
 # -col Colors for links. It can be a matrix which corresponds to ``mat``, or a function which generate colors 
 #      according to values in ``mat``, or a single value which means colors for all links are the same. You
 #      may use `colorRamp2` to generate a function which maps values to colors.
-# -row.col Colors for links. Links from the same row will have the same color.
+# -row.col Colors for links. Links from the same row in ``mat`` will have the same color.
 #          Length should be same as number of rows in ``mat``. This argument only works when ``col`` is set to ``NULL``.
-# -column.col Colors for links. Links from the same column will have the same color.
+# -column.col Colors for links. Links from the same column in ``mat`` will have the same color.
 #             Length should be same as number of columns in ``mat``. This argument only works when ``col`` and ``row.col`` is set to ``NULL``.
-# -directional Whether links have directions. The direction is from rows to columns. If you
-#              want the direction from columns to rows, just transpose your ``mat``.
+# -fromRows Unequal height of link root is used to represent the link direction.
+#           If links are directional, whether they start from Rows. The starting root is always
+#           more inside to circle centre than the ending root.
+# -directional Whether links have directions. The directions are always from rows to columns. If you
+#              want the direction from columns to rows, set ``fromRow`` to ``FALSE``.
 # -symmetric Whether the matrix is symmetric. If the value is set to ``TRUE``, only
 #            lower triangular matrix without the diagonal will be used.
-# -order Order of sectors. Default order is ``union(rownames(mat), colnames(mat))``
+# -order Order of sectors. Default order is ``union(rownames(mat), colnames(mat))``.
 # -preAllocateTracks Pre-allocate empty tracks before drawing chord diagram. It can be a single number indicating
-#                    how many empty tracks that are needed to be created or a list containing settings for empty
+#                    how many empty tracks needed to be created or a list containing settings for empty
 #                    tracks. Please refer to vignette for details.
-# -annotationTrack Which annotation track should be plotted?
+# -annotationTrack Which annotation track should be plotted? By default, a track containing sector names and a track
+#                  containing grid will be created.
+# -annotationTrackHeight Track height corresponding to values in ``annotationTrack``.
 # -link.border border for links
 # -grid.border border for grids. If it is ``NA``, the border color is same as grid color
-# -diffHeight The height difference between two 'root' if ``directional`` is set to ``TRUE``. 
+# -diffHeight The difference of height between two 'roots' if ``directional`` is set to ``TRUE``. 
 # -... pass to `circos.link`
 #
 # == details
-# Chord diagram is a way to visualize numeric tables ( http://circos.ca/intro/tabular_visualization/ ). This function
+# Chord diagram is a way to visualize numeric tables ( http://circos.ca/intro/tabular_visualization/ ), especially useful
+# when the table represent information of directional relation. This function
 # visualize tables in a circular way.
 #
-# Sectors of the plot is ``union(rownames(mat), colnames(mat))``. If there is no rowname or colname, the function will
-# assign names for it.
+# Sectors of the circos plot is ``union(rownames(mat), colnames(mat))``. If there is no rowname or colname, the function will
+# assign names for it ("R1", "R2", ... for row names, "C1", "C2", ... for column names).
 #
-# This function contains some settings that may be a little difficult to understand. Please refer to vignette for better explanation.
+# This function is flexible and contains some settings that may be a little difficult to understand. 
+# Please refer to vignette for better explanation.
 chordDiagram = function(mat, grid.col = NULL, transparency = 0,
-	col = NULL, row.col = NULL, column.col = NULL, directional = FALSE,
+	col = NULL, row.col = NULL, column.col = NULL, directional = FALSE, fromRows = TRUE,
 	symmetric = FALSE, order = NULL, preAllocateTracks = NULL,
-	annotationTrack = c("name", "grid"), link.border = NA, grid.border = NULL, 
-	diffHeight = 0.04, ...) {
-
+	annotationTrack = c("name", "grid"), annotationTrackHeight = c(0.05, 0.05),
+	link.border = NA, grid.border = NULL, diffHeight = 0.04, ...) {
+	
+	if(!is.matrix(mat)) {
+		stop("`mat` can only be a matrix.\n")
+	}
+	
 	transparency = ifelse(transparency < 0, 0, ifelse(transparency > 1, 1, transparency))
 
 	if(symmetric) {
@@ -70,9 +81,10 @@ chordDiagram = function(mat, grid.col = NULL, transparency = 0,
 			stop("Elements in `order` should be same as in `union(rownames(mat), colnames(mat))`.\n")
 		}
 	}
-
-	ri = apply(mat, 1, function(x) any(abs(x) > 1e-8))
-	ci = apply(mat, 2, function(x) any(abs(x) > 1e-8))
+	
+	ignore = max(abs(mat))/1e8
+	ri = apply(mat, 1, function(x) any(abs(x) > ignore))
+	ci = apply(mat, 2, function(x) any(abs(x) > ignore))
 
 	mat = mat[ri, ci]
 	if(is.matrix(col)) {
@@ -112,7 +124,7 @@ chordDiagram = function(mat, grid.col = NULL, transparency = 0,
 
 	n = length(factors)
 	if(is.null(grid.col)) {
-		grid.col = rgb(cbind(runif(n), runif(n), runif(n)))
+		grid.col = rand_color(n)
 		names(grid.col) = factors
 	} else {
 		if(length(grid.col) == 1) {
@@ -184,21 +196,13 @@ chordDiagram = function(mat, grid.col = NULL, transparency = 0,
 				xlim = get.cell.meta.data("xlim")
 				current.sector.index = get.cell.meta.data("sector.index")
 				i = get.cell.meta.data("sector.numeric.index")
-				theta = mean(get.cell.meta.data("xplot")) %% 360
-				if(theta < 90 || theta > 270) {
-					text.facing = "clockwise"
-					text.adj = c(0, 0.5)
-				} else {
-					text.facing = "reverse.clockwise"
-					text.adj = c(1, 0.5)
-				}
 				circos.text(mean(xlim), 0.5, labels = current.sector.index,
-					facing = text.facing, adj = text.adj)
-			}, track.height = 0.05)
+					facing = "inside", niceFacing = TRUE, adj = c(0.5, 0))
+			}, track.height = annotationTrackHeight[which(annotationTrack %in% "name")])
     }
 	if(any(annotationTrack %in% "grid")) {
 		circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.border = NA, 
-			track.height = 0.05, panel.fun = function(x, y) {
+			panel.fun = function(x, y) {
 				xlim = get.cell.meta.data("xlim")
 				current.sector.index = get.cell.meta.data("sector.index")
 				if(is.null(grid.border)) {
@@ -207,7 +211,7 @@ chordDiagram = function(mat, grid.col = NULL, transparency = 0,
 					border.col = grid.border
 				}
 				circos.rect(xlim[1], 0, xlim[2], 1, col = grid.col[current.sector.index], border = border.col)
-			})
+			}, track.height = annotationTrackHeight[which(annotationTrack %in% "grid")])
 	}
     # links
     rn = rownames(mat)
@@ -229,14 +233,30 @@ chordDiagram = function(mat, grid.col = NULL, transparency = 0,
 			if(abs(mat[rn[i], cn[j]]) < 1e-8) {
 				next
 			}
-			rou = get.track.end.position(get.current.track.index())
+			rou = {
+				tracks = get.all.track.index()
+				if(length(tracks) == 0) {
+					1
+				} else {
+					n = length(tracks)
+					get.cell.meta.data("cell.bottom.radius", track.index = tracks[n]) - 
+					get.cell.meta.data("track.margin", track.index = tracks[n])[1] - 
+					circos.par("track.margin")[2]
+			    }
+			}
             sector.index1 = rn[i]
             sector.index2 = cn[j]
 			
 			if(directional) {
-				circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
+				if(fromRows) {
+					circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
+								sector.index2, c(sector.sum.col[ cn[j] ], sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])),
+								col = col[rn[i], cn[j]], rou1 = rou - diffHeight, rou2 = rou, border = link.border, ...)
+				} else {
+					circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
 							sector.index2, c(sector.sum.col[ cn[j] ], sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])),
-							col = col[rn[i], cn[j]], rou1 = rou - diffHeight, rou2 = rou, border = link.border, ...)
+							col = col[rn[i], cn[j]], rou1 = rou, rou2 = rou - diffHeight, border = link.border, ...)
+				}
 			} else {
 				circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
 							sector.index2, c(sector.sum.col[ cn[j] ], sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])),

@@ -33,8 +33,22 @@ circlize = function(x, y, sector.index = get.current.sector.index(),
     return(m)
 }
 
-# reverse function of circlize
-reverse.circlize = function(theta, rou, sector.index, track.index) {
+# == title
+# Return the coordinate in data coordinate system
+#
+# == param
+# -theta        measured by degree
+# -rou          distance to the circle center (radius)
+# -sector.index Index for the sector
+# -track.index  Index for the track
+#
+# == details
+# This is the reverse function of `circlize`. It transform data points from polar coordinate system to data coordinate system.
+#
+# == values
+# A matrix with two columns (``x`` and ``y``)
+reverse.circlize = function(theta, rou, sector.index = get.current.sector.index(),
+    track.index = get.current.track.index()) {
 	sector.data = get.sector.data(sector.index)
     cell.data = get.cell.data(sector.index, track.index)
 	cell.ylim = get.cell.meta.data("cell.ylim", sector.index, track.index)
@@ -45,6 +59,7 @@ reverse.circlize = function(theta, rou, sector.index, track.index) {
 	
 	m = cbind(x, y)
 	colnames(m) = c("x", "y")
+	rownames(m) = NULL
 	return(m)
 }
 
@@ -117,22 +132,22 @@ recycle.with.levels = function(x, levels) {
     return(x)
 }
 
-check.track.position = function(trace.index, track.start, track.height) {
+check.track.position = function(track.index, track.start, track.height) {
 
     track.margin = circos.par("track.margin")
     if(track.start - track.height - track.margin[2] < 0 ||
        track.start - track.height < 0 ||
        track.start < 0) {
-        stop(paste("not enough space for plotting region of track index '", trace.index, "'.\n", sep = ""))
+        stop(paste("not enough space for cells at track index '", track.index, "'.\n", sep = ""))
     }
     if(track.start - track.margin[1] - track.height - track.margin[2] < 0) {
-        stop(paste("not enough space for bottom margin of track index '", trace.index, "'.\n", sep = ""))
+        stop(paste("not enough space for bottom margin of cells at track index '", track.index, "'.\n", sep = ""))
     }
     
-    if(trace.index > 1) {
+    if(track.index > 1) {
         
-        if(track.start > get.track.end.position(trace.index - 1)) {
-            stop("Plotting region overlaps with previous track.\n")
+        if(track.start > get.cell.meta.data("cell.bottom.radius", track.index = track.index - 1)) {
+            stop("Track overlaps with previous track.\n")
         }
     }
 }
@@ -167,11 +182,11 @@ as.degree = function(radian) {
 #
 # == param
 # -breaks A vector indicating numeric breaks
-# -colors A vector of colors which corresponds to values in ``breaks``
-# -transparency a single value in [0, 1]. 0 refers to no transparency and 1 refers to full transparency
+# -colors A vector of colors which correspond to values in ``breaks``
+# -transparency A single value in [0, 1]. 0 refers to no transparency and 1 refers to full transparency
 #
 # == details
-# Colors are interpolated according to break values and corresponding colors. Values exceeds breaks will be assigned with maximum or minimum color.
+# Colors are interpolated according to break values and corresponding colors. Values exceeding breaks will be assigned with maximum or minimum colors.
 #
 # == values
 # It returns a function which accepts a vector of numbers and returns interpolated colors.
@@ -215,7 +230,7 @@ colorRamp2 = function(breaks, colors, transparency = 0) {
 	return(rgb(t(res_rgb)/255, alpha = 1-transparency))
 }
 
-# will be considerred in the future
+# will be considered in the future
 circos.approx = function(x, y, resolution = 0.1, sector.index = get.cell.meta.data("sector.index"),
 	track.index = get.cell.meta.data("track.index"),
 	approxFun = function(x) sample(x, 1)) {
@@ -246,4 +261,8 @@ circos.approx = function(x, y, resolution = 0.1, sector.index = get.cell.meta.da
 	newy = newy[!is.na(newy)]
 	
 	return(list(x = newx, y = newy))
+}
+
+rand_color = function(n, transparency = 0) {
+    return(rgb(runif(n), runif(n), runif(n), 1 - transparency))
 }

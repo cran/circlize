@@ -1,7 +1,7 @@
-### R code from vignette source 'draw-phylogenetic-tree.Rnw'
+### R code from vignette source 'circular_phylogenetic_tree.Rnw'
 
 ###################################################
-### code chunk number 1: draw-phylogenetic-tree.Rnw:34-41 (eval = FALSE)
+### code chunk number 1: circular_phylogenetic_tree.Rnw:34-41 (eval = FALSE)
 ###################################################
 ## library(ape)
 ## data(bird.orders)
@@ -13,7 +13,7 @@
 
 
 ###################################################
-### code chunk number 2: draw-phylogenetic-tree.Rnw:100-120 (eval = FALSE)
+### code chunk number 2: circular_phylogenetic_tree.Rnw:99-112 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -23,22 +23,15 @@
 ## circos.trackPlotRegion(ylim = c(0, 1), bg.border = NA, track.height = 0.3, 
 ##     panel.fun = function(x, y) {
 ##         for(i in seq_len(n)) {
-##             theta = circlize(i-0.5, 0)[1, "theta"]
-##             if(theta < 90 || theta > 270) {
-##                 text.facing = "clockwise"
-##                 text.adj = c(0, 0.5)
-##             } else {
-##                 text.facing = "reverse.clockwise"
-##                 text.adj = c(1, 0.5)
-##             }
-##             circos.text(i-0.5, 0, labels[i], adj = text.adj, 
-##                 facing = text.facing, col = ct[labels[i]], cex = 0.7)
+##             circos.text(i-0.5, 0, labels[i], adj = c(0, 0.5), 
+##                 facing = "clockwise", niceFacing = TRUE,
+##                 col = ct[labels[i]], cex = 0.7)
 ##         }
 ## })
 
 
 ###################################################
-### code chunk number 3: draw-phylogenetic-tree.Rnw:128-175 (eval = FALSE)
+### code chunk number 3: circular_phylogenetic_tree.Rnw:120-167 (eval = FALSE)
 ###################################################
 ## # -dend a `dendogram` object
 ## # -maxy the maximum height of the tree is a global attribute,
@@ -90,7 +83,7 @@
 
 
 ###################################################
-### code chunk number 4: draw-phylogenetic-tree.Rnw:180-186 (eval = FALSE)
+### code chunk number 4: circular_phylogenetic_tree.Rnw:172-178 (eval = FALSE)
 ###################################################
 ## circos.trackPlotRegion(ylim = c(0, maxy), bg.border = NA, 
 ##     track.height = 0.4, panel.fun = function(x, y) {

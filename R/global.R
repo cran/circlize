@@ -3,11 +3,15 @@
 
 .CIRCOS.ENV = new.env()
 
-assign(".SECTOR.DATA", NULL, envir = .CIRCOS.ENV)
-assign(".TRACK.END.POSITION", 1, envir = .CIRCOS.ENV)
-assign(".CELL.DATA", NULL, envir = .CIRCOS.ENV)
-assign(".CURRENT.TRACK.INDEX", 0, envir = .CIRCOS.ENV)
-assign(".CURRENT.SECTOR.INDEX", NULL, envir = .CIRCOS.ENV)
+resetGlobalVariable = function() {
+	assign(".SECTOR.DATA", NULL, envir = .CIRCOS.ENV)
+	assign(".CELL.DATA", NULL, envir = .CIRCOS.ENV)
+	assign(".CURRENT.TRACK.INDEX", 0, envir = .CIRCOS.ENV)
+	assign(".CURRENT.SECTOR.INDEX", NULL, envir = .CIRCOS.ENV)
+}
+
+resetGlobalVariable()
+
 .CIRCOS.PAR.DEFAULT = list(
     start.degree = 0,
 	gap.degree = 1,
@@ -18,6 +22,7 @@ assign(".CURRENT.SECTOR.INDEX", NULL, envir = .CIRCOS.ENV)
 	points.overflow.warning = TRUE,
 	canvas.xlim = c(-1, 1),
 	canvas.ylim = c(-1, 1),
+	major.by.degree = 10,
 	clock.wise = TRUE)
 assign(".CIRCOS.PAR", .CIRCOS.PAR.DEFAULT, envir = .CIRCOS.ENV)
 
@@ -41,11 +46,11 @@ assign(".CIRCOS.PAR", .CIRCOS.PAR.DEFAULT, envir = .CIRCOS.ENV)
 #     is the percentage according to the radius of the unit circle.
 # -unit.circle.segments    Since curves are simulated by a series of straight lines,
 #     this parameter controls the amount of segments to represent a curve. The minimal length
-#     of the line segmentation is the length of the unit circle (``2pi``) / ``unit.circoe.segments``.
+#     of the line segmentation is the length of the unit circle (``2pi``) divided by ``unit.circoe.segments``.
 #     More segments means better approximation for the curves while larger size if you generate figures as PDF format.
 # -cell.padding            Padding of the cell. Like ``padding`` in Cascading Style Sheets
 #    (CSS), it is the blank area around the plotting regions, but within the borders.
-#     The parameter has four values, which controls the bottom, left, top and right padding
+#     The parameter has four values, which controls the bottom, left, top and right paddings
 #     respectively. The first and the third padding
 #     values are the percentages according to the radius of the unit circle and the second and
 #     fourth values are degrees.
@@ -53,28 +58,27 @@ assign(".CIRCOS.PAR", .CIRCOS.PAR.DEFAULT, envir = .CIRCOS.ENV)
 #     of the unit circle. The height includes the top and bottom cell paddings but not the margins.
 # -points.overflow.warning Since each cell is in fact not a real plotting region but only
 #     an ordinary rectangle, it does not eliminate points that are plotted out of
-#     the region. So if some points are out of the plotting region, by default, the 
-#     package would continue drawing the points and print warnings. But in some 
-#     circumstances, draw something out of the plotting region is useful, such as draw
+#     the region. So if some points are out of the plotting region, ``circlize`` would continue drawing the points but print warnings. In some 
+#     cases, draw something out of the plotting region is useful, such as draw
 #     some legend or text. Set this value to ``FALSE`` to turn off the warnings.
-# -canvas.xlim              The coordinate for the canvas. Because the package draw everything (or almost everything) inside the unit circle, so
+# -canvas.xlim              The coordinate for the canvas. Because ``circlize`` draws everything (or almost everything) inside the unit circle,
 #     the default ``canvas.xlim`` and ``canvas.ylim`` for the canvas would be all ``c(-1, 1)``. However, you can set it to a more broad
 #     interval if you want to draw other things out of the circle. By choosing proper
 #     ``canvas.xlim`` and ``canvas.ylim``, you can draw part of the circle. E.g. setting
 #     ``canvas.xlim`` to ``c(0, 1)`` and ``canvas.ylim`` to ``c(0, 1)`` would only draw
 #     circle in the region of (0, pi/2).
 # -canvas.ylim              The coordinate for the canvas. By default it is ``c(-1, 1)``
-# -clock.wise               The direction of drawing sectors. Default is ``TRUE``.
+# -clock.wise               The direction for adding sectors. Default is ``TRUE``.
 #
-# Similar to `graphics::par`, you can get the values of the parameters by specifying the 
-# names of the parameters and you can set the values of the parameters by specifying a
+# Similar as `graphics::par`, you can get the parameter values by specifying the 
+# names of parameters and you can set the parameter values by specifying a
 # named list which contains the new values.
 #
 # ``gap.degree``, ``start.degree``, ``canvas.xlim``, ``canvas.ylim`` and ``clock.wise`` 
 # only be set before the initialization of circos layout
 # (i.e. before calling `circos.initialize`) because these values will not be changed after
-# putting sectors on the circle. The left and right padding for ``cell.padding`` will also be
-# effectiveless after the initialization because all cells in a sector would share the same
+# adding sectors on the circle. The left and right padding for ``cell.padding`` will also be
+# ignored after the initialization because all cells in a sector would share the same
 # left and right paddings. 
 circos.par = function (...) {
     args = list(...)
@@ -136,18 +140,17 @@ is.circos.initialized = function() {
 }
 
 # == title
-# Initialize the circos sectors
+# Initialize the circos layout
 #
 # == param
 # -factors Factors which represent data categories
 # -x       Data on x-axis, a vector
 # -xlim    Limitations for values on x-axis
 # -sector.width Width for each sector. The length of the vector should be either 1 which means
-#          all sectors are having same width or as same as the number of sectors. The value for
-#          the vector is the relative value, and they will be scaled by dividing their summation.
-#          By defautl, it is ``NULL`` which means the width of sectors correspond to the data
-#          range in sectors. If you set the value, you need to notice the width for the sector here
-#          includes the gap after it.
+#          all sectors have same width or as same as the number of sectors. Values for
+#          the vector are relative, and they will be scaled by dividing their summation.
+#          By default, it is ``NULL`` which means the width of sectors correspond to the data
+#          range in sectors which is calculated internally.
 #
 # == details
 # The function allocates the sectors according to the values on x-axis.
@@ -167,21 +170,21 @@ is.circos.initialized = function() {
 #
 # Normally, width of sectors will be calculated internally according to the data range in sectors. But you can
 # still set the width manually. However, it is not always a good idea to change the default sector width since
-# the width can reflect the range of data in sectors. Anyway, in some circumstances, it is useful to manually set
+# the width can reflect the range of data in sectors. Anyway, in some cases, it is useful to manually set
 # the width such as you want to zoom in some part of the sectors.
 #
-# The function finally call `graphics::plot` and be ready for adding graphics.
+# The function finally calls `graphics::plot` and be ready for adding graphics.
 circos.initialize = function(factors, x = NULL, xlim = NULL, sector.width = NULL) {
 
-    assign(".SECTOR.DATA", NULL, envir = .CIRCOS.ENV)
-	assign(".TRACK.END.POSITION", 1, envir = .CIRCOS.ENV)
-	assign(".CELL.DATA", NULL, envir = .CIRCOS.ENV)
-	assign(".CURRENT.TRACK.INDEX", 0, envir = .CIRCOS.ENV)
-	assign(".CURRENT.SECTOR.INDEX", NULL, envir = .CIRCOS.ENV)
+    resetGlobalVariable()
 	
 	.SECTOR.DATA = get(".SECTOR.DATA", envir = .CIRCOS.ENV)
 	.CELL.DATA = get(".CELL.DATA", envir = .CIRCOS.ENV)
-
+	
+	if(any(factors == "")) {
+		stop("`factors` cannot contain empty strings.\n")
+	}
+	
     if(! is.factor(factors)) {
         factors = factor(factors)
     }
@@ -224,13 +227,15 @@ circos.initialize = function(factors, x = NULL, xlim = NULL, sector.width = NULL
     sector.range = max.value - min.value
     n.sector = length(le)
     
-    sector = vector("list", 5)
+    sector = vector("list", 7)
 	# for each sector, `start.degree always referto `min.value` and `end.degree` always
 	# refer to `max.value` in a reverse clockwise fasion. So here `start.degree` and 
 	# `end.degree` also correspond to the direction.
 	# So in the polar coordinate, `start.degree` would be larger than `end.degree`
-    names(sector) = c("factor", "min.value", "max.value", "start.degree", "end.degree")
+    names(sector) = c("factor", "min.value", "max.value", "start.degree", "end.degree", "min.data", "max.data")
     sector[["factor"]] = le
+	sector[["min.data"]] = min.value
+	sector[["max.data"]] = max.value
     
     gap.degree = circos.par("gap.degree")
 	if(length(gap.degree) == 1) {
@@ -273,10 +278,10 @@ circos.initialize = function(factors, x = NULL, xlim = NULL, sector.width = NULL
 		}
 		
 		sector.width.percentage = sector.width / sum(sector.width)
-		degree.per.sector = 360 * sector.width.percentage - gap.degree
+		degree.per.sector = (360 - sum(gap.degree)) * sector.width.percentage
 		
 		if(any(degree.per.sector <= 0)) {
-			stop("Detect some gaps are too large.\n")
+			stop("Maybe your `gap.degree` is too large so that there is no space to allocate sectors.\n")
 		}
 		
 		for(i in seq_len(n.sector)) {
@@ -306,7 +311,7 @@ circos.initialize = function(factors, x = NULL, xlim = NULL, sector.width = NULL
 	}
 	
 	if(any(cell.padding[2] + cell.padding[4] >= sector[["start.degree"]] - sector[["end.degree"]])) {
-		stop("Sumation of cell padding on x-direction are larger than the width of the sectors.\n")
+		stop("Summation of cell padding on x-direction are larger than the width for some sectors.\n")
 	}
 	
 	min.value = min.value - cell.padding[2]/(sector[["start.degree"]] - sector[["end.degree"]] - cell.padding[2] - cell.padding[4])*sector.range  # real min value
@@ -345,14 +350,10 @@ circos.initialize = function(factors, x = NULL, xlim = NULL, sector.width = NULL
 # parameters for circos plot which can only be set before `circos.initialize`. So before you draw the next
 # circos plot, you need to reset these parameters.
 #
-# If you meet some errors when re-drawing the circos plot, try running this function and it will solve part of the problems.
+# If you meet some errors when re-drawing the circos plot, try running this function and it will solve most of the problems.
 circos.clear = function() {
     
-	assign(".SECTOR.DATA", NULL, envir = .CIRCOS.ENV)
-	assign(".TRACK.END.POSITION", 1, envir = .CIRCOS.ENV)
-	assign(".CELL.DATA", NULL, envir = .CIRCOS.ENV)
-	assign(".CURRENT.TRACK.INDEX", 0, envir = .CIRCOS.ENV)
-	assign(".CURRENT.SECTOR.INDEX", NULL, envir = .CIRCOS.ENV)
+	resetGlobalVariable()
 	assign(".CIRCOS.PAR", .CIRCOS.PAR.DEFAULT, envir = .CIRCOS.ENV)
     
     return(invisible(NULL))
@@ -365,13 +366,31 @@ circos.clear = function() {
 # Simple function returning a vector of all sector index.
 get.all.sector.index = function() {
 	.SECTOR.DATA = get(".SECTOR.DATA", envir = .CIRCOS.ENV)
-    return(as.vector(.SECTOR.DATA$factor))
+	if(is.null(.SECTOR.DATA)) {
+		return(character(0))
+	} else {
+		return(as.vector(.SECTOR.DATA$factor))
+	}
+}
+
+# == title
+# Get index for all tracks
+#
+# == details
+# Simple function returning a vector of all track index.
+get.all.track.index = function() {
+	.CELL.DATA = get(".CELL.DATA", envir = .CIRCOS.ENV)
+	if(is.null(.CELL.DATA)) {
+		return(integer(0))
+	} else {
+		return(seq_along(.CELL.DATA[[1]]))
+	}
 }
 
 get.sector.data = function(sector.index = get.current.sector.index()) {
 	.SECTOR.DATA = get(".SECTOR.DATA", envir = .CIRCOS.ENV)
-    sector.data = as.vector(as.matrix(.SECTOR.DATA[.SECTOR.DATA[[1]] == sector.index, 2:5]))
-    names(sector.data) = colnames(.SECTOR.DATA)[2:5]
+    sector.data = as.vector(as.matrix(.SECTOR.DATA[.SECTOR.DATA[[1]] == sector.index, -1]))
+    names(sector.data) = colnames(.SECTOR.DATA)[-1]
     return(sector.data)
 }
 
@@ -385,15 +404,6 @@ set.current.track.index = function(x) {
 	.CURRENT.TRACK.INDEX = x
 	assign(".CURRENT.TRACK.INDEX", .CURRENT.TRACK.INDEX, envir = .CIRCOS.ENV)
     return(invisible(NULL))
-}
-
-get.max.track.index = function() {
-    if(get.current.track.index() == 0) {
-        return(0)
-    } else {
-		.CELL.DATA = get(".CELL.DATA", envir = .CIRCOS.ENV)
-        return(length(.CELL.DATA[[1]]))
-    }
 }
 
 # factors name, note it is not numeric index
@@ -412,28 +422,6 @@ set.current.sector.index = function(x) {
     return(invisible(NULL))
 }
 
-# Position where the current track ends (position of the bottom edge - bottom margin)
-# If no track has been created, the position is 1
-# Note there would be a little inconsistence for the definition of track.
-# In the package, the track is the height of cells
-# but in this funciton, track includes the margins. However, it is an internal function
-# and the definition of track would be unified
-get.track.end.position = function(track.index = get.current.track.index()) {
-    
-    if(track.index == 0) {
-        return(1)
-    } else {
-		.TRACK.END.POSITION = get(".TRACK.END.POSITION", envir = .CIRCOS.ENV)
-        return(.TRACK.END.POSITION[track.index])
-    }
-}
-
-set.track.end.position = function(track.index = get.current.track.index(), y) {
-    .TRACK.END.POSITION = get(".TRACK.END.POSITION", envir = .CIRCOS.ENV)
-    .TRACK.END.POSITION[track.index] = y
-	assign(".TRACK.END.POSITION", .TRACK.END.POSITION, envir = .CIRCOS.ENV)
-    return(invisible(NULL))
-}
 
 get.cell.data = function(sector.index = get.current.sector.index(), track.index = get.current.track.index()) {
 	.CELL.DATA = get(".CELL.DATA", envir = .CIRCOS.ENV)
@@ -464,26 +452,27 @@ has.cell = function(sector.index, track.index) {
 # Get information of the circos plot
 #
 # == param
-# -sector.index Which sectors you want to look at
-# -track.index  Which tracks you want to look at
+# -sector.index Which sectors you want to look at? It can be a vector.
+# -track.index  Which tracks you want to look at? It can be a vector.
 # -plot         Whether to add information on the plot
 #
 # == details
 # It tells you the basic parameters for sectors/tracks/cells. If both ``sector.index``
 # and ``track.index`` are set to ``NULL``, the function would print index for 
 # all sectors and all tracks. If ``sector.index`` and/or ``track.index`` are set,
-# the function would print xlim and ylim in the data coordinate for every cell in specified sectors and tracks.
+# the function would print ``xlim``, ``ylim``, ``cell.xlim``, ``cell.ylim``,
+# ``xplot``, ``yplot``, ``track.margin`` and ``cell.padding`` for every cell in specified sectors and tracks.
 # Also, the function will print index for your current sector and current track.
 #
-# If ``plot`` is set to ``TRUE``, the function will draw the index of the sector and the track 
-# for each cell on the plot.
+# If ``plot`` is set to ``TRUE``, the function will plot the index of the sector and the track 
+# for each cell on the figure.
 circos.info = function(sector.index = NULL, track.index = NULL, plot = FALSE) {
 	sectors = get.all.sector.index()
-	max.track.index = get.max.track.index()
+	tracks = get.all.track.index()
 		
 	if(plot) {
 		for(i in seq_along(sectors)) {
-			for(j in seq_len(max.track.index)) {
+			for(j in seq_along(tracks)) {
 				cell.xlim = get.cell.meta.data("cell.xlim", sector.index = sectors[i], track.index = j)
 				cell.ylim = get.cell.meta.data("cell.ylim", sector.index = sectors[i], track.index = j)
 				circos.text(mean(cell.xlim), mean(cell.ylim), labels = paste(sectors[i], j, sep = ":"),
@@ -493,50 +482,39 @@ circos.info = function(sector.index = NULL, track.index = NULL, plot = FALSE) {
 	} else {
 		# just print the name and xlim for each sector
 		if(is.null(sector.index) && is.null(track.index)) {
-			all.sector.index = get.all.sector.index()
-			max.track.index = get.max.track.index()
 			cat("All your sectors:\n")
-			print(all.sector.index)
+			print(sectors)
 			cat("\n")
 			cat("All your tracks:\n")
-			print(seq_len(get.max.track.index()))
+			print(tracks)
 			cat("\n")
 
-		} else if(is.null(track.index)) {
-			track.index = seq_len(get.max.track.index())
-			for(i in seq_along(sector.index)) {
-				for(j in seq_along(track.index)) {
-					cat("sector index: ", sector.index[i], "\n", sep = "")
-					cat("track index: ", track.index[j], "\n", sep = "")
-					xlim = get.cell.meta.data('xlim', sector.index[i], track.index[j])
-					ylim = get.cell.meta.data('ylim', sector.index[i], track.index[j])
-					cat("xlim: [", xlim[1], ", ", xlim[2], "]\n", sep = "")
-					cat("ylim: [", ylim[1], ", ", ylim[2], "]\n", sep = "")
-					cat("\n")
-				}
-			}
-		} else if(is.null(sector.index)) {
-			sector.index = get.all.sector.index()
-			for(i in seq_along(sector.index)) {
-				for(j in seq_along(track.index)) {
-					cat("sector index: ", sector.index[i], "\n", sep = "")
-					cat("track index: ", track.index[j], "\n", sep = "")
-					xlim = get.cell.meta.data('xlim', sector.index[i], track.index[j])
-					ylim = get.cell.meta.data('ylim', sector.index[i], track.index[j])
-					cat("xlim: [", xlim[1], ", ", xlim[2], "]\n", sep = "")
-					cat("ylim: [", ylim[1], ", ", ylim[2], "]\n", sep = "")
-					cat("\n")
-				}
-			}
 		} else {
+			if(is.null(track.index)) {
+				track.index = tracks
+			} else if(is.null(sector.index)) {
+				sector.index = sectors
+			}
 			for(i in seq_along(sector.index)) {
 				for(j in seq_along(track.index)) {
 					cat("sector index: ", sector.index[i], "\n", sep = "")
 					cat("track index: ", track.index[j], "\n", sep = "")
 					xlim = get.cell.meta.data('xlim', sector.index[i], track.index[j])
 					ylim = get.cell.meta.data('ylim', sector.index[i], track.index[j])
+					cell.xlim = get.cell.meta.data("cell.xlim", sector.index[i], track.index[j])
+					cell.ylim = get.cell.meta.data("cell.ylim", sector.index[i], track.index[j])
+					xplot = get.cell.meta.data("xplot", sector.index[i], track.index[j])
+					yplot = get.cell.meta.data("yplot", sector.index[i], track.index[j])
+				    track.margin = get.cell.meta.data("track.margin", sector.index[i], track.index[j])
+				    cell.padding = get.cell.meta.data("cell.padding", sector.index[i], track.index[j])
 					cat("xlim: [", xlim[1], ", ", xlim[2], "]\n", sep = "")
 					cat("ylim: [", ylim[1], ", ", ylim[2], "]\n", sep = "")
+					cat("cell.ylim: [", cell.ylim[1], ", ", cell.ylim[2], "]\n", sep = "")
+					cat("cell.ylim: [", cell.ylim[1], ", ", cell.ylim[2], "]\n", sep = "")
+					cat("xplot (degree): [", xplot[1], ", ", xplot[2], "]\n", sep = "")
+					cat("yplot (radius): [", yplot[1], ", ", yplot[2], "]\n", sep = "")
+					cat("track.margin: c(", track.margin[1], ", ", track.margin[2], ")\n", sep = "")
+					cat("cell.padding: c(", cell.padding[1], ", ", cell.padding[2], ", ", cell.padding[3], ", ", cell.padding[4], ")\n", sep = "")
 					cat("\n")
 				}
 			}
@@ -546,9 +524,9 @@ circos.info = function(sector.index = NULL, track.index = NULL, plot = FALSE) {
 		cat("Your current sector.index is ", get.current.sector.index(), "\n", sep = "")
 		cat("Your current track.index is ", get.current.track.index(), "\n", sep = "")
 	}
-		
-
+	
 }
+
 
 # == title
 # Label the sector index and the track index on each cell
@@ -561,7 +539,7 @@ show.index = function() {
 }
 
 # == title
-# Get the meta data for a cell
+# Get the meta data of a cell
 #
 # == param
 # -name         Only support one name at a time, see "details" section
@@ -572,7 +550,7 @@ show.index = function() {
 # The following meta information for a cell can be obtained:
 #
 # -sector.index         The name (index) for the sector
-# -sector.numeric.index Numeric index for the sector. It is the numeric order of levels of ``factors`` in initialization step
+# -sector.numeric.index Numeric index for the sector
 # -track.index          Numeric index for the track
 # -xlim                 Minimal and maximal values on the x-axis
 # -ylim                 Minimal and maximal values on the y-axis
@@ -582,13 +560,8 @@ show.index = function() {
 # -ycenter              Center of y-axis
 # -cell.xlim            Minimal and maximal values on the x-axis extended by cell paddings
 # -cell.ylim            Minimal and maximal values on the y-axis extended by cell paddings
-# -xplot                Right and left edge degree for the plotting region which are measured in polar coordinate.
-#                       The first element corresponds to the start point of values on x-axis (``cell.xlm[1]``)
-#                       and the second element corresponds to the end point of values on x-axis (``cell.xlim[2]``)
-#                       Since x-axis in data coordinate in cells are always clockwise, ``xplot[1]`` is larger
-#                       than ``xplot[2]``.
-# -yplot                Bottom and top value for the plotting region in polar coordinate. It is the value
-#                       of radius of arc corresponding to top border or bottom border.
+# -xplot                Degrees for right and left borders of the cell.
+# -yplot                Radius for top and bottom borders of the cell.
 # -cell.start.degree    Same as ``xplot[1]``
 # -cell.end.degree      Same as ``xplot[2]``
 # -cell.bottom.radius   Same as ``yplot[1]``
@@ -596,7 +569,7 @@ show.index = function() {
 # -track.margin         Margin for the cell
 # -cell.padding         Padding for the cell
 #
-# The function would be useful when you use ``panel.fun`` in `circos.trackPlotRegion` to
+# The function is useful when using ``panel.fun`` in `circos.trackPlotRegion` to
 # get detailed information of the current cell.
 get.cell.meta.data = function(name, sector.index = get.current.sector.index(), 
                               track.index = get.current.track.index()) {
@@ -610,7 +583,7 @@ get.cell.meta.data = function(name, sector.index = get.current.sector.index(),
 	if(!any(sector.index %in% get.all.sector.index())) {
 		stop(paste0("Cannot find sector: ", sector.index, ".\n"))
 	}
-	if(!any(track.index %in% seq_len(get.max.track.index()))) {
+	if(!any(track.index %in% get.all.track.index())) {
 		stop(paste0("Cannot find track: ", track.index, ".\n"))
 	}
 
@@ -678,6 +651,8 @@ get.cell.meta.data = function(name, sector.index = get.current.sector.index(),
 		return(current.cell.data$bg.lty)
 	} else if(name == "bg.lwd") {
 		return(current.cell.data$bg.lwd)
+	} else if(name == "track.height") {
+		return(current.cell.data$track.height)
 	} else {
 		stop("Wrong cell meta name.\n")
 	}

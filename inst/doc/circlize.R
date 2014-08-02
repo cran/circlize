@@ -7,7 +7,7 @@ source("src/intro-00-correspondence.R")
 
 
 ###################################################
-### code chunk number 2: circlize.Rnw:102-106 (eval = FALSE)
+### code chunk number 2: circlize.Rnw:98-102 (eval = FALSE)
 ###################################################
 ## set.seed(12345)
 ## n = 1000
@@ -16,7 +16,7 @@ source("src/intro-00-correspondence.R")
 
 
 ###################################################
-### code chunk number 3: circlize.Rnw:117-121 (eval = FALSE)
+### code chunk number 3: circlize.Rnw:113-117 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1), lwd = 0.1, cex = 0.7)
@@ -25,7 +25,7 @@ source("src/intro-00-correspondence.R")
 
 
 ###################################################
-### code chunk number 4: circlize.Rnw:146-155 (eval = FALSE)
+### code chunk number 4: circlize.Rnw:142-151 (eval = FALSE)
 ###################################################
 ## circos.trackPlotRegion(factors = a$factor, y = a$y,
 ##     panel.fun = function(x, y) {
@@ -39,14 +39,14 @@ source("src/intro-00-correspondence.R")
 
 
 ###################################################
-### code chunk number 5: circlize.Rnw:161-163 (eval = FALSE)
+### code chunk number 5: circlize.Rnw:157-159 (eval = FALSE)
 ###################################################
 ## bgcol = rep(c("#EFEFEF", "#CCCCCC"), 4)
 ## circos.trackHist(a$factor, a$x, bg.col = bgcol, col = NA)
 
 
 ###################################################
-### code chunk number 6: circlize.Rnw:171-179 (eval = FALSE)
+### code chunk number 6: circlize.Rnw:166-174 (eval = FALSE)
 ###################################################
 ## circos.trackPlotRegion(factors = a$factor, x = a$x, y = a$y,
 ##   panel.fun = function(x, y) {
@@ -59,21 +59,21 @@ source("src/intro-00-correspondence.R")
 
 
 ###################################################
-### code chunk number 7: circlize.Rnw:187-189 (eval = FALSE)
+### code chunk number 7: circlize.Rnw:182-184 (eval = FALSE)
 ###################################################
 ## circos.updatePlotRegion(sector.index = "d", track.index = 2)
 ## circos.points(x = -2:2, y = rep(0, 5))
 
 
 ###################################################
-### code chunk number 8: circlize.Rnw:194-196 (eval = FALSE)
+### code chunk number 8: circlize.Rnw:190-192 (eval = FALSE)
 ###################################################
 ## circos.trackPlotRegion(factors = a$factor, y = a$y)
 ## circos.trackLines(a$factor[1:100], a$x[1:100], a$y[1:100], type = "h")
 
 
 ###################################################
-### code chunk number 9: circlize.Rnw:202-206 (eval = FALSE)
+### code chunk number 9: circlize.Rnw:198-202 (eval = FALSE)
 ###################################################
 ## circos.link("a", 0, "b", 0, h = 0.4)
 ## circos.link("c", c(-0.5, 0.5), "d", c(-0.5,0.5), col = "red",
@@ -82,7 +82,7 @@ source("src/intro-00-correspondence.R")
 
 
 ###################################################
-### code chunk number 10: circlize.Rnw:211-212 (eval = FALSE)
+### code chunk number 10: circlize.Rnw:207-208 (eval = FALSE)
 ###################################################
 ## circos.clear()
 
@@ -118,7 +118,7 @@ source("src/intro-05-factor.R")
 
 
 ###################################################
-### code chunk number 16: circlize.Rnw:431-465 (eval = FALSE)
+### code chunk number 16: circlize.Rnw:426-460 (eval = FALSE)
 ###################################################
 ## factors = sample(letters[1:6], 100, replace = TRUE)
 ## x = rnorm(100)
@@ -193,43 +193,49 @@ source("src/intro-09-text.R")
 
 
 ###################################################
-### code chunk number 23: figerrorline
+### code chunk number 23: figtexteasy
+###################################################
+source("src/intro-09-text-niceFacing.R")
+
+
+###################################################
+### code chunk number 24: figerrorline
 ###################################################
 source("src/intro-10-smooth.R")
 
 
 ###################################################
-### code chunk number 24: figaxis
+### code chunk number 25: figaxis
 ###################################################
 source("src/intro-11-axis.R")
 
 
 ###################################################
-### code chunk number 25: figlink
+### code chunk number 26: figlink
 ###################################################
 source("src/intro-12-link.R")
 
 
 ###################################################
-### code chunk number 26: fighist
+### code chunk number 27: fighist
 ###################################################
 source("src/intro-14-hist.R")
 
 
 ###################################################
-### code chunk number 27: figheatmap
+### code chunk number 28: figheatmap
 ###################################################
 source("src/intro-15-heatmap.R")
 
 
 ###################################################
-### code chunk number 28: sectorhighlight
+### code chunk number 29: sectorhighlight
 ###################################################
 source("src/intro-16-highlight.R")
 
 
 ###################################################
-### code chunk number 29: circlize.Rnw:1043-1054 (eval = FALSE)
+### code chunk number 30: circlize.Rnw:1069-1087 (eval = FALSE)
 ###################################################
 ## factors = letters[1:3]
 ## circos.initialize(factors = factors, xlim = c(0, 1))
@@ -241,11 +247,18 @@ source("src/intro-16-highlight.R")
 ##         i = get.cell.meta.data("sector.numeric.index")
 ##         circos.rect(cell.xlim[1], cell.ylim[1], cell.xlim[2], cell.ylim[2],
 ##             col = i, border = NA)
+## 		
+## 		seg = seq(cell.ylim[1], cell.ylim[2], length = 5)
+## 		seg = seg[-1]
+## 		seg = seg[-length(seg)]
+## 		for(h in seg) {
+## 			circos.lines(cell.xlim, c(h, h), lty = 2, col = "grey")
+## 		}
 ## })
 
 
 ###################################################
-### code chunk number 30: circlize.Rnw:1106-1137 (eval = FALSE)
+### code chunk number 31: circlize.Rnw:1145-1179 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## factors = sample(letters[1:6], 100, replace = TRUE)
@@ -259,6 +272,7 @@ source("src/intro-16-highlight.R")
 ##     
 ##     cell.xlim = get.cell.meta.data("cell.xlim")
 ##     cell.ylim = get.cell.meta.data("cell.ylim")
+## 	
 ##     # reference lines
 ##     for(xi in seq(cell.xlim[1], cell.xlim[2], length.out = 10)) {
 ##         circos.lines(c(xi, xi), cell.ylim, lty = 2, col = "white") 
@@ -267,11 +281,13 @@ source("src/intro-16-highlight.R")
 ##         circos.lines(cell.xlim, c(yi, yi), lty = 2, col = "white") 
 ##     }
 ##     
+## 	# region with different colors
 ##     xlim = get.cell.meta.data("xlim")
 ##     ylim = get.cell.meta.data("ylim")
 ##     circos.rect(xlim[1], 1, xlim[2], ylim[2], col = "#FF000020", border = NA)
 ##     circos.rect(xlim[1], ylim[1], xlim[2], -1, col = "#00FF0020", border = NA)
-## 
+## 	
+## 	# points with different colors
 ##     circos.points(x[y >= 1], y[y >= 1], pch = 16, cex = 0.8, col = "red")
 ##     circos.points(x[y <= -1], y[y <= -1], pch = 16, cex = 0.8, col = "green")
 ##     circos.points(x[y > -1 & y < 1], y[y > -1 & y < 1], pch = 16, cex = 0.5)
@@ -281,13 +297,13 @@ source("src/intro-16-highlight.R")
 
 
 ###################################################
-### code chunk number 31: combine
+### code chunk number 32: combine
 ###################################################
 source("src/intro-16-combine.R")
 
 
 ###################################################
-### code chunk number 32: circlize.Rnw:1158-1173 (eval = FALSE)
+### code chunk number 33: circlize.Rnw:1200-1215 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -307,13 +323,13 @@ source("src/intro-16-combine.R")
 
 
 ###################################################
-### code chunk number 33: figpart
+### code chunk number 34: figpart
 ###################################################
 source("src/intro-17-part.R")
 
 
 ###################################################
-### code chunk number 34: circlize.Rnw:1193-1212 (eval = FALSE)
+### code chunk number 35: circlize.Rnw:1235-1254 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -337,13 +353,13 @@ source("src/intro-17-part.R")
 
 
 ###################################################
-### code chunk number 35: figpart2
+### code chunk number 36: figpart2
 ###################################################
 source("src/intro-18-part2.R")
 
 
 ###################################################
-### code chunk number 36: circlize.Rnw:1234-1251 (eval = FALSE)
+### code chunk number 37: circlize.Rnw:1276-1293 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -365,13 +381,13 @@ source("src/intro-18-part2.R")
 
 
 ###################################################
-### code chunk number 37: fignested
+### code chunk number 38: fignested
 ###################################################
 source("src/intro-19-nested.R")
 
 
 ###################################################
-### code chunk number 38: circlize.Rnw:1270-1293 (eval = FALSE)
+### code chunk number 39: circlize.Rnw:1312-1335 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -399,13 +415,13 @@ source("src/intro-19-nested.R")
 
 
 ###################################################
-### code chunk number 39: figseperated
+### code chunk number 40: figseperated
 ###################################################
 source("src/intro-20-seperated.R")
 
 
 ###################################################
-### code chunk number 40: circlize.Rnw:1313-1328 (eval = FALSE)
+### code chunk number 41: circlize.Rnw:1355-1370 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
@@ -425,13 +441,13 @@ source("src/intro-20-seperated.R")
 
 
 ###################################################
-### code chunk number 41: figdifrad
+### code chunk number 42: figdifrad
 ###################################################
 source("src/intro-21-diffradius.R")
 
 
 ###################################################
-### code chunk number 42: circlize.Rnw:1352-1370 (eval = FALSE)
+### code chunk number 43: circlize.Rnw:1394-1412 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## set.seed(12345)
@@ -454,13 +470,13 @@ source("src/intro-21-diffradius.R")
 
 
 ###################################################
-### code chunk number 43: figoutside
+### code chunk number 44: figoutside
 ###################################################
 source("src/intro-22-outside.R")
 
 
 ###################################################
-### code chunk number 44: circlize.Rnw:1391-1414 (eval = FALSE)
+### code chunk number 45: circlize.Rnw:1433-1456 (eval = FALSE)
 ###################################################
 ## library(circlize)
 ## 
@@ -488,7 +504,7 @@ source("src/intro-22-outside.R")
 
 
 ###################################################
-### code chunk number 45: figlayout
+### code chunk number 46: figlayout
 ###################################################
 source("src/intro-23-layout.R")
 

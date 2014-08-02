@@ -35,12 +35,15 @@ export(
 	generateRandomBed,
 	genomicDensity,
 	get.all.sector.index,
+	get.all.track.index,
 	get.cell.meta.data,
 	get.current.chromosome,
 	getI,
 	highlight.chromosome,
 	posTransform.default,
+	posTransform.text,
 	rainfallTransform,
 	read.cytoband,
+	reverse.circlize,
 	show.index
 )

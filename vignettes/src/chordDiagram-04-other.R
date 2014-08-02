@@ -1,5 +1,7 @@
 set.seed(123)
 
+op = par(no.readonly = TRUE)
+
 mat = matrix(sample(100, 25), 5)
 rownames(mat) = letters[1:5]
 colnames(mat) = letters[1:5]
@@ -13,3 +15,6 @@ for(cn in intersect(rownames(mat), colnames(mat))) {
 	mat[cn, cn] = 0
 }
 chordDiagram(mat, directional = TRUE, row.col = 1:5, transparency = 0.5)
+circos.clear()
+
+par(op)

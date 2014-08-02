@@ -1,40 +1,47 @@
-# functions to draw links are not so nice,
-# a little inconsistent to the other functions and a little hard to understand
-# it may be improved later.
-
 
 # == title
 # Draw links between points or intervals
 #
 # == param
-# -sector.index1 Sector index for one sector
+# -sector.index1 Index for sector one
 # -point1        A single value or a numeric vector of length 2. If it is a 2-elements vector, then
 #                the link would be a belt/ribbon.
-# -sector.index2 Sector index for the other sector
+# -sector.index2 Index for the other sector
 # -point2        A single value or a numeric vector of length 2. If it is a 2-elements vector, then
 #                the link would be a belt/ribbon.
 # -rou           The position of the 'root' of the link. It is the percentage of the radius of the unit circle.
-#                By default it is from the bottom of the most recent track.
+#                By default its value is the position of bottom margin of the most inner track.
 # -rou1          The position of root 1 of the link. 
 # -rou2          The position of root 2 of the link.
 # -h             Height of the link. 
-# -w             It controls the shape of Bezier curve
-# -h2            Height of the bottom line of the link if it is a ribbon.
-# -w2            Shape of the bottom line of the link
+# -w             Since the link is a Bezier curve, it controls the shape of Bezier curve.
+# -h2            Height of the bottom edge of the link if it is a ribbon.
+# -w2            Shape of the bottom edge of the link if it is a ribbon.
 # -col           Color of the link. If the link is a ribbon, then it is the filled color for the ribbon.
 # -lwd           Line (or border) width
 # -lty           Line (or border) style
 # -border        If the link is a ribbon, then it is the color for the ribbon border.
 #
 # == details
-# The link is a quadratic Bezier curve.
+# Links are implemented as quadratic Bezier curves.
 #
 # Drawing links does not create any track. So you can think it is independent of the tracks.
 #
 # By default you only need to set ``sector.index1``, ``point1``, ``sector.index2`` and ``point2``. The
-# link would look nice. See vignette for detailed explanation.
+# links would look nice. 
+#
+# See vignette for detailed explanation.
 circos.link = function(sector.index1, point1, sector.index2, point2,
-    rou = get.track.end.position(get.current.track.index()),
+    rou = {tracks = get.all.track.index()
+	       if(length(tracks) == 0) {
+		       1
+		   } else {
+		       n = length(tracks)
+		       get.cell.meta.data("cell.bottom.radius", track.index = tracks[n]) - 
+			     get.cell.meta.data("track.margin", track.index = tracks[n])[1] - 
+			     circos.par("track.margin")[2]
+		   }
+    },
     rou1 = rou, rou2 = rou, h = NULL, w = 1, h2 = h, w2 = w,
     col = "black", lwd = par("lwd"), lty = par("lty"), border = NA) {
     
@@ -155,16 +162,30 @@ getQuadraticPoints = function(theta1, theta2, rou1, rou2, h = NULL, w = 1) {
 	x2 = rou_min*cos(as.radian(theta2))
 	y2 = rou_min*sin(as.radian(theta2))
 	
+	# determin h
+	beta = (theta1 - theta2) %% 360
+	if(beta > 180) beta = 360 - beta
+	h_auto = rou_min*(1-0.5*cos(as.radian(beta/2)))
+	
 	if(is.null(h)) {
-		beta = (theta1 - theta2) %% 360
-		if(beta > 180) beta = 360 - beta
-		h = cos(as.radian(beta/2))*rou_min/((1+w)/w)
+		h = h_auto
 	}
+	if(h > rou_min) {
+		h = h_auto
+	}
+	
+	h2 = h - rou_min*(1-cos(as.radian(beta/2)))
+	
+	if(w < 0) h2 = -h2
 	
 	dis = 1/2 * sqrt((x1 - x2)^2 + (y1 - y2)^2)
 	p0 = c(-dis, 0)
 	p2 = c(dis, 0)
-	p1 = c(0, (1+w)/w*h)
+	if(w == 0) {
+		p1 = c(0, 0)
+	} else {
+		p1 = c(0, (1+w)/w*h2)
+	}
 	
 	d = quadratic.bezier(p0, p1, p2, w = w)
 
@@ -177,6 +198,7 @@ getQuadraticPoints = function(theta1, theta2, rou1, rou2, h = NULL, w = 1) {
 		col = "green"
 	}
 	
+	# rotate coordinate
 	mat = matrix(c(cos(as.radian(alpha)), sin(as.radian(alpha)), -sin(as.radian(alpha)), cos(as.radian(alpha))), nrow = 2)
 	d = d %*% mat
 	
