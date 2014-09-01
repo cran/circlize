@@ -18,7 +18,7 @@
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1))
 ## circos.par(cell.padding = c(0, 0, 0, 0))
-## circos.initialize("a", xlim = c(0, n))
+## circos.initialize(factors = "a", xlim = c(0, n))
 ## maxy = attr(hc, "height")  # maximum height of the tree
 ## circos.trackPlotRegion(ylim = c(0, 1), bg.border = NA, track.height = 0.3, 
 ##     panel.fun = function(x, y) {
@@ -31,17 +31,18 @@
 
 
 ###################################################
-### code chunk number 3: circular_phylogenetic_tree.Rnw:120-167 (eval = FALSE)
+### code chunk number 3: circular_phylogenetic_tree.Rnw:120-168 (eval = FALSE)
 ###################################################
+## # == param
 ## # -dend a `dendogram` object
 ## # -maxy the maximum height of the tree is a global attribute,
 ## #       so here it is set as an argument
-## circos.dendrogram = function(dend, maxy=attr(dend, "height")) {
+## circos.dendrogram = function(dend, maxy = attr(dend, "height")) {
 ##     labels = as.character(labels(dend))
 ##     x = seq_along(labels) - 0.5 # leaves are places at x = 0.5, 1.5, ..., n - 0.5
 ##     names(x) = labels
 ##     
-##     is.leaf = function(object) (is.logical(L = attr(object, "leaf"))) && L
+##     is.leaf = function(object) (is.logical(L <- attr(object, "leaf"))) && L
 ##     
 ##     draw.d = function(dend, maxy) {
 ##         leaf = attr(dend, "leaf")
@@ -83,7 +84,7 @@
 
 
 ###################################################
-### code chunk number 4: circular_phylogenetic_tree.Rnw:172-178 (eval = FALSE)
+### code chunk number 4: circular_phylogenetic_tree.Rnw:173-179 (eval = FALSE)
 ###################################################
 ## circos.trackPlotRegion(ylim = c(0, maxy), bg.border = NA, 
 ##     track.height = 0.4, panel.fun = function(x, y) {

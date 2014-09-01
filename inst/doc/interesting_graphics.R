@@ -4,7 +4,7 @@
 ### code chunk number 1: figclock
 ###################################################
 library(circlize)
-factors = "a"  # any name is fine
+factors = "a"  # any name is OK
 par(mar = c(1, 1, 1, 1))
 circos.par(gap.degree = 0, cell.padding = c(0, 0, 0, 0), start.degree = 90)
 circos.initialize(factors = factors, xlim = c(0, 12))
@@ -40,10 +40,10 @@ circos.clear()
 ### code chunk number 3: figdartboard (eval = FALSE)
 ###################################################
 ## library(circlize)
-## factors = 1:20
+## factors = 1:20  # just indicate there are 20 sectors
 ## par(mar = c(1, 1, 1, 1))
 ## circos.par(gap.degree = 0, cell.padding = c(0, 0, 0, 0),
-##     start.degree = 360/40, track.margin = c(0, 0), clock.wise = FALSE)
+##     start.degree = 360/20/2, track.margin = c(0, 0), clock.wise = FALSE)
 ## circos.initialize(factors = factors, xlim = c(0, 1))
 ## circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.col = "black",
 ##     track.height = 0.15)
@@ -75,10 +75,10 @@ circos.clear()
 ### code chunk number 4: figdartboard
 ###################################################
 library(circlize)
-factors = 1:20
+factors = 1:20  # just indicate there are 20 sectors
 par(mar = c(1, 1, 1, 1))
 circos.par(gap.degree = 0, cell.padding = c(0, 0, 0, 0),
-    start.degree = 360/40, track.margin = c(0, 0), clock.wise = FALSE)
+    start.degree = 360/20/2, track.margin = c(0, 0), clock.wise = FALSE)
 circos.initialize(factors = factors, xlim = c(0, 1))
 circos.trackPlotRegion(ylim = c(0, 1), factors = factors, bg.col = "black",
     track.height = 0.15)

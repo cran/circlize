@@ -11,7 +11,7 @@ head(d)
 
 
 ###################################################
-### code chunk number 2: draw_ideogram.Rnw:62-73
+### code chunk number 2: draw_ideogram.Rnw:63-74
 ###################################################
 chromosome = unique(d[[1]])
 chromosome.ind = gsub("chr", "", chromosome)
@@ -27,40 +27,40 @@ chromosome
 
 
 ###################################################
-### code chunk number 3: draw_ideogram.Rnw:83-88 (eval = FALSE)
+### code chunk number 3: draw_ideogram.Rnw:81-86 (eval = FALSE)
 ###################################################
 ## xlim = matrix(nrow = 0, ncol = 2)
 ## for(chr in chromosome) {
 ##     d2 = d[d[[1]] == chr, ]
-##     xlim = rbind(xlim,c(min(d2[[2]]), max(d2[[3]])))
+##     xlim = rbind(xlim, c(min(d2[[2]]), max(d2[[3]])))
 ## }
 
 
 ###################################################
-### code chunk number 4: draw_ideogram.Rnw:97-99 (eval = FALSE)
+### code chunk number 4: draw_ideogram.Rnw:95-97 (eval = FALSE)
 ###################################################
 ## par(mar = c(1, 1, 1, 1), lwd = 0.5)
-## circos.par("cell.padding" = c(0, 0, 0, 0))
+## circos.par(cell.padding = c(0, 0, 0, 0))
 
 
 ###################################################
-### code chunk number 5: draw_ideogram.Rnw:114-115 (eval = FALSE)
+### code chunk number 5: draw_ideogram.Rnw:112-113 (eval = FALSE)
 ###################################################
 ## circos.initialize(factors = factor(chromosome, levels = chromosome), xlim = xlim)
 
 
 ###################################################
-### code chunk number 6: draw_ideogram.Rnw:126-128 (eval = FALSE)
+### code chunk number 6: draw_ideogram.Rnw:124-126 (eval = FALSE)
 ###################################################
 ## circos.trackPlotRegion(factors = chromosome, ylim = c(0, 1), bg.border = NA, 
 ##     track.height = 0.1)
 
 
 ###################################################
-### code chunk number 7: draw_ideogram.Rnw:147-185 (eval = FALSE)
+### code chunk number 7: draw_ideogram.Rnw:145-183 (eval = FALSE)
 ###################################################
 ## for(chr in chromosome) {
-##     # data in `chr`
+##     # data in current `chr`
 ##     d2 = d[d[[1]] == chr, ]
 ##     n = nrow(d2)
 ##     
@@ -100,14 +100,14 @@ chromosome
 
 
 ###################################################
-### code chunk number 8: draw_ideogram.Rnw:201-203 (eval = FALSE)
+### code chunk number 8: draw_ideogram.Rnw:196-198 (eval = FALSE)
 ###################################################
 ## circos.link(sector.index1 = "chr2", point1 = 111111111, sector.index2 = "chr16", 
 ##     point2 = 55555555)
 
 
 ###################################################
-### code chunk number 9: draw_ideogram.Rnw:209-213 (eval = FALSE)
+### code chunk number 9: draw_ideogram.Rnw:204-208 (eval = FALSE)
 ###################################################
 ## # create a new track
 ## circos.trackPlotRegion(ylim = c(0, 1), bg.border = NA)
