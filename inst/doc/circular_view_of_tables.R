@@ -175,7 +175,7 @@ source("src/chordDiagram-03-advanced.R")
 ### code chunk number 21: circular_view_of_tables.Rnw:325-331 (eval = FALSE)
 ###################################################
 ## list(ylim = c(0, 1),
-##     track.height = circos.par("default.track.height"),
+##     track.height = circos.par("track.height"),
 ##     bg.col = NA,
 ##     bg.border = NA,
 ##     bg.lty = par("lty"),

@@ -20,7 +20,7 @@ source("src/intro-00-correspondence.R")
 ###################################################
 ## library(circlize)
 ## par(mar = c(1, 1, 1, 1), lwd = 0.1, cex = 0.7)
-## circos.par("default.track.height" = 0.1)
+## circos.par("track.height" = 0.1)
 ## circos.initialize(factors = a$factor, x = a$x)
 
 
@@ -429,7 +429,7 @@ source("src/intro-20-seperated.R")
 ## lim = c(1, 1.1, 1.2, 1.3)
 ## for(i in 1:4) {
 ##     circos.par("canvas.xlim" = c(-lim[i], lim[i]),
-##         "canvas.ylim" = c(-lim[i], lim[i]), "default.track.height" = 0.4)
+##         "canvas.ylim" = c(-lim[i], lim[i]), "track.height" = 0.4)
 ##     circos.initialize(factors = factors, xlim = c(0, 1))
 ##     circos.trackPlotRegion(ylim = c(0, 1), bg.border = NA)
 ##     circos.updatePlotRegion(sector.index = factors[i], bg.border = "black")

@@ -263,7 +263,158 @@ source("src/genomic-04-genomicTrackPlotRegion.R")
 
 
 ###################################################
-### code chunk number 29: genomic_plot.Rnw:483-494 (eval = FALSE)
+### code chunk number 29: genomic_plot.Rnw:480-535 (eval = FALSE)
+###################################################
+## ### track A
+## bed = generateRandomBed(nr = 300)
+## circos.genomicTrackPlotRegion(bed, panel.fun = function(region, value, ...) {
+##     circos.genomicPoints(region, value, pch = 16, cex = 0.5, ...)
+## })
+## 
+## ### track B
+## bed = generateRandomBed(nr = 300)
+## circos.genomicTrackPlotRegion(bed, stack = TRUE, 
+##     panel.fun = function(region, value, ...) {
+##         circos.genomicPoints(region, value, pch = 16, cex = 0.5, ...)
+##         i = getI(...)
+##         cell.xlim = get.cell.meta.data("cell.xlim")
+##         circos.lines(cell.xlim, c(i, i), lty = 2, col = "#00000040")
+## })
+## 
+## ### track C
+## bed1 = generateRandomBed(nr = 300)
+## bed2 = generateRandomBed(nr = 300)
+## bed_list = list(bed1, bed2)
+## circos.genomicTrackPlotRegion(bed_list, 
+##     panel.fun = function(region, value, ...) {
+##         cex = (value[[1]] - min(value[[1]]))/(max(value[[1]]) - min(value[[1]]))
+##         i = getI(...)
+##         circos.genomicPoints(region, value, cex = cex, pch = 16, col = i, ...)
+## })
+## 
+## ### track D
+## circos.genomicTrackPlotRegion(bed_list, stack = TRUE, 
+##     panel.fun = function(region, value, ...) {
+##         cex = (value[[1]] - min(value[[1]]))/(max(value[[1]]) - min(value[[1]]))
+##         i = getI(...)
+##         circos.genomicPoints(region, value, cex = cex, pch = 16, col = i, ...)
+##         cell.xlim = get.cell.meta.data("cell.xlim")
+##         circos.lines(cell.xlim, c(i, i), lty = 2, col = "#00000040")
+## })
+## 
+## ### track E
+## bed = generateRandomBed(nr = 300, nc = 4)
+## circos.genomicTrackPlotRegion(bed, 
+##     panel.fun = function(region, value, ...) {
+##         cex = (value[[1]] - min(value[[1]]))/(max(value[[1]]) - min(value[[1]]))
+##         circos.genomicPoints(region, value, cex = 0.5, pch = 16, col = 1:4, ...)
+## })
+## 
+## ### track F
+## bed = generateRandomBed(nr = 300, nc = 4)
+## circos.genomicTrackPlotRegion(bed, stack = TRUE, 
+##     panel.fun = function(region, value, ...) {
+##         cex = (value[[1]] - min(value[[1]]))/(max(value[[1]]) - min(value[[1]]))
+##         i = getI(...)
+##         circos.genomicPoints(region, value, cex = cex, pch = 16, col = i, ...)
+##         cell.xlim = get.cell.meta.data("cell.xlim")
+##         circos.lines(cell.xlim, c(i, i), lty = 2, col = "#00000040")
+## })
+
+
+###################################################
+### code chunk number 30: genomic_plot.Rnw:540-585 (eval = FALSE)
+###################################################
+## ### track A
+## bed = generateRandomBed(nr = 500)
+## circos.genomicTrackPlotRegion(bed, 
+##     panel.fun = function(region, value, ...) {
+##         circos.genomicLines(region, value, type = "l", ...)
+## })
+## 
+## ### track B
+## bed1 = generateRandomBed(nr = 500)
+## bed2 = generateRandomBed(nr = 500)
+## bed_list = list(bed1, bed2)
+## circos.genomicTrackPlotRegion(bed_list, 
+##     panel.fun = function(region, value, ...) {
+##         i = getI(...)
+##         circos.genomicLines(region, value, col = i, ...)
+## })
+## 
+## ### track C
+## circos.genomicTrackPlotRegion(bed_list, stack = TRUE, 
+##     panel.fun = function(region, value, ...) {
+##         i = getI(...)
+##         circos.genomicLines(region, value, col = i, ...)
+## })
+## 
+## ### track D
+## bed = generateRandomBed(nr = 500, nc = 4)
+## circos.genomicTrackPlotRegion(bed, 
+##     panel.fun = function(region, value, ...) {
+##         circos.genomicLines(region, value, col = 1:4, ...)
+## })
+## 
+## ### track E
+## bed = generateRandomBed(nr = 500, nc = 4)
+## circos.genomicTrackPlotRegion(bed, stack = TRUE, 
+##     panel.fun = function(region, value, ...) {
+##         i = getI(...)
+##         circos.genomicLines(region, value, col = i, ...)
+## })
+## 
+## ### track F
+## bed = generateRandomBed(nr = 200)
+## circos.genomicTrackPlotRegion(bed, 
+##     panel.fun = function(region, value, ...) {
+##         circos.genomicLines(region, value, type = "segment", lwd = 2, ...)
+## })
+
+
+###################################################
+### code chunk number 31: genomic_plot.Rnw:590-626 (eval = FALSE)
+###################################################
+## ### track A
+## f = colorRamp2(breaks = c(-1, 0, 1), colors = c("green", "black", "red"))
+## bed = generateRandomBed(nr = 100, nc = 4)
+## circos.genomicTrackPlotRegion(bed, stack = TRUE, 
+##     panel.fun = function(region, value, ...) {
+##         circos.genomicRect(region, value, col = f(value[[1]]), 
+##             border = f(value[[1]]), ...)
+## })
+## 
+## ### track B
+## bed1 = generateRandomBed(nr = 100)
+## bed2 = generateRandomBed(nr = 100)
+## bed_list = list(bed1, bed2)
+## circos.genomicTrackPlotRegion(bed_list, stack = TRUE, 
+##     panel.fun = function(region, value, ...) {
+##         circos.genomicRect(region, value, col = f(value[[1]]), 
+##             border = f(value[[1]]), ...)
+## })
+## 
+## ### track C
+## circos.genomicTrackPlotRegion(bed_list, ylim = c(0, 3), 
+##     panel.fun = function(region, value, ...) {
+##         i = getI(...)
+##         circos.genomicRect(region, value, ytop = i+0.4, ybottom = i-0.4, 
+##             col = f(value[[1]]), border = f(value[[1]]), ...)
+## })
+## 
+## ### track D
+## bed = generateRandomBed(nr = 200)
+## circos.genomicTrackPlotRegion(bed, 
+##     panel.fun = function(region, value, ...) {
+##         circos.genomicRect(region, value, ytop.column = 1, ybottom = 0, 
+##             col = ifelse(value[[1]] > 0, "red", "green"), ...)
+##         cell.xlim = get.cell.meta.data("cell.xlim")
+##         circos.lines(cell.xlim, c(0, 0), lty = 2, col = "#00000040")
+## })
+
+
+###################################################
+### code chunk number 32: genomic_plot.Rnw:634-645 (eval = FALSE)
 ###################################################
 ## circos.genomicTrackPlotRegion(bed, ylim = c(-1, 1),
 ##     panel.fun = function(region, value, ...) {
@@ -279,20 +430,20 @@ source("src/genomic-04-genomicTrackPlotRegion.R")
 
 
 ###################################################
-### code chunk number 30: genomic_plot.Rnw:503-505 (eval = FALSE)
+### code chunk number 33: genomic_plot.Rnw:654-656 (eval = FALSE)
 ###################################################
 ## circos.genomicLink(bed1, bed2)
 ## circos.genomicLink(bed1, bed2, col)
 
 
 ###################################################
-### code chunk number 31: figgenomiclink
+### code chunk number 34: figgenomiclink
 ###################################################
 source("src/genomic-05-genomicLink.R")
 
 
 ###################################################
-### code chunk number 32: genomic_plot.Rnw:524-528 (eval = FALSE)
+### code chunk number 35: genomic_plot.Rnw:675-679 (eval = FALSE)
 ###################################################
 ## highlight.chromosome("chr1")
 ## highlight.chromosome("chr1", track.index = c(2, 3))
@@ -301,13 +452,13 @@ source("src/genomic-05-genomicLink.R")
 
 
 ###################################################
-### code chunk number 33: fighighlight
+### code chunk number 36: fighighlight
 ###################################################
 source("src/genomic-06-highlight.chromosome.R")
 
 
 ###################################################
-### code chunk number 34: genomic_plot.Rnw:568-571 (eval = FALSE)
+### code chunk number 37: genomic_plot.Rnw:719-722 (eval = FALSE)
 ###################################################
 ## circos.genomicTrackPlotRegion(data, panel.fun = function(region, value, ...) {
 ##     circos.genomicPoints(region, value, posTransform = posTransform.default, ...)
@@ -315,7 +466,7 @@ source("src/genomic-06-highlight.chromosome.R")
 
 
 ###################################################
-### code chunk number 35: genomic_plot.Rnw:579-584 (eval = FALSE)
+### code chunk number 38: genomic_plot.Rnw:730-735 (eval = FALSE)
 ###################################################
 ## circos.genomicPosTransformLines(data, posTransform = posTransform.default)
 ## circos.genomicPosTransformLines(data, posTransform = posTransform.default,
@@ -325,13 +476,13 @@ source("src/genomic-06-highlight.chromosome.R")
 
 
 ###################################################
-### code chunk number 36: figpostransform
+### code chunk number 39: figpostransform
 ###################################################
 source("src/genomic-07-posTransformLines.R")
 
 
 ###################################################
-### code chunk number 37: genomic_plot.Rnw:609-616 (eval = FALSE)
+### code chunk number 40: genomic_plot.Rnw:760-767 (eval = FALSE)
 ###################################################
 ## bed = generateRandomBed(nr = 400, fun = function(k) rep("text", k))
 ## circos.genomicTrackPlotRegion(bed, ylim = c(0, 1), 
@@ -343,7 +494,7 @@ source("src/genomic-07-posTransformLines.R")
 
 
 ###################################################
-### code chunk number 38: genomic_plot.Rnw:626-631 (eval = FALSE)
+### code chunk number 41: genomic_plot.Rnw:777-782 (eval = FALSE)
 ###################################################
 ## i_track = get.cell.meta.data("track.index")  # previous track
 ## circos.genomicPosTransformLines(bed, 
@@ -353,7 +504,7 @@ source("src/genomic-07-posTransformLines.R")
 
 
 ###################################################
-### code chunk number 39: genomic_plot.Rnw:640-655 (eval = FALSE)
+### code chunk number 42: genomic_plot.Rnw:791-806 (eval = FALSE)
 ###################################################
 ## circos.genomicTrackPlotRegion(bed, ylim = c(0, 1), track.height = 0.1, bg.border = NA)
 ## i_track = get.cell.meta.data("track.index")  # remember this empty track, we'll come back soon
@@ -373,7 +524,7 @@ source("src/genomic-07-posTransformLines.R")
 
 
 ###################################################
-### code chunk number 40: genomic_plot.Rnw:661-673 (eval = FALSE)
+### code chunk number 43: genomic_plot.Rnw:812-824 (eval = FALSE)
 ###################################################
 ## circos.genomicTrackPlotRegion(bed, ylim = c(0, 1), 
 ##     panel.fun = function(region, value, ...) {
@@ -390,19 +541,19 @@ source("src/genomic-07-posTransformLines.R")
 
 
 ###################################################
-### code chunk number 41: figpostransformtext
+### code chunk number 44: figpostransformtext
 ###################################################
 source("src/genomic-07-posTransformLinesText.R")
 
 
 ###################################################
-### code chunk number 42: figrainfall
+### code chunk number 45: figrainfall
 ###################################################
 source("src/genomic-08-rainfallplot.R")
 
 
 ###################################################
-### code chunk number 43: genomic_plot.Rnw:709-712 (eval = FALSE)
+### code chunk number 46: genomic_plot.Rnw:860-863 (eval = FALSE)
 ###################################################
 ## circos.genomicDensity(bed)
 ## circos.genomicDensity(bed, window.size = 1e6)
@@ -410,7 +561,7 @@ source("src/genomic-08-rainfallplot.R")
 
 
 ###################################################
-### code chunk number 44: genomic_plot.Rnw:720-722 (eval = FALSE)
+### code chunk number 47: genomic_plot.Rnw:871-873 (eval = FALSE)
 ###################################################
 ## circos.genoimcRainfall(bed)
 ## circos.genoimcRainfall(bedlist, col = c("red", "green"))
