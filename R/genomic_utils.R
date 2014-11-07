@@ -32,10 +32,13 @@ read.cytoband = function(cytoband = paste(system.file(package = "circlize"),
 	
 	if(!is.null(species)) {
 		url = paste("http://hgdownload.cse.ucsc.edu/goldenPath/", species, "/database/cytoBand.txt.gz", sep = "")
-		cytoband = paste(tempdir(), "/cytoBand.txt.gz", sep = "")
-		e = try(download.file(url, destfile = cytoband, quiet = TRUE), silent = TRUE)
-		if(class(e) == "try-error") {
-			stop("Seems your species name is wrong or UCSC does not provide cytoband data for your species or internet connection was interrupted.\nIf possible, download cytoBand file from\n", url, "\nand use `read.cytoband(file)`.\n")
+		cytoband = paste0(circos.par("__tempdir__"), "/", species, "_cytoBand.txt.gz")
+		if(!file.exists(cytoband)) {
+			e = try(download.file(url, destfile = cytoband, quiet = TRUE), silent = TRUE)
+			if(class(e) == "try-error") {
+				file.remove(cytoband)
+				stop("Seems your species name is wrong or UCSC does not provide cytoband data for your species\nor internet connection was interrupted.\nIf possible, download cytoBand file from\n", url, "\nand use `read.cytoband(file)`.\n")
+			}
 		}
 	}
 	
@@ -68,6 +71,7 @@ read.cytoband = function(cytoband = paste(system.file(package = "circlize"),
 		chr.len = c(chr.len, max(d2[, 3]))
 		dnew = rbind(dnew, d2)
 	}
+	names(chr.len) = chromosome
 	
 	return(list(df = dnew, chromosome = chromosome, chr.len = chr.len))
 }
@@ -107,12 +111,14 @@ cytoband.col = function(x) {
 # -nr  Number of rows
 # -nc  Number of numeric columns / value columns
 # -fun Function for generating random values
+# -species species, pass to `read.cytoband`
 #
 # == details
 # The function will uniformly sample positions from human genome. Chromosome names start with "chr"
 # and positions are sorted. The final number of rows may not be exactly as same as ``nr``.
-generateRandomBed = function(nr = 10000, nc = 1, fun = function(k) rnorm(k, 0, 0.5)) {
-	cyto = read.cytoband()
+generateRandomBed = function(nr = 10000, nc = 1, fun = function(k) rnorm(k, 0, 0.5),
+    species = "hg19") {
+	cyto = read.cytoband(species = species)
 	chr.len = cyto$chr.len
 	chromosome = cyto$chromosome
 	dl = lapply(seq_along(chr.len), function(i) {
@@ -121,7 +127,7 @@ generateRandomBed = function(nr = 10000, nc = 1, fun = function(k) rnorm(k, 0, 0
 		breaks = sort(sample(chr.len[i], k))
 		res = data.frame(chr = rep(chromosome[i], length(breaks)/2),
 						  start = breaks[seq_along(breaks) %% 2 == 1],
-						  start = breaks[seq_along(breaks) %% 2 == 0],
+						  end = breaks[seq_along(breaks) %% 2 == 0],
 						  stringsAsFactors = FALSE)
 		for(k in seq_len(nc)) {
 			res = cbind(res, value = fun(length(breaks)/2))
@@ -132,6 +138,12 @@ generateRandomBed = function(nr = 10000, nc = 1, fun = function(k) rnorm(k, 0, 0
 	df = NULL
 	for(i in seq_along(dl)) {
 		df = rbind(df, dl[[i]])
+	}
+	
+	if(ncol(df) == 3) {
+		colnames(df) = c("chr", "start", "end")
+	} else {
+		colnames(df) = c("chr", "start", "end", paste0("value", seq_len(ncol(df)-3)))
 	}
 	return(df)
 }

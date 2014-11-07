@@ -494,12 +494,13 @@ source("src/genomic-07-posTransformLines.R")
 
 
 ###################################################
-### code chunk number 41: genomic_plot.Rnw:777-782 (eval = FALSE)
+### code chunk number 41: genomic_plot.Rnw:776-782 (eval = FALSE)
 ###################################################
 ## i_track = get.cell.meta.data("track.index")  # previous track
 ## circos.genomicPosTransformLines(bed, 
-##     posTransform = quote(posTransform.text(region, y = 0, labels = value[[1]], 
-##         cex = 0.8, track.index = i_track)), direction = "outside"
+##     posTransform = function(region, value) posTransform.text(region, y = 0, 
+##         labels = value[[1]], cex = 0.8, track.index = i_track), 
+##     direction = "outside"
 ## )
 
 
@@ -517,14 +518,14 @@ source("src/genomic-07-posTransformLines.R")
 ## }, track.height = 0.1, bg.border = NA)
 ## 
 ## circos.genomicPosTransformLines(bed, 
-##     posTransform = quote(posTransform.text(region, y = 1, labels = value[[1]],
-##         cex = 0.8, track.index = i_track+1)),
+##     posTransform = function(region, value) posTransform.text(region, y = 1, 
+##         labels = value[[1]], cex = 0.8, track.index = i_track+1),
 ##     direction = "inside", track.index = i_track
 ## )
 
 
 ###################################################
-### code chunk number 43: genomic_plot.Rnw:812-824 (eval = FALSE)
+### code chunk number 43: genomic_plot.Rnw:812-825 (eval = FALSE)
 ###################################################
 ## circos.genomicTrackPlotRegion(bed, ylim = c(0, 1), 
 ##     panel.fun = function(region, value, ...) {
@@ -535,8 +536,9 @@ source("src/genomic-07-posTransformLines.R")
 ## 
 ## i_track = get.cell.meta.data("track.index")  # previous track
 ## circos.genomicPosTransformLines(bed, 
-##     posTransform = quote(posTransform.text(region, y = 0, labels = value[[1]], 
-##         cex = 0.8, padding = 0.2, track.index = i_track)), direction = "outside"
+##     posTransform = function(region, value) posTransform.text(region, y = 0, 
+##         labels = value[[1]], cex = 0.8, padding = 0.2, track.index = i_track),
+##     direction = "outside"
 ## )
 
 
@@ -553,7 +555,7 @@ source("src/genomic-08-rainfallplot.R")
 
 
 ###################################################
-### code chunk number 46: genomic_plot.Rnw:860-863 (eval = FALSE)
+### code chunk number 46: genomic_plot.Rnw:861-864 (eval = FALSE)
 ###################################################
 ## circos.genomicDensity(bed)
 ## circos.genomicDensity(bed, window.size = 1e6)
@@ -561,7 +563,7 @@ source("src/genomic-08-rainfallplot.R")
 
 
 ###################################################
-### code chunk number 47: genomic_plot.Rnw:871-873 (eval = FALSE)
+### code chunk number 47: genomic_plot.Rnw:872-874 (eval = FALSE)
 ###################################################
 ## circos.genoimcRainfall(bed)
 ## circos.genoimcRainfall(bedlist, col = c("red", "green"))

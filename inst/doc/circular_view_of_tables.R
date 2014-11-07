@@ -305,3 +305,42 @@ source("src/chordDiagram-04-other.R")
 source("src/chordDiagram-05-compare.R")
 
 
+###################################################
+### code chunk number 36: circular_view_of_tables.Rnw:503-508 (eval = FALSE)
+###################################################
+## mat = matrix(rnorm(36), 6, 6)
+## rownames(mat) = paste0("R", 1:6)
+## colnames(mat) = paste0("C", 1:6)
+## mat[2, ] = 1e-10
+## mat[, 3] = 1e-10
+
+
+###################################################
+### code chunk number 37: circular_view_of_tables.Rnw:514-516 (eval = FALSE)
+###################################################
+## par(mar = c(1, 1, 1, 1))
+## chordDiagram(mat)
+
+
+###################################################
+### code chunk number 38: circular_view_of_tables.Rnw:522-523 (eval = FALSE)
+###################################################
+## chordDiagram(mat, row.col = rep(c("red", "blue"), 3))
+
+
+###################################################
+### code chunk number 39: circular_view_of_tables.Rnw:529-534 (eval = FALSE)
+###################################################
+## chordDiagram(mat, grid.col = rep(c("red", "blue"), 6))
+## 
+## circos.par("gap.degree" = rep(c(2, 10), 6))
+## chordDiagram(mat)
+## circos.clear()
+
+
+###################################################
+### code chunk number 40: figchordmisc
+###################################################
+source("src/chordDiagram-06-misc.R")
+
+
