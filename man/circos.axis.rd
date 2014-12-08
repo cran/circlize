@@ -17,7 +17,8 @@ circos.axis(h = "top", major.at = NULL, labels = TRUE, major.tick = TRUE,
     labels.font = par("font"), labels.cex = par("cex"),
     labels.facing = "inside", labels.direction = NULL, labels.niceFacing = TRUE,
     direction = c("outside", "inside"), minor.ticks = 4,
-    major.tick.percentage = 0.1, labels.away.percentage = 0.05, lwd = par("lwd"))
+    major.tick.percentage = 0.1, labels.away.percentage = major.tick.percentage/2,
+    lwd = par("lwd"))
 }
 \arguments{
   \item{h}{Position of the x-axis, can be "top", "bottom" or a numeric value}
@@ -96,8 +97,8 @@ while(1) {
     sec = ceiling(current.time$sec)
     min = current.time$min
     hour = current.time$hour
-	
-	# erase the clock hands
+    
+    # erase the clock hands
     draw.sector(rou1 = 0.8, border = "white", col = "white")
 
     sec.degree = 90 - sec/60 * 360

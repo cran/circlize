@@ -16,16 +16,19 @@ circlize = function(x, y, sector.index = get.current.sector.index(),
 	track.index = get.current.track.index()) {
     
     sector.data = get.sector.data(sector.index)
-    cell.data = get.cell.data(sector.index, track.index)
-    cell.ylim = get.cell.meta.data("cell.ylim", sector.index, track.index)
-        
+       
     theta = sector.data["start.degree"] - (x - sector.data["min.value"]) / (sector.data["max.value"] - sector.data["min.value"]) *
             abs(sector.data["start.degree"] - sector.data["end.degree"])
-        
-    y.range = cell.ylim[2] - cell.ylim[1]
-        
-    rou = cell.data$track.start - (cell.ylim[2] - y) / y.range * cell.data$track.height
     
+	if(track.index == 0) {
+		rou = rep(1, length(theta))
+	} else {
+		cell.data = get.cell.data(sector.index, track.index)
+		cell.ylim = get.cell.meta.data("cell.ylim", sector.index, track.index)  
+		y.range = cell.ylim[2] - cell.ylim[1] 
+		rou = cell.data$track.start - (cell.ylim[2] - y) / y.range * cell.data$track.height
+    }
+	
     m = cbind(theta, rou)
     colnames(m) = c("theta", "rou")
     rownames(m) = NULL
@@ -228,9 +231,9 @@ colorRamp2 = function(breaks, colors, transparency = 0) {
 # rgb1 vector with 3 elements
 # rgb2 vector with 3 elements
 .get_color = function(x, break1, break2, rgb1, rgb2, transparency) {
-	res_rgb = NULL
+	res_rgb = matrix(nrow = 3, ncol = length(x))
 	for(i in seq_along(x)) {
-		res_rgb = cbind(res_rgb, (x[i] - break2)*(rgb2 - rgb1) / (break2 - break1) + rgb2)
+		res_rgb[, i] = (x[i] - break2)*(rgb2 - rgb1) / (break2 - break1) + rgb2
 	}
 	return(rgb(t(res_rgb)/255, alpha = 1-transparency))
 }
@@ -268,6 +271,25 @@ circos.approx = function(x, y, resolution = 0.1, sector.index = get.cell.meta.da
 	return(list(x = newx, y = newy))
 }
 
-rand_color = function(n, transparency = 0) {
+# == title
+# generate random colors
+#
+# == param
+# -n number of colors
+# -transparency transparency, numeric value between 0 and 1
+#
+# == value
+# a vector of colors
+rand_color = function(n = 1, transparency = 0) {
     return(rgb(runif(n), runif(n), runif(n), 1 - transparency))
+}
+
+get_most_inside_radius = function() {
+	tracks = get.all.track.index()
+	if(length(tracks) == 0) {
+	    1
+	} else {
+	    n = length(tracks)
+	    get.cell.meta.data("cell.bottom.radius", track.index = tracks[n]) - get.cell.meta.data("track.margin", track.index = tracks[n])[1] - circos.par("track.margin")[2]
+	}
 }

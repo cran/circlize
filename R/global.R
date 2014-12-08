@@ -157,7 +157,8 @@ circos.par = setGlobalOptions(
 	'__tempdir__' = list(
 		.value = ".",
 		.private = TRUE,
-		.visible = TRUE
+		.filter = function(x) {dir.create(x, showWarnings = FALSE); return(x)},
+		.visible = FALSE
 	)
 )
 
@@ -509,11 +510,19 @@ circos.info = function(sector.index = NULL, track.index = NULL, plot = FALSE) {
 	} else {
 		# just print the name and xlim for each sector
 		if(is.null(sector.index) && is.null(track.index)) {
-			cat("All your sectors:\n")
-			print(sectors)
+			if(length(sectors)) {
+				cat("All your sectors:\n")
+				print(sectors)
+			} else {
+				cat("No sector has been created\n")
+			}
 			cat("\n")
-			cat("All your tracks:\n")
-			print(tracks)
+			if(length(tracks)) {
+				cat("All your tracks:\n")
+				print(tracks)
+			} else {
+				cat("No track has been created\n")
+			}
 			cat("\n")
 
 		} else {
@@ -524,7 +533,7 @@ circos.info = function(sector.index = NULL, track.index = NULL, plot = FALSE) {
 			}
 			for(i in seq_along(sector.index)) {
 				for(j in seq_along(track.index)) {
-					cat("sector index: ", sector.index[i], "\n", sep = "")
+					cat("sector index: '", sector.index[i], "'\n", sep = "")
 					cat("track index: ", track.index[j], "\n", sep = "")
 					xlim = get.cell.meta.data('xlim', sector.index[i], track.index[j])
 					ylim = get.cell.meta.data('ylim', sector.index[i], track.index[j])
@@ -548,8 +557,8 @@ circos.info = function(sector.index = NULL, track.index = NULL, plot = FALSE) {
 				
 		}
 
-		cat("Your current sector.index is ", get.current.sector.index(), "\n", sep = "")
-		cat("Your current track.index is ", get.current.track.index(), "\n", sep = "")
+		if(length(get.current.sector.index())) cat("Your current sector.index is ", get.current.sector.index(), "\n", sep = "")
+		if(get.current.track.index() > 0) cat("Your current track.index is ", get.current.track.index(), "\n", sep = "")
 	}
 	
 }

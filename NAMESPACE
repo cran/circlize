@@ -43,11 +43,11 @@ export(
 	posTransform.default,
 	posTransform.text,
 	rainfallTransform,
+	rand_color,
 	read.cytoband,
 	reverse.circlize,
 	show.index
 )
 
 importFrom("GlobalOptions", setGlobalOptions)
-import("methods")
 

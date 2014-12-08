@@ -12,16 +12,7 @@
 }
 \usage{
 circos.genomicLink(region1, region2,
-    rou = {tracks = get.all.track.index()
-    if(length(tracks) == 0) {
-    1
-    } else {
-    n = length(tracks)
-    get.cell.meta.data("cell.bottom.radius", track.index = tracks[n]) -
-    get.cell.meta.data("track.margin", track.index = tracks[n])[1] -
-    circos.par("track.margin")[2]
-    }
-    }, rou1 = rou, rou2 = rou,
+    rou = get_most_inside_radius(), rou1 = rou, rou2 = rou,
     col = "black", lwd = par("lwd"), lty = par("lty"), border = NA, ...)
 }
 \arguments{
@@ -58,7 +49,7 @@ bed1 = generateRandomBed(nr = 100)
 bed1 = bed1[sample(nrow(bed1), 20), ]
 bed2 = generateRandomBed(nr = 100)
 bed2 = bed2[sample(nrow(bed2), 20), ]
-circos.par("default.track.height" = 0.1, cell.padding = c(0, 0, 0, 0))
+circos.par("track.height" = 0.1, cell.padding = c(0, 0, 0, 0))
 circos.initializeWithIdeogram()
 
 circos.genomicLink(bed1, bed2, col = sample(1:5, 20, replace = TRUE), border = NA)

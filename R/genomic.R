@@ -190,6 +190,7 @@ circos.genomicInitialize = function(data, sector.names = NULL, major.by = NULL,
 #                 If ``data`` is a data frame, the default value for ``numeric.column`` is all the numeric column starting from the fourth column.
 #                 If ``data`` is a list of data frame, the default value for ``numeric.column`` is a vector which have the same length as ``data``
 #                 and the value in default ``numeric.column`` is the index of the first numeric column in corresponding data frame.
+# -jitter Numeric. Only works for adding points in ``circos.genomicTrackPlotRegion`` under ``stack`` mode
 # -panel.fun Self-defined function which will be applied on each sector. Please not it is different
 #            from that in `circos.trackPlotRegion`. In this function, there are two arguments (``region`` and ``value``) plus ``...``.
 #            In them, ``region`` is a two-column data frame with start positions and end positions in current genomic category (e.g. chromosome). 
@@ -228,7 +229,8 @@ circos.genomicInitialize = function(data, sector.names = NULL, major.by = NULL,
 # argument is used to pass hidden values to low-level graphical functions. So if you are using functions like ``circos.genomicPoints``, you should also
 # add ``...`` as an additional argument into ``circos.genomicPoints``.
 circos.genomicTrackPlotRegion = function(data = NULL, ylim = NULL, stack = FALSE,
-	numeric.column = NULL, panel.fun = function(region, value, ...)  {NULL}, ... ) {
+	numeric.column = NULL, jitter = 0,
+	panel.fun = function(region, value, ...)  {NULL}, ... ) {
 	
 	if(is.null(data)) {
 		all.sector.index = get.all.sector.index()
@@ -245,9 +247,11 @@ circos.genomicTrackPlotRegion = function(data = NULL, ylim = NULL, stack = FALSE
 	
 	# excluding the first three columns
 	if(!is.null(numeric.column)) {
-		numeric.column = numeric.column - 3
+		if(is.numeric(numeric.column)) {
+			numeric.column = numeric.column - 3
+		}
 		if(any(numeric.column < 0)) {
-			stop("Wrong value in `numeric.column`, they should be larger than 3.\n")
+			stop("Wrong value in `numeric.column`, they should be larger than 3 or character index.\n")
 		}
 	}
 	
@@ -308,6 +312,7 @@ circos.genomicTrackPlotRegion = function(data = NULL, ylim = NULL, stack = FALSE
 							.param = new.env()
 							assign("i", i, envir = .param)
 							assign("stack", TRUE, envir = .param)
+							assign("jitter", jitter, envir = .param)
 							if(!is.null(numeric.column) && !is.na(numeric.column[i])) {
 								assign("numeric.column", numeric.column[i], envir = .param)
 							}
@@ -332,6 +337,7 @@ circos.genomicTrackPlotRegion = function(data = NULL, ylim = NULL, stack = FALSE
 							.param = new.env()
 							assign("i", i, envir = .param)
 							assign("stack", TRUE, envir = .param)
+							assign("jitter", jitter, envir = .param)
 							genomicPanelFun(df[2:3], df[-(1:3)][non.numeric.column], .param = .param)
 						}
 
@@ -348,6 +354,7 @@ circos.genomicTrackPlotRegion = function(data = NULL, ylim = NULL, stack = FALSE
 								assign("i", i, envir = .param)
 								assign("stack", TRUE, envir = .param)
 								assign("numeric.column", 1, envir = .param)
+								assign("jitter", jitter, envir = .param)
 								genomicPanelFun(df[2:3], df[-(1:3)][c(numeric.column[i], non.numeric.column)], .param = .param)
 							}
 						}
@@ -468,7 +475,11 @@ circos.genomicPoints = function(region, value, numeric.column = NULL,
 		.param = args$.param
 		if(!is.null(.param$stack)) {
 			if(.param$stack && is.null(numeric.column)) {
-				value = data.frame(hline = rep(.param$i, nr))
+				if(is.null(.param$jitter)) {
+					value = data.frame(hline = rep(.param$i, nr))
+				} else {
+					value = data.frame(hline = rep(.param$i, nr) + (runif(nr) - 0.5)*abs(.param$jitter))
+				}
 				numeric.column = 1
 			}
 		} else if(!is.null(.param$numeric.column) && is.null(numeric.column)) {
@@ -526,6 +537,8 @@ circos.genomicPoints = function(region, value, numeric.column = NULL,
 # -track.index Pass to `circos.lines`
 # -posTransform Self-defined function to transform genomic positions, see `posTransform.default` for explaination
 # -col col of lines/areas. If there are more than one numeric column, the length of ``col`` can be either one or number of numeric columns.
+#      If there is only one numeric column and type is either ``segment`` or ``h``, 
+#      the length of ``col`` can be either one or number of rows of ``region``.
 #      pass to `circos.lines`
 # -lwd Settings are similar as ``col``. Pass to `circos.lines`
 # -lty Settings are similar as ``col``. Pass to `circos.lines`
@@ -591,17 +604,23 @@ circos.genomicLines = function(region, value, numeric.column = NULL,
 	}
 
 	nc = length(numeric.column)
-
-	col = .normalizeGraphicalParam(col, nc, 1, "col")
-	lwd = .normalizeGraphicalParam(lwd, nc, 1, "col")
-	lty = .normalizeGraphicalParam(lty, nc, 1, "col")
+	
+	if(all(type %in% c("h", "segment"))) {
+		col = .normalizeGraphicalParam(col, nc, nr, "col")
+		lwd = .normalizeGraphicalParam(lwd, nc, nr, "col")
+		lty = .normalizeGraphicalParam(lty, nc, nr, "col")
+	} else {
+		col = .normalizeGraphicalParam(col, nc, 1, "col")
+		lwd = .normalizeGraphicalParam(lwd, nc, 1, "col")
+		lty = .normalizeGraphicalParam(lty, nc, 1, "col")
+	}
+	pt.col = .normalizeGraphicalParam(pt.col, nc, 1, "col")
+	cex = .normalizeGraphicalParam(cex, nc, 1, "col")
+	pch = .normalizeGraphicalParam(pch, nc, 1, "col")
 	type = .normalizeGraphicalParam(type, nc, 1, "col")
 	area = .normalizeGraphicalParam(area, nc, 1, "col")
 	baseline = .normalizeGraphicalParam(baseline, nc, 1, "col")
 	border = .normalizeGraphicalParam(border, nc, 1, "col")
-	pt.col = .normalizeGraphicalParam(pt.col, nc, 1, "col")
-	cex = .normalizeGraphicalParam(cex, nc, 1, "col")
-	pch = .normalizeGraphicalParam(pch, nc, 1, "col")
 	
 	if(!is.null(args$hline)) {
 		for(i in seq_len(nr)) {
@@ -613,7 +632,7 @@ circos.genomicLines = function(region, value, numeric.column = NULL,
 		if(type == "segment") {
 			for(i in seq_len(nr)) {
 				circos.lines( c(region[i, 1], region[i, 2]), c(value[i, numeric.column], value[i, numeric.column]), 
-					col = col, lwd = lwd, lty = lty, type = "l",
+					col = col[i], lwd = lwd[i], lty = lty[i], type = "l",
 					sector.index = sector.index, track.index = track.index )
 			}
 		} else {
@@ -889,16 +908,7 @@ circos.genomicText = function(region, value, y = NULL, labels = NULL, labels.col
 #
 # If you want to have more controls on links, please use `circos.link` directly.
 circos.genomicLink = function(region1, region2, 
-	rou = {tracks = get.all.track.index()
-	       if(length(tracks) == 0) {
-		       1
-		   } else {
-		       n = length(tracks)
-		       get.cell.meta.data("cell.bottom.radius", track.index = tracks[n]) - 
-			     get.cell.meta.data("track.margin", track.index = tracks[n])[1] - 
-			     circos.par("track.margin")[2]
-		   }
-    }, rou1 = rou, rou2 = rou,
+	rou = get_most_inside_radius(), rou1 = rou, rou2 = rou,
     col = "black", lwd = par("lwd"), lty = par("lty"), border = NA, ...) {
 	
 	region1 = normalizeToDataFrame(region1)
@@ -1195,10 +1205,10 @@ genomicDensity = function(region, window.size = 10000000, overlap = TRUE) {
 }
 
 # == title
-# Highlight a chromosome
+# Highlight chromosomes
 #
 # == param
-# -chr Chromosome name. Only allow single chromosome. It should be consistent with the sector index.
+# -chr Chromosome names. It should be consistent with the sector index.
 # -track.index A vector of track index that you want to highlight
 # -col Color for highlighting. Note the color should be semi-transparent.
 # -border Border of the highlighted region
@@ -1208,45 +1218,73 @@ genomicDensity = function(region, window.size = 10000000, overlap = TRUE) {
 #          representing ratios of the width or height of the highlighted region
 #
 # == details
-# You may use `circos.info` to find out index for all tracks.
+# You can use `circos.info` to find out index for all tracks.
 #
 # The function calls `draw.sector`.
 highlight.chromosome = function(chr, track.index = get.all.track.index(), 
 	col = "#FF000040", border = NA, lwd = par("lwd"), lty = par("lty"),
 	padding = c(0, 0, 0, 0)) {
 	
-	if(length(chr) != 1) {
-		stop("`chr` can only be length 1.\n")
+	sector.index = chr
+	sectors = get.all.sector.index()
+	if(!all(sector.index %in% sectors)) {
+		stop("`chr` contains index that does not beling to available sectors")
 	}
-	
 	tracks = get.all.track.index()
 	if(!all(track.index %in% tracks)) {
-		stop("`track.index` contains index that does not belong to available sectors.\n")
+		stop("`track.index` contains index that does not belong to available tracks.\n")
 	}
 	
-	track.index = sort(unique(track.index))
-	ts = continuousIndexSegment(track.index)
-	
-	for(i in seq_along(ts)) {
-		track.index.vector = ts[[i]]
-		start.degree = get.cell.meta.data("cell.start.degree", chr, track.index = 1)
-		end.degree = get.cell.meta.data("cell.end.degree", chr, track.index = 1)
-		rou1 = get.cell.meta.data("cell.top.radius", chr, track.index.vector[1])
-		rou2 = get.cell.meta.data("cell.bottom.radius", chr, track.index.vector[length(track.index.vector)])
+	# if all chromosomes are selected
+	if(length(setdiff(sectors, sector.index)) == 0) {
+		track.index = sort(unique(track.index))
+		ts = continuousIndexSegment(track.index)
 		
-		d1 = end.degree - start.degree
-		d2 = rou1 - rou2
-		start.degree = start.degree - d1*padding[2]
-		end.degree = end.degree + d1*padding[4]
-		rou1 = rou1 + d2*padding[3]
-		rou2 = rou2 - d2*padding[1]
+		for(i in seq_along(ts)) {
+			track.index.vector = ts[[i]]
+			start.degree = 0
+			end.degree = 360
+			rou1 = get.cell.meta.data("cell.top.radius", sectors[1], track.index.vector[1])
+			rou2 = get.cell.meta.data("cell.bottom.radius", sectors[1], track.index.vector[length(track.index.vector)])
+			
+			d2 = rou1 - rou2
+			rou1 = rou1 + d2*padding[3]
+			rou2 = rou2 - d2*padding[1]
+			
+			draw.sector(start.degree = start.degree, end.degree = end.degree, rou1 = rou1, rou2 = rou2, col = col, border = border, lwd = lwd, lty = lty)
+		}
 		
-		draw.sector(start.degree = start.degree, end.degree = end.degree, rou1 = rou1, rou2 = rou2, col = col, border = border, lwd = lwd, lty = lty)
-	}
+	} else {
 	
+		sector.numeric.index = which(sectors %in% sector.index)
+		ss = continuousIndexSegment(sector.numeric.index, n = length(sectors), loop = TRUE)
+		
+		track.index = sort(unique(track.index))
+		ts = continuousIndexSegment(track.index)
+		
+		for(j in seq_along(ss)) {
+			sector.index.vector = sectors[ ss[[j]] ]
+			for(i in seq_along(ts)) {
+				track.index.vector = ts[[i]]
+				start.degree = get.cell.meta.data("cell.start.degree", sector.index.vector[1], track.index = 1)
+				end.degree = get.cell.meta.data("cell.end.degree", sector.index.vector[length(sector.index.vector)], track.index = 1)
+				rou1 = get.cell.meta.data("cell.top.radius", sector.index.vector[1], track.index.vector[1])
+				rou2 = get.cell.meta.data("cell.bottom.radius", sector.index.vector[1], track.index.vector[length(track.index.vector)])
+				
+				d1 = end.degree - start.degree
+				d2 = rou1 - rou2
+				start.degree = start.degree - d1*padding[2]
+				end.degree = end.degree + d1*padding[4]
+				rou1 = rou1 + d2*padding[3]
+				rou2 = rou2 - d2*padding[1]
+				
+				draw.sector(start.degree = start.degree, end.degree = end.degree, rou1 = rou1, rou2 = rou2, col = col, border = border, lwd = lwd, lty = lty)
+			}
+		}
+	}	
 }
 
-continuousIndexSegment = function(x) {
+continuousIndexSegment = function(x, n = NULL, loop = FALSE) {
 	if(length(x) == 1) {
 		return(list(x))
 	} else {
@@ -1255,6 +1293,16 @@ continuousIndexSegment = function(x) {
 		for(i in seq_along(k)[-length(k)]) {
 			lt[[i]] = x[(k[i] + 1):(k[i+1])]
 		}
+		
+		if(loop && length(lt) > 1) {
+			first = lt[[1]]
+			last = lt[[length(lt)]]
+			if(first[1] == 1 && last[length(last)] == n) {
+				lt[[1]] = c(last, first)
+				lt = lt[-length(lt)]
+			}
+		}
+		
 		return(lt)
 	}
 }
