@@ -208,7 +208,11 @@ colorRamp2 = function(breaks, colors, transparency = 0) {
 	
     transparency = ifelse(transparency > 1, 1, ifelse(transparency < 0, 0, transparency))
 
-    function(x) {
+    fun = function(x = NULL) {
+    	if(is.null(x)) {
+    		stop("Please specify `x`\n")
+    	}
+
 		att = attributes(x)
         x = ifelse(x < breaks[1], breaks[1],
                   ifelse(x > breaks[length(breaks)], breaks[length(breaks)],
@@ -223,6 +227,9 @@ colorRamp2 = function(breaks, colors, transparency = 0) {
 		attributes(res_col) = att
 		return(res_col)
     }
+    
+    attr(fun, "breaks") = breaks
+    return(fun)
 }
 
 # x: vector
@@ -233,7 +240,9 @@ colorRamp2 = function(breaks, colors, transparency = 0) {
 .get_color = function(x, break1, break2, rgb1, rgb2, transparency) {
 	res_rgb = matrix(nrow = 3, ncol = length(x))
 	for(i in seq_along(x)) {
-		res_rgb[, i] = (x[i] - break2)*(rgb2 - rgb1) / (break2 - break1) + rgb2
+		xx = abs((x[i] - break2)*(rgb2 - rgb1) / (break2 - break1) + rgb2)
+		xx = round(xx)
+		res_rgb[, i] = xx
 	}
 	return(rgb(t(res_rgb)/255, alpha = 1-transparency))
 }

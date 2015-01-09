@@ -4,7 +4,7 @@ opts_chunk$set(fig.pos = "")
 
 library(circlize)
 circos.initialize = function(...) {
-    circos.par(unit.circle.segments = 400)
+    circos.par(unit.circle.segments = 300)
     circlize::circos.initialize(...)
 }
 
@@ -31,7 +31,6 @@ dgm[[2]]
 
 ## ----phylogenetic_tree_part1, eval = FALSE-------------------------------
 #  library(circlize)
-#  par(mar = c(1, 1, 1, 1))
 #  circos.par(cell.padding = c(0, 0, 0, 0))
 #  circos.initialize(factors = "a", xlim = c(0, n)) # only one sector
 #  maxy = attr(dgm, "height")  # maximum height of the trees
@@ -110,9 +109,8 @@ circos.dendrogram = function(dend, maxy = attr(dend, "height")) {
 #  circos.clear()
 
 ## ----phylogenetic_tree, echo = FALSE, fig.align = "center", out.width = "0.6\\textwidth", out.height = "1.2\\textwidth", fig.width = 6, fig.height = 12, fig.cap = "A simple phylogenetic tree. Top: circular style; Bottom: normal style."----
-par(mar = c(1, 1, 1, 1), mfrow = c(2, 1))
+par(mfrow = c(2, 1))
 library(circlize)
-par(mar = c(1, 1, 1, 1))
 circos.par(cell.padding = c(0, 0, 0, 0))
 circos.initialize(factors = "a", xlim = c(0, n)) # only one sector
 maxy = attr(dgm, "height")  # maximum height of the trees

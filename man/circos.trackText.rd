@@ -13,8 +13,8 @@
 \usage{
 circos.trackText(factors, x, y, labels, track.index = get.cell.meta.data("track.index"),
     direction = NULL, facing = c("inside", "outside", "reverse.clockwise", "clockwise",
-    "downward", "bending"), niceFacing = FALSE, adj = par("adj"), cex = 1, col = "black",
-    font = par("font"))
+    "downward", "bending", "bending.inside", "bending.outside"), niceFacing = FALSE,
+    adj = par("adj"), cex = 1, col = "black", font = par("font"))
 }
 \arguments{
   \item{factors}{Factors which represent the categories of data}

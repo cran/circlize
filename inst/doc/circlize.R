@@ -4,7 +4,7 @@ opts_chunk$set(fig.pos = "", fig.align = "center")
 
 library(circlize)
 circos.initialize = function(...) {
-    circos.par(unit.circle.segments = 400)
+    circos.par(unit.circle.segments = 300)
     circlize::circos.initialize(...)
 }
 
@@ -327,7 +327,7 @@ source("src/intro-09-text.R")
 #  circos.text(x, y, labels, sector.index, track.index)
 #  circos.text(x, y, labels, facing, adj, cex, col, font)
 
-## ----circlize_text_easy, echo = FALSE, out.width = "\\textwidth", fig.cap = "Human easy text facing. When {\\tt niceFacing} is on, settings in upper two figures or bottom two are actually identical. Red dots represent positions of the texts."----
+## ----circlize_text_easy, echo = FALSE, out.width = "0.6\\textheight", out.height = "0.9\\textheight", fig.width = 6, fig.height = 9, fig.cap = "Human easy text facing. When {\\tt niceFacing} is on, settings in the same row are actually identical. Red dots represent positions of the texts."----
 source("src/intro-09-text-niceFacing.R")
 
 ## ----eval = FALSE--------------------------------------------------------
@@ -552,7 +552,7 @@ sector.width = c(xrange[normal_sector_index] / sum(xrange[normal_sector_index]),
 #      xlim = get.cell.meta.data("xlim")
 #      ylim = get.cell.meta.data("ylim")
 #      sector.index = get.cell.meta.data("sector.index")
-#      circos.text(mean(xlim), mean(ylim), sector.index)
+#      circos.text(mean(xlim), mean(ylim), sector.index, niceFacing = TRUE)
 #  })
 
 ## ----circlize_zoom_2, eval = FALSE---------------------------------------
@@ -570,7 +570,7 @@ circos.trackPlotRegion(df2$factors, x = df2$x, y = df2$y, panel.fun = function(x
     xlim = get.cell.meta.data("xlim")
     ylim = get.cell.meta.data("ylim")
     sector.index = get.cell.meta.data("sector.index")
-    circos.text(mean(xlim), mean(ylim), sector.index)
+    circos.text(mean(xlim), mean(ylim), sector.index, niceFacing = TRUE)
 })
 circos.link("a", get.cell.meta.data("cell.xlim", sector.index = "a"),
     "zoom_a", get.cell.meta.data("cell.xlim", sector.index = "zoom_a"),

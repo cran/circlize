@@ -1,3 +1,22 @@
+Changes in version 0.2.1
+------------------------------------------------------------------------------
+
+* If par("mar") is using default, it will be changed to par(mar = c(1, 1, 1, 1))
+  internally and will be recovered after calling circos.clear()
+* `circos.text`: add two options ('bending.inside' which is identical to original
+  'bending' and 'bending.outside'), both support `niceFacing`
+* circos.par('__tempdir__') is initialized by `tempdir()`
+* `.get_color`: there will be no negative value due to 0.000 - 0.000
+* `chordDiagram`: `grid.col` is correctly reduced if rownames and colnames overlap
+* `circos.text`: `font` is passed to `text` function
+* `colorRamp2`: returned function has an attribute: `breaks`
+* `chordDiagram`: assign same names for rows and columns if the input matrix
+  is specified symmetric while has no names
+* `chordDiagram`: also check rownames and colnames if the matrix is specified as
+  symmetric.
+* don't remove temporary folder
+* `value` can be scalar or vector in `circos.genomicPoints`, `circos.genomicLines`, ...
+
 Changes in version 0.2.0
 ------------------------------------------------------------------------------
 

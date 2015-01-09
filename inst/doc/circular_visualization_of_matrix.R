@@ -4,7 +4,7 @@ opts_chunk$set(fig.pos = "")
 
 library(circlize)
 chordDiagram = function(...) {
-    circos.par(unit.circle.segments = 400)
+    circos.par(unit.circle.segments = 300)
     circlize::chordDiagram(...)
 }
 
@@ -354,7 +354,7 @@ invisible(dev.off())
 #      xlim = get.cell.meta.data("xlim", sector.index = si, track.index = 1)
 #      ylim = get.cell.meta.data("ylim", sector.index = si, track.index = 1)
 #      circos.text(mean(xlim), mean(ylim), si, sector.index = si, track.index = 1,
-#          facing = "bending", col = "white")
+#          facing = "bending.inside", col = "white")
 #  }
 
 ## ----chord_diagram_labels_multile_style, eval = FALSE--------------------
@@ -391,7 +391,7 @@ for(si in get.all.sector.index()) {
     xlim = get.cell.meta.data("xlim", sector.index = si, track.index = 1)
     ylim = get.cell.meta.data("ylim", sector.index = si, track.index = 1)
     circos.text(mean(xlim), mean(ylim), si, sector.index = si, track.index = 1, 
-        facing = "bending", col = "white")
+        facing = "bending.inside", col = "white")
 }
 text(-0.9, 0.9, "B", cex = 1.5)
 circos.par(points.overflow.warning = FALSE)

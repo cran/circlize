@@ -4,14 +4,13 @@ opts_chunk$set(fig.pos = "", fig.align = "center")
 
 library(circlize)
 circos.initialize = function(...) {
-    circos.par(unit.circle.segments = 400)
+    circos.par(unit.circle.segments = 300)
     circlize::circos.initialize(...)
 }
 
 ## ----interesting_clock, fig.align = "center", out.width = "0.6\\textwidth", fig.cap = "A clock."----
 library(circlize)
 factors = "a"  # any name is OK
-par(mar = c(1, 1, 1, 1))
 circos.par(gap.degree = 0, cell.padding = c(0, 0, 0, 0), start.degree = 90)
 circos.initialize(factors = factors, xlim = c(0, 12))
 circos.trackPlotRegion(factors = factors, ylim = c(0, 1), bg.border = NA)
@@ -25,7 +24,6 @@ circos.clear()
 
 ## ----interesting_dartboard, fig.align = "center", out.width = "0.6\\textwidth", fig.cap = "A dartboard."----
 factors = 1:20  # just indicate there are 20 sectors
-par(mar = c(1, 1, 1, 1))
 circos.par(gap.degree = 0, cell.padding = c(0, 0, 0, 0),
     start.degree = 360/20/2, track.margin = c(0, 0), clock.wise = FALSE)
 circos.initialize(factors = factors, xlim = c(0, 1))
@@ -51,7 +49,6 @@ circos.clear()
 
 ## ----interesting_bagua, fig.align = "center", out.width = "0.6\\textwidth", fig.cap = "Bagua and Taiji."----
 factors = 1:8
-par(mar = c(1, 1, 1, 1))
 circos.par(start.degree = 22.5, gap.degree = 6)
 circos.initialize(factors = factors, xlim = c(0, 1))
 

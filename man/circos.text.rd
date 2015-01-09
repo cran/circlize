@@ -14,8 +14,8 @@
 circos.text(x, y, labels, sector.index = get.cell.meta.data("sector.index"),
     track.index = get.cell.meta.data("track.index"), direction = NULL,
     facing = c("inside", "outside", "reverse.clockwise", "clockwise",
-    "downward", "bending"), niceFacing = FALSE, adj = par("adj"), cex = 1, col = "black",
-    font = par("font"), ...)
+    "downward", "bending", "bending.inside", "bending.outside"), niceFacing = FALSE,
+    adj = par("adj"), cex = 1, col = "black", font = par("font"), ...)
 }
 \arguments{
   \item{x}{Data points on x-axis}
@@ -55,8 +55,8 @@ circos.trackPlotRegion(factors = factors, ylim = c(0, 10), track.height = 0.5,
     circos.text(0, 5, "reverse.clockwise", facing = "reverse.clockwise", 
         adj = c(0.5, 0), cex = 0.8)
     circos.text(10, 5, "clockwise", facing = "clockwise", adj = c(0.5, 0), cex = 0.8)
-    circos.text(5, 5, "downward", facing = "downward", cex = 0.8)
-    circos.text(5, 1, "bending", facing = "bending", cex = 0.8)
+    circos.text(3, 9, "====bending.inside====", facing = "bending.inside", cex = 0.8)
+    circos.text(7, 9, "====bending.outside====", facing = "bending.outside", cex = 0.8)
 })
 circos.clear()
 

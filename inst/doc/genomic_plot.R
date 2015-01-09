@@ -4,12 +4,12 @@ opts_chunk$set(fig.pos = "", fig.align = "center")
 
 library(circlize)
 circos.genomicInitialize = function(...) {
-    circos.par(unit.circle.segments = 400)
+    circos.par(unit.circle.segments = 300)
     circlize::circos.genomicInitialize(...)
 }
 
 circos.initializeWithIdeogram = function(...) {
-    circos.par(unit.circle.segments = 400)
+    circos.par(unit.circle.segments = 300)
     circlize::circos.initializeWithIdeogram(...)
 }
 
@@ -1016,6 +1016,178 @@ par(mfrow = c(1, 1))
 
 ## ----genomic_text_pos_transformation, echo = FALSE, out.width = "\\textwidth", fig.cap = "Transformation of text positions."----
 source("src/genomic-07-posTransformLinesText.R")
+
+## ----genome_more_labels_1, eval = FALSE----------------------------------
+#  set.seed(999)
+#  bed = generateRandomBed(nr = 800, fun = function(k) rep("text", k))
+#  
+#  par(mar = c(1, 1, 1, 1))
+#  circos.par(start.degree = 75, canvas.xlim = c(0, 1), canvas.ylim = c(0, 1),
+#      gap.degree = 300, cell.padding = c(0, 0, 0, 0), track.margin = c(0, 0))
+#  circos.initializeWithIdeogram(plotType = NULL, chromosome.index = "chr1")
+
+## ----genome_more_labels_2, eval = FALSE----------------------------------
+#  circos.genomicTrackPlotRegion(bed, ylim = c(0, 1),
+#      panel.fun = function(region, value, ...) {
+#  
+#      # original positions
+#      circos.genomicPoints(region, data.frame(rep(0, nrow(region))), pch = 16)
+#  
+#      xlim = get.cell.meta.data("xlim")
+#      breaks = seq(xlim[1], xlim[2], length.out = 7)
+#      midpoints = (region[[1]] + region[[2]])/2
+#      for(i in seq_along(breaks)[-1]) {
+#          # index for current interval
+#          l = midpoints >= breaks[i - 1] & midpoints < breaks[i]
+#          # if there is no data in this interval
+#          if(sum(l) == 0) next
+#  
+#          # sub-regions in this interval
+#          sub_region = region[l, , drop = FALSE]
+#          sub_value = value[l, , drop = FALSE]
+#  
+#          # note here i == 2, 4, 6, ... corresponds to odd intervals
+#          # text in odd intervals are in lower position
+#          if(i %% 2 == 0) {
+#              y = 0.2
+#          } else {
+#              y = 0.8
+#          }
+#  
+#          # get the transformed position and add text with new positions
+#          tr_region = posTransform.text(sub_region, y = y, labels = sub_value[[1]],
+#              cex = 0.8, adj = c(0, 0.5))
+#          circos.genomicText(tr_region, sub_value, labels.column = 1, y = y,
+#              adj = c(0, 0.5), facing = "clockwise", niceFacing = TRUE, cex = 0.8)
+#  
+#          # add position transformation lines for odd intervals
+#          if(i %% 2 == 0) {
+#              for(i in seq_len(nrow(sub_region))) {
+#                  x = c( (sub_region[i, 1] + sub_region[i, 2])/2,
+#                         (sub_region[i, 1] + sub_region[i, 2])/2,
+#                         (tr_region[i, 1] + tr_region[i, 2])/2,
+#                         (tr_region[i, 1] + tr_region[i, 2])/2)
+#                  y = c(0, 0.2/3, 0.2/3*2, 0.2)
+#                  circos.lines(x, y)
+#              }
+#          } else { # add position transformation lines for even intervals
+#              median_sub_region_midpoint = median(midpoints[l])
+#              sub_region_width = max(midpoints[l]) - min(midpoints[l])
+#              for(i in seq_len(nrow(sub_region))) {
+#                  x = c( (sub_region[i, 1] + sub_region[i, 2])/2,
+#                         (sub_region[i, 1] + sub_region[i, 2])/2,
+#                         median_sub_region_midpoint +
+#                             sub_region_width*(i - nrow(sub_region))/nrow(sub_region) * 0.2,
+#                         median_sub_region_midpoint +
+#                             sub_region_width*(i - nrow(sub_region))/nrow(sub_region) * 0.2,
+#                         (tr_region[i, 1] + tr_region[i, 2])/2,
+#                         (tr_region[i, 1] + tr_region[i, 2])/2)
+#                  y = c(0, 0.1, 0.2, 0.6, 0.7, 0.8)
+#                  circos.lines(x, y)
+#              }
+#          }
+#      }
+#  
+#  }, track.height = 0.2, bg.border = NA)
+#  
+#  circos.clear()
+
+## ----genome_more_labels, echo = FALSE, out.width = "\\textwidth", out.height = "0.5\\textwidth", fig.width = 14, fig.height = 7, fig.cap = "Position transformation for a lot of text. A) put text on two layers; B) put text on one layer."----
+par(mfrow = c(1, 2), mar = c(1, 1, 1, 1))
+set.seed(999)
+bed = generateRandomBed(nr = 800, fun = function(k) rep("text", k))
+
+par(mar = c(1, 1, 1, 1))
+circos.par(start.degree = 75, canvas.xlim = c(0, 1), canvas.ylim = c(0, 1), 
+    gap.degree = 300, cell.padding = c(0, 0, 0, 0), track.margin = c(0, 0))
+circos.initializeWithIdeogram(plotType = NULL, chromosome.index = "chr1")
+text(0.1, 0.1, "A", cex = 1.5)
+
+circos.genomicTrackPlotRegion(bed, ylim = c(0, 1), 
+    panel.fun = function(region, value, ...) {
+    
+    # original positions
+    circos.genomicPoints(region, data.frame(rep(0, nrow(region))), pch = 16)
+        
+    xlim = get.cell.meta.data("xlim")
+    breaks = seq(xlim[1], xlim[2], length.out = 7)
+    midpoints = (region[[1]] + region[[2]])/2
+    for(i in seq_along(breaks)[-1]) {
+        # index for current interval
+        l = midpoints >= breaks[i - 1] & midpoints < breaks[i]
+        # if there is no data in this interval
+        if(sum(l) == 0) next
+        
+        # sub-regions in this interval
+        sub_region = region[l, , drop = FALSE]
+        sub_value = value[l, , drop = FALSE]
+        
+        # note here i == 2, 4, 6, ... corresponds to odd intervals
+        # text in odd intervals are in lower position
+        if(i %% 2 == 0) {
+            y = 0.2
+        } else {
+            y = 0.8
+        }
+        
+        # get the transformed position and add text with new positions
+        tr_region = posTransform.text(sub_region, y = y, labels = sub_value[[1]], 
+            cex = 0.8, adj = c(0, 0.5))
+        circos.genomicText(tr_region, sub_value, labels.column = 1, y = y, 
+            adj = c(0, 0.5), facing = "clockwise", niceFacing = TRUE, cex = 0.8)
+        
+        # add position transformation lines for odd intervals
+        if(i %% 2 == 0) {    
+            for(i in seq_len(nrow(sub_region))) {
+                x = c( (sub_region[i, 1] + sub_region[i, 2])/2,
+                       (sub_region[i, 1] + sub_region[i, 2])/2,
+                       (tr_region[i, 1] + tr_region[i, 2])/2,
+                       (tr_region[i, 1] + tr_region[i, 2])/2)
+                y = c(0, 0.2/3, 0.2/3*2, 0.2)
+                circos.lines(x, y)
+            }
+        } else { # add position transformation lines for even intervals
+            median_sub_region_midpoint = median(midpoints[l])
+            sub_region_width = max(midpoints[l]) - min(midpoints[l])
+            for(i in seq_len(nrow(sub_region))) {
+                x = c( (sub_region[i, 1] + sub_region[i, 2])/2,
+                       (sub_region[i, 1] + sub_region[i, 2])/2,
+                       median_sub_region_midpoint + 
+                           sub_region_width*(i - nrow(sub_region))/nrow(sub_region) * 0.2,
+                       median_sub_region_midpoint + 
+                           sub_region_width*(i - nrow(sub_region))/nrow(sub_region) * 0.2,
+                       (tr_region[i, 1] + tr_region[i, 2])/2,
+                       (tr_region[i, 1] + tr_region[i, 2])/2)
+                y = c(0, 0.1, 0.2, 0.6, 0.7, 0.8)
+                circos.lines(x, y)
+            }
+        }
+    }
+    
+}, track.height = 0.2, bg.border = NA)
+
+circos.clear()
+par(mar = c(1, 1, 1, 1))
+circos.par(start.degree = 75, canvas.xlim = c(0, 1), canvas.ylim = c(0, 1), gap.degree = 300, cell.padding = c(0, 0, 0, 0), track.margin = c(0, 0))
+circos.initializeWithIdeogram(plotType = NULL, chromosome.index = "chr1")
+circos.genomicTrackPlotRegion(bed, ylim = c(0, 1), panel.fun = function(region, value, ...) {
+    circos.genomicText(region, value, y = 0, labels.column = 1, facing = "clockwise", adj = c(0, 0.5),
+        posTransform = posTransform.text, cex = 0.8, niceFacing = F)
+}, track.height = 0.1, bg.border = NA)
+i_track = get.cell.meta.data("track.index")
+
+circos.genomicPosTransformLines(bed, 
+    posTransform = function(region, value) posTransform.text(region, y = 0, labels = value[[1]], cex = 0.8, track.index = i_track),
+    direction = "outside"
+)
+
+circos.genomicTrackPlotRegion(bed, ylim = c(0, 1), panel.fun = function(region, value, ...) {
+    circos.points( (region[[1]] + region[[2]])/2, rep(0.5, nrow(region)), pch = 16)
+}, track.height = 0.02, bg.border = NA)
+
+circos.clear()
+
+text(0.1, 0.1, "B", cex = 1.5)
 
 ## ----eval = FALSE--------------------------------------------------------
 #  circos.genomicDensity(bed)

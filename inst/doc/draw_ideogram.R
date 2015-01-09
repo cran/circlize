@@ -4,7 +4,7 @@ opts_chunk$set(fig.pos = "")
 
 library(circlize)
 circos.initialize = function(...) {
-    circos.par(unit.circle.segments = 400)
+    circos.par(unit.circle.segments = 300)
     circlize::circos.initialize(...)
 }
 
