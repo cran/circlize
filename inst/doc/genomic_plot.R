@@ -51,18 +51,18 @@ invisible(dev.off())
 
 ## ----genomic_initialize_ideogram_3, eval = FALSE, echo = c(1:2, 6:7, 11:12)----
 #  cytoband = cytoband.df
-#  circos.initializeWithIdeogram(cytoband, sort.chr = FALSE)
-#  text(0, 0, "read from a data frame", cex = 0.7)
+#  circos.initializeWithIdeogram(cytoband, sort.chr = TRUE)
+#  text(0, 0, "read from cytoband df\nsort.chr = TRUE", cex = 0.7)
 #  text(-0.9, 0.9, "C", cex = 1.5)
+#  
+#  cytoband = cytoband.df
+#  circos.initializeWithIdeogram(cytoband, sort.chr = FALSE)
+#  text(0, 0, "read from a data frame\nunique(cytoband[[1]])", cex = 0.7)
+#  text(-0.9, 0.9, "D", cex = 1.5)
 #  
 #  cytoband[[1]] = factor(cytoband[[1]], levels = paste0("chr", c(22:1, "X", "Y")))
 #  circos.initializeWithIdeogram(cytoband, sort.chr = FALSE)
 #  text(0, 0, "read from cytoband file\nfirst column converted to factor\nlevels = paste0('chr', c(22:1, 'X', 'Y'))", cex = 0.7)
-#  text(-0.9, 0.9, "D", cex = 1.5)
-#  
-#  cytoband = cytoband.df
-#  circos.initializeWithIdeogram(cytoband, sort.chr = TRUE)
-#  text(0, 0, "read from cytoband df\nsort.chr = TRUE", cex = 0.7)
 #  text(-0.9, 0.9, "E", cex = 1.5)
 
 ## ----eval=FALSE----------------------------------------------------------
@@ -104,18 +104,18 @@ circos.initializeWithIdeogram(chromosome.index = paste0("chr", 10:1))
 text(0, 0, "subset of chromosomes", cex = 0.7)
 text(-0.9, 0.9, "B", cex = 1.5)
 cytoband = cytoband.df
-circos.initializeWithIdeogram(cytoband, sort.chr = FALSE)
-text(0, 0, "read from a data frame", cex = 0.7)
+circos.initializeWithIdeogram(cytoband, sort.chr = TRUE)
+text(0, 0, "read from cytoband df\nsort.chr = TRUE", cex = 0.7)
 text(-0.9, 0.9, "C", cex = 1.5)
+
+cytoband = cytoband.df
+circos.initializeWithIdeogram(cytoband, sort.chr = FALSE)
+text(0, 0, "read from a data frame\nunique(cytoband[[1]])", cex = 0.7)
+text(-0.9, 0.9, "D", cex = 1.5)
 
 cytoband[[1]] = factor(cytoband[[1]], levels = paste0("chr", c(22:1, "X", "Y")))
 circos.initializeWithIdeogram(cytoband, sort.chr = FALSE)
 text(0, 0, "read from cytoband file\nfirst column converted to factor\nlevels = paste0('chr', c(22:1, 'X', 'Y'))", cex = 0.7)
-text(-0.9, 0.9, "D", cex = 1.5)
-
-cytoband = cytoband.df
-circos.initializeWithIdeogram(cytoband, sort.chr = TRUE)
-text(0, 0, "read from cytoband df\nsort.chr = TRUE", cex = 0.7)
 text(-0.9, 0.9, "E", cex = 1.5)
 circos.initializeWithIdeogram(plotType = c("axis", "labels"))
 text(0, 0, "plotType = c('axis', 'labels')", cex = 0.7)

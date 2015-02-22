@@ -35,7 +35,7 @@ for(chr in chromosome) {
 }
 
 ## ----ideogram_basic_trunk1, eval = FALSE---------------------------------
-#  par(mar = c(1, 1, 1, 1), lwd = 0.5)
+#  par(lwd = 0.5)
 #  circos.par(cell.padding = c(0, 0, 0, 0))
 
 ## ----ideogram_basic_trunk2, eval = FALSE---------------------------------
@@ -99,7 +99,7 @@ for(chr in chromosome) {
 
 ## ----ideogram_basic, echo = FALSE, fig.align = "center", out.width = "0.8\\textwidth", fig.cap = "Ideogram in circular layout."----
 circos.par(points.overflow.warning = FALSE)
-par(mar = c(1, 1, 1, 1), lwd = 0.5)
+par(lwd = 0.5)
 circos.par(cell.padding = c(0, 0, 0, 0))
 circos.initialize(factors = factor(chromosome, levels = chromosome), xlim = xlim)
 circos.trackPlotRegion(ylim = c(0, 1), bg.border = NA, track.height = 0.1)

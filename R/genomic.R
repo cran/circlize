@@ -7,12 +7,14 @@
 #            Pass to `read.cytoband`.
 # -species Abbreviations of species. e.g. hg19 for human, mm10 for mouse. If this
 #          value is specified, the function will download cytoBand.txt.gz from
-#          UCSC website automatically. Pass to `read.cytoband`.
-# -sort.chr Whether chromosome names should be sorted (first sort by numbers then by letters) when reading cytoband data.
-#           Pass to `read.cytoband`.
-# -chromosome.index Index of chromosomes. The index is used only for subsetting, not for re-ordering.
+#          UCSC website automatically. If there is no cytoband for user's species,
+#          it will keep on trying to download chromInfo file. Pass to `read.cytoband` and `read.chromInfo`.
+# -chromosome.index subset of chromosomes, also used to re-set chromosome orders.
+# -sort.chr Whether chromosome names should be sorted (first sort by numbers then by letters).
+#           If ``chromosome.index`` is set, this argumetn is enforced to ``FALSE``
 # -major.by     Increment of major ticks. Pass to `circos.genomicInitialize`.
-# -plotType     Which tracks should be drawn. ``rect`` for ideogram rectangle, ``axis`` for genomic axis and ``labels`` for chromosome names.
+# -plotType     Which tracks should be drawn. ``ideogram`` for ideogram rectangle, ``axis`` for genomic axis and ``labels`` for chromosome names.
+#               If there is no ideogram for specified species, ``ideogram`` will be enforced to be excluded.
 #               If it is set to ``NULL``, the function just initialize the plot but draw nothing.
 # -track.height Height of the track which contains "axis" and "labels".
 # -ideogram.height Height of the ideogram track
@@ -20,7 +22,8 @@
 #
 # == details
 # The function will initialize the circos plot in which each sector corresponds to a chromosome. You can control the order of 
-# chromosomes by set a special format of ``cytoband`` (please refer to `read.cytoband` to find out how to control a proper ``cytoband``).
+# chromosomes by ``chromosome.index`` or by ``sort.chr``, or by setting a special format of ``cytoband`` (please refer to `read.cytoband` 
+# to find out how to control a proper ``cytoband``).
 #
 # The function finally pass data to `circos.genomicInitialize` to initialize the circos plot.
 #
@@ -31,20 +34,46 @@ circos.initializeWithIdeogram = function(cytoband = paste(system.file(package = 
 	plotType = c("ideogram", "axis", "labels"), 
 	track.height = 0.05, ideogram.height = 0.05, ...) {
 	
-	cytoband = read.cytoband(cytoband, species = species, sort.chr = sort.chr)
+
+	# proper order will be returned depending on cytoband and sort.chr
+	e = try(cytoband <- read.cytoband(cytoband, species = species, sort.chr = sort.chr, chromosome.index = chromosome.index), silent = TRUE)
+	if(class(e) == "try-error" && !is.null(species)) {  # if species is defined
+		e2 = try(cytoband <- read.chromInfo(species = species, sort.chr = sort.chr, chromosome.index = chromosome.index), silent = TRUE)
+		if(class(e2) == "try-error") {
+			message(e)
+			message(e2)
+			stop("Cannot download either cytoband or chromInfo file from UCSC.\n")
+		} else {
+			message("Downloading cytoBand file from UCSC failed. Use chromInfo file instead.\nNote ideogram track will be removed from the plot.")
+			plotType = setdiff(plotType, "ideogram")
+
+			# because in chromInfo file, there are also many short scaffold
+			if(is.null(chromosome.index)) {
+	            chromInfo = read.chromInfo(species = species)
+	            chr_len = sort(chromInfo$chr.len, decreasing = TRUE)
+
+	            # sometimes there are small scaffold
+	            i = which(chr_len[seq_len(length(chr_len)-1)] / chr_len[seq_len(length(chr_len)-1)+1] > 5)[1]
+	            if(length(i)) {
+	                chromosome = chromInfo$chromosome[chromInfo$chromosome %in% names(chr_len[chr_len >= chr_len[i]])]
+	            } else {
+	                chromosome = chromInfo$chromosome
+	            }
+	            cytoband = read.chromInfo(species = species, chromosome.index = chromosome, sort.chr = sort.chr)
+	        } 
+		}
+	} else if(class(e) == "try-error") {
+		stop(e)
+	}
 	df = cytoband$df
 	chromosome = cytoband$chromosome
 	
-	if(! is.null(chromosome.index)) {
-		chromosome = chromosome[chromosome %in% chromosome.index]
-		if(length(chromosome) == 0) {
-			stop("Cannot find any chromosome. It is probably related with your chromosome names with or without 'chr' prefix.\nYou can run `circos.info()` to find out which type of chromosome names are used.\n")
-		}
+	if(is.null(chromosome.index)) {
+		chromosome.index = chromosome
 	}
-	
-	df = df[df[[1]] %in% chromosome, , drop = FALSE]
+
 	# here df[[1]] is quite important, should be re-factered
-	df[[1]] = factor(as.vector(df[[1]]), levels = chromosome)
+	df[[1]] = factor(as.vector(df[[1]]), levels = chromosome.index)
 	
 	# sn for sector names, but not for sector index
 	sn = unique(as.vector(df[[1]]))
@@ -1229,80 +1258,14 @@ genomicDensity = function(region, window.size = 10000000, overlap = TRUE) {
 # Highlight chromosomes
 #
 # == param
-# -chr Chromosome names. It should be consistent with the sector index.
-# -track.index A vector of track index that you want to highlight
-# -col Color for highlighting. Note the color should be semi-transparent.
-# -border Border of the highlighted region
-# -lwd Width of borders
-# -lty Style of borders
-# -padding Padding for the highlighted region. It should contain four values
-#          representing ratios of the width or height of the highlighted region
+# -... pass to `highlight.sector`
 #
 # == details
-# You can use `circos.info` to find out index for all tracks.
+# This is only a shortcut function of `highlight.sector`.
 #
-# The function calls `draw.sector`.
-highlight.chromosome = function(chr, track.index = get.all.track.index(), 
-	col = "#FF000040", border = NA, lwd = par("lwd"), lty = par("lty"),
-	padding = c(0, 0, 0, 0)) {
+highlight.chromosome = function(...) {
 	
-	sector.index = chr
-	sectors = get.all.sector.index()
-	if(!all(sector.index %in% sectors)) {
-		stop("`chr` contains index that does not beling to available sectors")
-	}
-	tracks = get.all.track.index()
-	if(!all(track.index %in% tracks)) {
-		stop("`track.index` contains index that does not belong to available tracks.\n")
-	}
-	
-	# if all chromosomes are selected
-	if(length(setdiff(sectors, sector.index)) == 0) {
-		track.index = sort(unique(track.index))
-		ts = continuousIndexSegment(track.index)
-		
-		for(i in seq_along(ts)) {
-			track.index.vector = ts[[i]]
-			start.degree = 0
-			end.degree = 360
-			rou1 = get.cell.meta.data("cell.top.radius", sectors[1], track.index.vector[1])
-			rou2 = get.cell.meta.data("cell.bottom.radius", sectors[1], track.index.vector[length(track.index.vector)])
-			
-			d2 = rou1 - rou2
-			rou1 = rou1 + d2*padding[3]
-			rou2 = rou2 - d2*padding[1]
-			
-			draw.sector(start.degree = start.degree, end.degree = end.degree, rou1 = rou1, rou2 = rou2, col = col, border = border, lwd = lwd, lty = lty)
-		}
-		
-	} else {
-	
-		sector.numeric.index = which(sectors %in% sector.index)
-		ss = continuousIndexSegment(sector.numeric.index, n = length(sectors), loop = TRUE)
-		
-		track.index = sort(unique(track.index))
-		ts = continuousIndexSegment(track.index)
-		
-		for(j in seq_along(ss)) {
-			sector.index.vector = sectors[ ss[[j]] ]
-			for(i in seq_along(ts)) {
-				track.index.vector = ts[[i]]
-				start.degree = get.cell.meta.data("cell.start.degree", sector.index.vector[1], track.index = 1)
-				end.degree = get.cell.meta.data("cell.end.degree", sector.index.vector[length(sector.index.vector)], track.index = 1)
-				rou1 = get.cell.meta.data("cell.top.radius", sector.index.vector[1], track.index.vector[1])
-				rou2 = get.cell.meta.data("cell.bottom.radius", sector.index.vector[1], track.index.vector[length(track.index.vector)])
-				
-				d1 = end.degree - start.degree
-				d2 = rou1 - rou2
-				start.degree = start.degree - d1*padding[2]
-				end.degree = end.degree + d1*padding[4]
-				rou1 = rou1 + d2*padding[3]
-				rou2 = rou2 - d2*padding[1]
-				
-				draw.sector(start.degree = start.degree, end.degree = end.degree, rou1 = rou1, rou2 = rou2, col = col, border = border, lwd = lwd, lty = lty)
-			}
-		}
-	}	
+	highlight.sector(...)
 }
 
 continuousIndexSegment = function(x, n = NULL, loop = FALSE) {

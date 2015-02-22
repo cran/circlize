@@ -1,53 +1,54 @@
-export(
-	chordDiagram,
-	circlize,
-	circos.axis,
-	circos.clear,
-	circos.genomicDensity,
-	circos.genomicInitialize,
-	circos.genomicLines,
-	circos.genomicLink,
-	circos.genomicPoints,
-	circos.genomicPosTransformLines,
-	circos.genomicRainfall,
-	circos.genomicRect,
-	circos.genomicText,
-	circos.genomicTrackPlotRegion,
-	circos.info,
-	circos.initialize,
-	circos.initializeWithIdeogram,
-	circos.lines,
-	circos.link,
-	circos.par,
-	circos.points,
-	circos.polygon,
-	circos.rect,
-	circos.text,
-	circos.trackHist,
-	circos.trackLines,
-	circos.trackPlotRegion,
-	circos.trackPoints,
-	circos.trackText,
-	circos.updatePlotRegion,
-	colorRamp2,
-	cytoband.col,
-	draw.sector,
-	generateRandomBed,
-	genomicDensity,
-	get.all.sector.index,
-	get.all.track.index,
-	get.cell.meta.data,
-	get.current.chromosome,
-	getI,
-	highlight.chromosome,
-	posTransform.default,
-	posTransform.text,
-	rainfallTransform,
-	rand_color,
-	read.cytoband,
-	reverse.circlize,
-	show.index
-)
+export(adjacencyList2Matrix)
+export(colorRamp2)
+export(circos.initializeWithIdeogram)
+export(circos.polygon)
+export(circos.genomicRect)
+export(posTransform.text)
+export(highlight.chromosome)
+export(circos.updatePlotRegion)
+export(circos.text)
+export(circos.points)
+export(circos.genomicPosTransformLines)
+export(highlight.sector)
+export(circos.genomicLines)
+export(circos.genomicDensity)
+export(get.cell.meta.data)
+export(circos.trackHist)
+export(circos.lines)
+export(circlize)
+export(circos.genomicText)
+export(circos.genomicPoints)
+export(circos.genomicLink)
+export(circos.par)
+export(read.cytoband)
+export(getI)
+export(show.index)
+export(genomicDensity)
+export(reverse.circlize)
+export(generateRandomBed)
+export(circos.clear)
+export(posTransform.default)
+export(circos.genomicRainfall)
+export(circos.rect)
+export(circos.trackLines)
+export(circos.genomicTrackPlotRegion)
+export(circos.trackText)
+export(rand_color)
+export(circos.initialize)
+export(draw.sector)
+export(cytoband.col)
+export(circos.link)
+export(get.all.track.index)
+export(get.all.sector.index)
+export(circos.genomicInitialize)
+export(get.current.chromosome)
+export(rainfallTransform)
+export(read.chromInfo)
+export(circos.axis)
+export(circos.trackPoints)
+export(chordDiagram)
+export(circos.trackPlotRegion)
+export(circos.info)
 
 importFrom("GlobalOptions", setGlobalOptions)
 

@@ -29,7 +29,6 @@ row_sum = apply(mat, 1, sum)
 xlim = cbind(rep(0, length(factors)), c(row_sum, col_sum))
 
 ## ----chord_diagram_by_hand_initialize, eval = FALSE----------------------
-#  par(mar = c(1, 1, 1, 1))
 #  circos.par(cell.padding = c(0, 0, 0, 0))
 #  circos.initialize(factors = factors, xlim = xlim)
 #  circos.trackPlotRegion(factors = factors, ylim = c(0, 1), bg.border = NA,
@@ -54,7 +53,6 @@ xlim = cbind(rep(0, length(factors)), c(row_sum, col_sum))
 
 ## ----chord_diagram_by_hand, echo = FALSE, fig.align = "center", out.width = "0.6\\textwidth", fig.cap = "Matrix in circular layout."----
 circos.par(points.overflow.warning = FALSE)
-par(mar = c(1, 1, 1, 1))
 circos.par(cell.padding = c(0, 0, 0, 0))
 circos.initialize(factors = factors, xlim = xlim)
 circos.trackPlotRegion(factors = factors, ylim = c(0, 1), bg.border = NA, 
@@ -94,7 +92,7 @@ circos.clear()
 #  chordDiagram(mat, order = c("S1", "E1", "E2", "S2", "E3", "E4", "S3", "E5", "E6"))
 
 ## ----chord_diagram_basic, echo = FALSE, fig.align = "center", out.width = "\\textwidth", fig.cap = "Basic usages of {\\tt chordDiagram}. A) default style; B) set {\\tt gap.degree}; C) set {\\tt start.degree}; D) set orders of sectors."----
-par(mfrow = c(2, 2), mar = c(1, 1, 1, 1))
+par(mfrow = c(2, 2))
 set.seed(999)
 chordDiagram(mat)
 circos.clear()
@@ -135,7 +133,7 @@ par(mfrow = c(1, 1))
 #  chordDiagram(mat, grid.col = grid.col, column.col = 1:6)
 
 ## ----chord_diagram_color, echo = FALSE, fig.align = "center", out.width = "0.6\\textheight", out.height = "0.9\\textheight", fig.width = 7, fig.height = 10.5, fig.cap = "Color settings in {\\tt chordDiagram}. A) set {\\tt grid.col}; B) set {\\tt transparency}; C) set {\\tt col} as a matrix; D) set {\\tt col} as a function; E) set {\\tt row.col}; F) set {\\tt column.col}."----
-par(mfrow = c(3, 2), mar = c(1, 1, 1, 1))
+par(mfrow = c(3, 2))
 grid.col = NULL  # just create the variable
 grid.col[rn] = c("red", "green", "blue")
 grid.col[cn] = "grey"
@@ -155,6 +153,27 @@ text(-0.9, 0.9, "E", cex = 1.5)
 chordDiagram(mat, grid.col = grid.col, column.col = 1:6)
 text(-0.9, 0.9, "F", cex = 1.5)
 par(mfrow = c(1, 1))
+
+## ----chord_diagram_style_cross_1, eval = FALSE---------------------------
+#  chordDiagram(mat, grid.col = grid.col, link.order = c(1, 1))
+#  chordDiagram(mat, grid.col = grid.col, link.order = c(1, -1))
+#  chordDiagram(mat, grid.col = grid.col, link.order = c(-1, 1))
+#  chordDiagram(mat, grid.col = grid.col, link.order = c(-1, -1))
+
+## ----chord_diagram_link_order, echo = FALSE, fig.align = "center", out.width = "\\textwidth", fig.cap = "Link orders in sectors. A) set {\\tt link.order} to {\\tt c(1, 1)}; B) set {\\tt link.order} to {\\tt c(1, -1)}; C) set {\\tt link.order} to {\\tt c(-1, 1)}; D) set {\\tt link.order} to {\\tt c(-1, -1)}."----
+par(mfrow = c(2, 2))
+chordDiagram(mat, grid.col = grid.col, link.order = c(1, 1))
+text(-0.9, 0.9, "A", cex = 1.5)
+chordDiagram(mat, grid.col = grid.col, link.order = c(1, -1))
+text(-0.9, 0.9, "B", cex = 1.5)
+chordDiagram(mat, grid.col = grid.col, link.order = c(-1, 1))
+text(-0.9, 0.9, "C", cex = 1.5)
+chordDiagram(mat, grid.col = grid.col, link.order = c(-1, -1))
+text(-0.9, 0.9, "D", cex = 1.5)
+par(mfrow = c(1, 1))
+
+## ----chord_diagram_style_cross_2, eval = FALSE---------------------------
+#  chordDiagram(mat, grid.col = grid.col, cross = TRUE)
 
 ## ----chord_diagram_style_scalar, eval = FALSE----------------------------
 #  chordDiagram(mat, grid.col = grid.col, link.lwd = 2, link.lty = 2, link.border = "black")
@@ -179,8 +198,8 @@ par(mfrow = c(1, 1))
 #  
 #  chordDiagram(mat, grid.col = grid.col, link.lwd = 2, link.border = border_mat2)
 
-## ----chord_diagram_style, echo = FALSE, fig.align = "center", out.width = "\\textwidth", fig.cap = "Link style settings in {\\tt chordDiagram}. A) set as scalar; B) set as matrix; C) set as sub matrix."----
-par(mfrow = c(2, 2), mar = c(1, 1, 1, 1))
+## ----chord_diagram_style, echo = FALSE, fig.align = "center", out.width = "\\textwidth", fig.cap = "Link style settings in {\\tt chordDiagram}. A) graphic parameters set as scalar; B) graphic parameters set as matrix; C) graphic parameters set as sub matrix."----
+par(mfrow = c(2, 2))
 chordDiagram(mat, grid.col = grid.col, link.lwd = 2, link.lty = 2, link.border = "black")
 text(-0.9, 0.9, "A", cex = 1.5)
 lwd_mat = matrix(1, nrow = nrow(mat), ncol = ncol(mat))
@@ -215,7 +234,7 @@ par(mfrow = c(1, 1))
 #  chordDiagram(mat, grid.col = grid.col, col = col_fun)
 
 ## ----chord_diagram_highlight, echo = FALSE, fig.align = "center", out.width = "\\textwidth", fig.cap = "Highlight links by colors. A) set {\\tt row.col}; B) set by matrix; C) set by color function."----
-par(mfrow = c(2, 2), mar = c(1, 1, 1, 1))
+par(mfrow = c(2, 2))
 chordDiagram(mat, grid.col = grid.col, row.col = c("#FF000080", "#00FF0010", "#0000FF10"))
 text(-0.9, 0.9, "A", cex = 1.5)
 col_mat[mat < 12] = "#00000000"
@@ -254,7 +273,7 @@ mat3
 #  chordDiagram(mat3, directional = TRUE, row.col = 1:5)
 
 ## ----chord_diagram_directional, echo = FALSE, fig.align = "center", out.width = "0.6\\textheight", out.height = "0.9\\textheight", fig.width = 7, fig.height = 10.5, fig.cap = "Visualization of directional matrix. A) with default settings; B) set difference of two feet of links; C) set the starting feet; D) row names and column names have overlaps; E) remove self-loop."----
-par(mfrow = c(3, 2), mar = c(1, 1, 1, 1))
+par(mfrow = c(3, 2))
 chordDiagram(mat, directional = TRUE)
 text(-0.9, 0.9, "A", cex = 1.5)
 chordDiagram(mat, directional = TRUE, diffHeight = 0.08)
@@ -277,7 +296,7 @@ par(mfrow = c(1, 1))
 #  chordDiagram(cor(mat3), col = colorRamp2(c(-1, 0, 1), c("green", "white", "red")))
 
 ## ----chord_diagram_symmetric, echo = FALSE, fig.align = "center", out.width = "\\textwidth", out.height = "0.5\\textwidth", fig.width = 7, fig.height = 3.5, fig.cap = "Visualization of symmetric matrix. A) set {\\tt symmetric} to {\\tt TRUE}; B) set {\\tt symmetric} to {\\tt FALSE}."----
-par(mfrow = c(1, 2), mar = c(1, 1, 1, 1))
+par(mfrow = c(1, 2))
 mat3 = matrix(rnorm(100), 10)
 colnames(mat3) = letters[1:10]
 chordDiagram(cor(mat3), symmetric = TRUE,
@@ -303,7 +322,7 @@ invisible(dev.off())
 #  text(-0.9, 0.9, "C", cex = 1.5)
 
 ## ----chord_diagram_default_track, echo = FALSE, fig.align = "center", out.width = "\\textwidth", fig.cap = "Track organization in {\\tt chordDiagram}. A) only show the grid track; B) set label track and grid track with heights; C) do not add label track or grid track."----
-par(mfrow = c(2, 2), mar = c(1, 1, 1, 1))
+par(mfrow = c(2, 2))
 chordDiagram(mat, grid.col = grid.col, annotationTrack = "grid")
 text(-0.9, 0.9, "A", cex = 1.5)
 chordDiagram(mat, grid.col = grid.col, annotationTrack = c("name", "grid"),
@@ -375,7 +394,7 @@ invisible(dev.off())
 #  }, bg.border = NA)
 
 ## ----chord_diagram_labels, echo = FALSE, fig.align = "center", out.width = "\\textwidth", fig.cap = "Customize sector labels. A) put sector labels in radical direction; B) sector labels are put inside grids; C) sector labels are put in different direction according the width of sectors."----
-par(mfrow = c(2, 2), mar = c(1, 1, 1, 1))
+par(mfrow = c(2, 2))
 chordDiagram(mat, annotationTrack = "grid", preAllocateTracks = list(track.height = 0.3))
 # we go back to the first track and customize sector labels
 circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
@@ -449,7 +468,7 @@ par(mfrow = c(1, 1))
 #  circos.clear()
 
 ## ----chord_diagram_axes, echo = FALSE, fig.align = "center", out.width = "\\textwidth", out.height = "0.5\\textwidth", fig.width = 7, fig.height = 3.5, fig.cap = "Customize sector axes. A) add axes to the grid track; B) add another percentage axes"----
-par(mfrow = c(1, 2), mar = c(1, 1, 1, 1))
+par(mfrow = c(1, 2))
 chordDiagram(mat, grid.col = grid.col)
 for(si in get.all.sector.index()) {
     # here the index for the grid track is 2
@@ -516,7 +535,7 @@ par(mfrow = c(1, 1))
 #  circos.clear()
 
 ## ----chord_diagram_compare, echo = FALSE, fig.align = "center", out.width = "\\textwidth", out.height = "0.5\\textwidth", fig.width = 7, fig.height = 3.5, fig.cap = "Compare two Chord Diagrams and make them in same scale. bottom matrix has half the values as in the upper matrix."----
-par(mfrow = c(1, 2), mar = c(1, 1, 1, 1))
+par(mfrow = c(1, 2))
 mat1 = matrix(sample(20, 25, replace = TRUE), 5)
 
 gap.degree = c(rep(2, 4), 10, rep(2, 4), 10)
@@ -567,7 +586,7 @@ mat[, 3] = 1e-10
 #  circos.clear()
 
 ## ----chord_diagram_reduce, echo = FALSE, fig.align = "center", out.width = "\\textwidth", fig.cap = "Reduced Chord Diagram with removing tiny sectors. A) notice how sector labels are reduced; B) notice how link colors are reduced; C) notice how grid colors are reduced; D) notice how gap degrees are reduced."----
-par(mfrow = c(2, 2), mar = c(1, 1, 1, 1))
+par(mfrow = c(2, 2))
 chordDiagram(mat)
 text(-0.9, 0.9, "A", cex = 1.5)
 chordDiagram(mat, row.col = rep(c("red", "blue"), 3))

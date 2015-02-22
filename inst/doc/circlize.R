@@ -459,7 +459,25 @@ draw.sector(0, 360, rou1 = 0.7, rou2 = 0.6, col = "#0000FF80")
 #      clock.wise = TRUE, col = "#00FFFF40")
 #  circos.clear()
 
-## ----circlize_highlight, echo = FALSE, out.width = "0.8\\textwidth", fig.cap = "Highlight sectors and tracks."----
+## ----circlize_highlight_sector, eval = FALSE-----------------------------
+#  factors = letters[1:8]
+#  circos.initialize(factors, xlim = c(0, 1))
+#  for(i in 1:4) {
+#      circos.trackPlotRegion(ylim = c(0, 1))
+#  }
+#  circos.info(plot = TRUE)
+#  
+#  highlight.sector(c("a", "h"), track.index = 1)
+#  highlight.sector("c", col = "#00FF0040")
+#  highlight.sector("d", col = NA, border = "red", lwd = 2)
+#  highlight.sector("e", col = "#0000FF40", track.index = c(2, 3))
+#  highlight.sector(c("f", "g"), col = NA, border = "green",
+#      lwd = 2, track.index = c(2, 3))
+#  highlight.sector(factors, col = "#FFFF0040", track.index = 4)
+#  circos.clear()
+
+## ----circlize_highlight, echo = FALSE, out.width = "0.6\\textwidth", out.height = "1.2\\textwidth", fig.width = 6, fig.height = 12, fig.cap = "Highlight sectors and tracks. A) highlight by {\\tt code draw.sector}; B) highlight by {\\tt highlight.sector}."----
+par(mfrow = c(2, 1))
 par(mar = c(1, 1, 1, 1))
 factors = letters[1:8]
 circos.initialize(factors, xlim = c(0, 1))
@@ -483,6 +501,24 @@ pos = circlize(c(0.2, 0.8), c(0.2, 0.8), sector.index = "h", track.index = 2)
 draw.sector(pos[1, "theta"], pos[2, "theta"], pos[1, "rou"], pos[2, "rou"], 
     clock.wise = TRUE, col = "#00FFFF40")
 circos.clear()
+text(-0.9, 0.9, "A", cex = 1.5)
+factors = letters[1:8]
+circos.initialize(factors, xlim = c(0, 1))
+for(i in 1:4) {
+    circos.trackPlotRegion(ylim = c(0, 1))
+}
+circos.info(plot = TRUE)
+
+highlight.sector(c("a", "h"), track.index = 1)
+highlight.sector("c", col = "#00FF0040")
+highlight.sector("d", col = NA, border = "red", lwd = 2)
+highlight.sector("e", col = "#0000FF40", track.index = c(2, 3))
+highlight.sector(c("f", "g"), col = NA, border = "green", 
+    lwd = 2, track.index = c(2, 3))
+highlight.sector(factors, col = "#FFFF0040", track.index = 4)
+circos.clear()
+text(-0.9, 0.9, "B", cex = 1.5)
+par(mfrow = c(1, 1))
 
 ## ----echo = 2:7----------------------------------------------------------
 pdf(NULL)
