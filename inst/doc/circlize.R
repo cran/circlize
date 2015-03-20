@@ -361,7 +361,7 @@ source("src/intro-11-axis.R")
 #  circos.link(sector.index1, c(0, 1), sector.index2, c(1, 2))
 #  circos.link(sector.index1, c(0, 1), sector.index2, 0, col, lwd, lty, border)
 
-## ----circlize_link, echo = FALSE, out.width = "\\textwidth", fig.cap = "Drawing links. A) set different positions of roots; B) set different height of two borders. C,D) set different {\\tt h} and {\\tt w}."----
+## ----circlize_link, echo = FALSE, out.width = "0.6\\textheight", out.height = "0.9\\textheight", fig.width = 6, fig.height = 9, fig.cap = "A) set different positions of roots; B) set different height of two borders. C,D) set different {\\tt h} and {\\tt w}. E) if two branches overlap, the link will be degenerated as a 'hill'. F) links with directions."----
 source("src/intro-12-link.R")
 
 ## ----tidy = TRUE---------------------------------------------------------
@@ -378,6 +378,10 @@ circlize:::get_most_inside_radius
 ## ----eval = FALSE--------------------------------------------------------
 #  circos.link(sector.index1, 0, sector.index2, 0, w)
 #  circos.link(sector.index1, 0, sector.index2, 0, w, w2)
+
+## ----eval = FALSE--------------------------------------------------------
+#  circos.link(sector.index1, 0, sector.index2, 0, directional = 1)
+#  circos.link(sector.index1, c(0, 1), sector.index2, c(0, 1), directional = -1)
 
 ## ----eval = FALSE--------------------------------------------------------
 #  factors = c("a", "a", "a", "b", "b")

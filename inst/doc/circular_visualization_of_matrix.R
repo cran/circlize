@@ -198,7 +198,14 @@ par(mfrow = c(1, 1))
 #  
 #  chordDiagram(mat, grid.col = grid.col, link.lwd = 2, link.border = border_mat2)
 
-## ----chord_diagram_style, echo = FALSE, fig.align = "center", out.width = "\\textwidth", fig.cap = "Link style settings in {\\tt chordDiagram}. A) graphic parameters set as scalar; B) graphic parameters set as matrix; C) graphic parameters set as sub matrix."----
+## ----chord_diagram_style_dataframe, eval = FALSE-------------------------
+#  lty_df = data.frame(c("S1", "S2", "S3"), c("E5", "E6", "E4"), c(1, 2, 3))
+#  lwd_df = data.frame(c("S1", "S2", "S3"), c("E5", "E6", "E4"), c(2, 2, 2))
+#  border_df = data.frame(c("S1", "S2", "S3"), c("E5", "E6", "E4"), c(1, 1, 1))
+#  chordDiagram(mat, grid.col = grid.col, link.lty = lty_df, link.lwd = lwd_df,
+#      link.border = border_df)
+
+## ----chord_diagram_style, echo = FALSE, fig.align = "center", out.width = "\\textwidth", fig.cap = "Link style settings in {\\tt chordDiagram}. A) graphic parameters set as scalar; B) graphic parameters set as matrix; C) graphic parameters set as sub matrix. D) graphic parameters set as a three-column data frame."----
 par(mfrow = c(2, 2))
 chordDiagram(mat, grid.col = grid.col, link.lwd = 2, link.lty = 2, link.border = "black")
 text(-0.9, 0.9, "A", cex = 1.5)
@@ -220,6 +227,12 @@ colnames(border_mat2) = colnames(mat)
 
 chordDiagram(mat, grid.col = grid.col, link.lwd = 2, link.border = border_mat2)
 text(-0.9, 0.9, "C", cex = 1.5)
+lty_df = data.frame(c("S1", "S2", "S3"), c("E5", "E6", "E4"), c(1, 2, 3))
+lwd_df = data.frame(c("S1", "S2", "S3"), c("E5", "E6", "E4"), c(2, 2, 2))
+border_df = data.frame(c("S1", "S2", "S3"), c("E5", "E6", "E4"), c(1, 1, 1))
+chordDiagram(mat, grid.col = grid.col, link.lty = lty_df, link.lwd = lwd_df,
+    link.border = border_df)
+text(-0.9, 0.9, "D", cex = 1.5)
 par(mfrow = c(1, 1))
 
 ## ----chord_diagram_highlight_row, eval = FALSE---------------------------
@@ -233,7 +246,12 @@ par(mfrow = c(1, 1))
 #  col_fun = function(x) ifelse(x < 12, "#00000000", "#FF000080")
 #  chordDiagram(mat, grid.col = grid.col, col = col_fun)
 
-## ----chord_diagram_highlight, echo = FALSE, fig.align = "center", out.width = "\\textwidth", fig.cap = "Highlight links by colors. A) set {\\tt row.col}; B) set by matrix; C) set by color function."----
+## ----chord_diagram_highlight_df, eval = FALSE----------------------------
+#  col_df = data.frame(c("S1", "S2", "S3"), c("E5", "E6", "E4"),
+#      c("#FF000080", "#00FF0080", "#0000FF80"))
+#  chordDiagram(mat, grid.col = grid.col, col = col_df)
+
+## ----chord_diagram_highlight, echo = FALSE, fig.align = "center", out.width = "\\textwidth", fig.cap = "Highlight links by colors. A) set {\\tt row.col}; B) set by matrix; C) set by color function; D) set by a three-column data frame."----
 par(mfrow = c(2, 2))
 chordDiagram(mat, grid.col = grid.col, row.col = c("#FF000080", "#00FF0010", "#0000FF10"))
 text(-0.9, 0.9, "A", cex = 1.5)
@@ -243,6 +261,10 @@ text(-0.9, 0.9, "B", cex = 1.5)
 col_fun = function(x) ifelse(x < 12, "#00000000", "#FF000080")
 chordDiagram(mat, grid.col = grid.col, col = col_fun)
 text(-0.9, 0.9, "C", cex = 1.5)
+col_df = data.frame(c("S1", "S2", "S3"), c("E5", "E6", "E4"), 
+    c("#FF000080", "#00FF0080", "#0000FF80"))
+chordDiagram(mat, grid.col = grid.col, col = col_df)
+text(-0.9, 0.9, "D", cex = 1.5)
 par(mfrow = c(1, 1))
 
 ## ----chord_diagram_directional_simple, eval = FALSE, echo = c(1, 3, 5)----
@@ -272,7 +294,19 @@ mat3
 ## ----chord_diagram_directional_non_selfloop, eval = FALSE----------------
 #  chordDiagram(mat3, directional = TRUE, row.col = 1:5)
 
-## ----chord_diagram_directional, echo = FALSE, fig.align = "center", out.width = "0.6\\textheight", out.height = "0.9\\textheight", fig.width = 7, fig.height = 10.5, fig.cap = "Visualization of directional matrix. A) with default settings; B) set difference of two feet of links; C) set the starting feet; D) row names and column names have overlaps; E) remove self-loop."----
+## ----chord_diagram_directional_arrow, eval = FALSE-----------------------
+#  arr.col = data.frame(c("S1", "S2", "S3"), c("E5", "E6", "E4"),
+#      c("black", "black", "black"))
+#  chordDiagram(mat, directional = TRUE, direction.type = "arrows",
+#      link.arr.col = arr.col, link.arr.length = 0.2)
+
+## ----chord_diagram_directional_arrow2, eval = FALSE----------------------
+#  arr.col = data.frame(c("S1", "S2", "S3"), c("E5", "E6", "E4"),
+#      c("black", "black", "black"))
+#  chordDiagram(mat, directional = TRUE, direction.type = c("diffHeight", "arrows"),
+#      link.arr.col = arr.col, link.arr.length = 0.2)
+
+## ----chord_diagram_directional, echo = FALSE, fig.align = "center", out.width = "0.6\\textheight", out.height = "0.9\\textheight", fig.width = 7, fig.height = 10.5, fig.cap = "Visualization of directional matrix. A) with default settings; B) set difference of two feet of links; C) set the starting feet; D) row names and column names have overlaps; E, F) directions are represented by arrows."----
 par(mfrow = c(3, 2))
 chordDiagram(mat, directional = TRUE)
 text(-0.9, 0.9, "A", cex = 1.5)
@@ -282,8 +316,16 @@ chordDiagram(mat, directional = TRUE, fromRows = FALSE)
 text(-0.9, 0.9, "C", cex = 1.5)
 chordDiagram(mat2, directional = TRUE, row.col = 1:5)
 text(-0.9, 0.9, "D", cex = 1.5)
-chordDiagram(mat3, directional = TRUE, row.col = 1:5)
+arr.col = data.frame(c("S1", "S2", "S3"), c("E5", "E6", "E4"), 
+    c("black", "black", "black"))
+chordDiagram(mat, directional = TRUE, direction.type = "arrows",
+    link.arr.col = arr.col, link.arr.length = 0.2)
 text(-0.9, 0.9, "E", cex = 1.5)
+arr.col = data.frame(c("S1", "S2", "S3"), c("E5", "E6", "E4"), 
+    c("black", "black", "black"))
+chordDiagram(mat, directional = TRUE, direction.type = c("diffHeight", "arrows"),
+    link.arr.col = arr.col, link.arr.length = 0.2)
+text(-0.9, 0.9, "F", cex = 1.5)
 par(mfrow = c(1, 1))
 
 ## ----chord_diagram_symmetric_show, eval = FALSE--------------------------

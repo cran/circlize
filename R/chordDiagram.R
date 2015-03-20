@@ -10,7 +10,8 @@
 # -transparency Transparency of link colors, 0 means no transparency and 1 means full transparency.
 #               If transparency is already set in ``col`` or ``row.col`` or ``column.col``, this argument will be ignored.
 # -col Colors for links. It can be a matrix which corresponds to ``mat``, or a function which generate colors 
-#      according to values in ``mat``, or a single value which means colors for all links are the same. You
+#      according to values in ``mat``, or a single value which means colors for all links are the same, or a three-column
+#      data frame in which the first two columns correspond to row names and columns and the third column is colors. You
 #      may use `colorRamp2` to generate a function which maps values to colors.
 # -row.col Colors for links. Links from the same row in ``mat`` will have the same color.
 #          Length should be same as number of rows in ``mat``. This argument only works when ``col`` is set to ``NULL``.
@@ -21,8 +22,10 @@
 #           more inside to circle centre than the ending root.
 # -directional Whether links have directions. The directions are always from rows to columns. If you
 #              want the direction from columns to rows, set ``fromRow`` to ``FALSE``.
+# -direction.type type for representing directions. Can be one or two values in "diffHeight" and "arrows".
 # -symmetric Whether the matrix is symmetric. If the value is set to ``TRUE``, only
 #            lower triangular matrix without the diagonal will be used.
+# -keep.diagonal If the matrix is specified as symmetric, whether keep diagonal for visualization.
 # -order Order of sectors. Default order is ``union(rownames(mat), colnames(mat))``.
 # -preAllocateTracks Pre-allocate empty tracks before drawing chord diagram. It can be a single number indicating
 #                    how many empty tracks needed to be created or a list containing settings for empty
@@ -30,20 +33,26 @@
 # -annotationTrack Which annotation track should be plotted? By default, a track containing sector names and a track
 #                  containing grid will be created.
 # -annotationTrackHeight Track height corresponding to values in ``annotationTrack``.
-# -link.border border for links, single scalar or a matrix with names
-# -link.lwd width for link borders, single scalar or a matrix with names
-# -link.lty style for link borders, single scalar or a matrix with names
+# -link.border border for links, single scalar or a matrix with names or a data frame with three columns
+# -link.lwd width for link borders, single scalar or a matrix with names or a data frame with three columns
+# -link.lty style for link borders, single scalar or a matrix with names or a data frame with three columns
 # -grid.border border for grids. If it is ``NULL``, the border color is same as grid color
 # -diffHeight The difference of height between two 'roots' if ``directional`` is set to ``TRUE``. 
 # -reduce if the ratio of the width of certain grid compared to the whole circle is less than this value, the grid is removed on the plot.
 #         Set it to value less than zero if you want to keep all tiny grid.
 # -link.order order of links in single sector. The value is a length-two vector which 
 #         controls order of sectors which correspond to rows and columns respectively.
+# -link.arr.length pass to `shape::Arrowhead`, same settings as ``link.lwd``.
+# -link.arr.width pass to `shape::Arrowhead`, same settings as ``link.lwd``.
+# -link.arr.type pass to `shape::Arrowhead`, same settings as ``link.lwd``. Default value is ``triangle``.
+# -link.arr.col color or the single line link which is put in the center of the belt, same settings as ``link.lwd``.
+# -link.arr.lwd line width ofthe single line link which is put in the center of the belt, same settings as ``link.lwd``.
+# -link.arr.lty line type of the single line link which is put in the center of the belt, same settings as ``link.lwd``.
 # -... pass to `circos.link`
 #
 # == details
 # Chord diagram is a way to visualize numeric tables ( http://circos.ca/intro/tabular_visualization/ ), especially useful
-# when the table represent information of directional relation. This function
+# when the table represents information of directional relations. This function
 # visualize tables in a circular way.
 #
 # Sectors of the circos plot is ``union(rownames(mat), colnames(mat))``. If there is no rowname or colname, the function will
@@ -52,14 +61,24 @@
 # This function is flexible and contains some settings that may be a little difficult to understand. 
 # Please refer to vignette for better explanation.
 chordDiagram = function(mat, grid.col = NULL, transparency = 0.5,
-	col = NULL, row.col = NULL, column.col = NULL, directional = FALSE, fromRows = TRUE,
-	symmetric = FALSE, order = NULL, preAllocateTracks = NULL,
+	col = NULL, row.col = NULL, column.col = NULL, directional = FALSE, 
+	direction.type = "diffHeight", fromRows = TRUE,
+	symmetric = FALSE, keep.diagonal = FALSE, order = NULL, preAllocateTracks = NULL,
 	annotationTrack = c("name", "grid"), annotationTrackHeight = c(0.05, 0.05),
 	link.border = NA, link.lwd = par("lwd"), link.lty = par("lty"), grid.border = NA, 
-	diffHeight = 0.04, reduce = 1e-5, link.order = -1, ...) {
+	diffHeight = 0.04, reduce = 1e-5, link.order = -1,
+	link.arr.length = 0.4, link.arr.width = link.arr.length/2, 
+	link.arr.type = "triangle", link.arr.lty = par("lty"), 
+	link.arr.lwd = par("lwd"), link.arr.col = par("col"), ...) {
 	
 	if(!is.matrix(mat)) {
 		stop("`mat` can only be a matrix.\n")
+	}
+
+	if(directional) {
+		if(length(setdiff(direction.type, c("diffHeight", "arrows"))) > 0) {
+			stop("`direction.type` can only be in 'diffHeight' and 'arrows'.")
+		}
 	}
 	
 	transparency = ifelse(transparency < 0, 0, ifelse(transparency > 1, 1, transparency))
@@ -87,7 +106,8 @@ chordDiagram = function(mat, grid.col = NULL, transparency = 0.5,
 			stop("Since you specified a symmetric matrix, rownames and colnames should be the same.\n")
 		}
 
-		mat[upper.tri(mat, diag = TRUE)] = 0
+		mat[upper.tri(mat, diag = !keep.diagonal)] = 0
+		
 	}
 
 	if(!is.null(order)) {
@@ -117,6 +137,12 @@ chordDiagram = function(mat, grid.col = NULL, transparency = 0.5,
 
 	xlim[names(rs)] = xlim[names(rs)] + rs
 	xlim[names(cs)] = xlim[names(cs)] + cs
+
+	# self-link, values are added twice
+	self_link = intersect(rownames(mat), colnames(mat))
+	if(length(self_link)) {
+		xlim[self_link] = xlim[self_link] - abs(diag(mat[self_link, self_link, drop = FALSE]))
+	}
 
 	keep_index = names(xlim)[xlim / sum(xlim) >= reduce]
 	ri = which(rownames(mat) %in% keep_index)
@@ -166,6 +192,11 @@ chordDiagram = function(mat, grid.col = NULL, transparency = 0.5,
 	xlim[names(rs)] = xlim[names(rs)] + rs
 	xlim[names(cs)] = xlim[names(cs)] + cs
 
+	self_link = intersect(rownames(mat), colnames(mat))
+	if(length(self_link)) {
+		xlim[self_link] = xlim[self_link] - abs(diag(mat[self_link, self_link, drop = FALSE]))
+	}
+
 	factors = names(xlim)
 	factors = factor(factors, levels = factors)
 	xlim = cbind(rep(0, length(factors)), xlim)
@@ -191,14 +222,15 @@ chordDiagram = function(mat, grid.col = NULL, transparency = 0.5,
 		}
 	}
 
+	rn = rownames(mat)
+	cn = colnames(mat)
+
 	## make a color matrix based on settings
 	if(!is.null(col)) {
 		if(is.function(col)) {
 			col = col(mat)
-		} else if(is.matrix(col)) {
-
-		} else if(length(col) == 1) {
-			col = rep(col, length(mat))
+		} else {
+			col = .normalize_to_mat(col, rn, cn, "#FFFFFF00")
 		}
 	} else if(!is.null(row.col)) {
 		if(length(row.col) == 1) {
@@ -266,28 +298,16 @@ chordDiagram = function(mat, grid.col = NULL, transparency = 0.5,
 	rn = rownames(mat)
 	cn = colnames(mat)
 	
-	.normalize_to_mat = function(value, rn, cn, default) {
-		var_name = deparse(substitute(value))
-		mat = matrix(default, nrow = length(rn), ncol = length(cn))
-		rownames(mat) = rn
-		colnames(mat) = cn
-		if(length(value) == 1) {
-			mat[,] = value
-		} else {
-			if(!is.null(rownames(value)) && !is.null(colnames(value))) {
-				common_rn = intersect(rownames(value), rn)
-				common_cn = intersect(colnames(value), cn)
-				mat[common_rn, common_cn] = value[common_rn, common_cn]
-			} else {
-				stop(paste0(var_name, " should be a scalar or a matrix with both rownames and colnames.\n"))
-			}
-		}
-		return(mat)
-	}
 	
 	link.border = .normalize_to_mat(link.border, rn, cn, default = NA)
 	link.lwd = .normalize_to_mat(link.lwd, rn, cn, default = 1)
 	link.lty = .normalize_to_mat(link.lty, rn, cn, default = 1)
+	link.arr.length = .normalize_to_mat(link.arr.length, rn, cn, default = 0.4)
+	link.arr.width = .normalize_to_mat(link.arr.width, rn, cn, default = 0.2)
+	link.arr.type = .normalize_to_mat(link.arr.type, rn, cn, default = "triangle")
+	link.arr.lty = .normalize_to_mat(link.arr.lty, rn, cn, default = 1)
+	link.arr.lwd = .normalize_to_mat(link.arr.lwd, rn, cn, default = 1)
+	link.arr.col = .normalize_to_mat(link.arr.col, rn, cn, default = NA)
 	
     sector.sum.row = numeric(length(factors))
     sector.sum.col = numeric(length(factors))
@@ -319,7 +339,7 @@ chordDiagram = function(mat, grid.col = NULL, transparency = 0.5,
 		}
 		if(rn[i] %in% cn) {
 			is = which(cn == rn[i])
-			cn_index = c(is, cn_index[cn_index != is])
+			cn_index = c(is, cn_index[cn_index != is])  # self link is always put in the first?
 		}
 		
 		for(j in cn_index) {
@@ -330,27 +350,75 @@ chordDiagram = function(mat, grid.col = NULL, transparency = 0.5,
             sector.index1 = rn[i]
             sector.index2 = cn[j]
 			
-			if(directional) {
-				if(fromRows) {
-					circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
-								sector.index2, c(sector.sum.col[ cn[j] ], sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])),
-								col = col[rn[i], cn[j]], rou1 = rou - diffHeight, rou2 = rou, border = link.border[rn[i], cn[j]], 
-								lwd = link.lwd[rn[i], cn[j]], lty = link.lty[rn[i], cn[j]], ...)
-				} else {
-					circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
-							sector.index2, c(sector.sum.col[ cn[j] ], sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])),
-							col = col[rn[i], cn[j]], rou1 = rou, rou2 = rou - diffHeight, border = link.border[rn[i], cn[j]],
-							lwd = link.lwd[rn[i], cn[j]], lty = link.lty[rn[i], cn[j]], ...)
-				}
-			} else {
-				circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
-							sector.index2, c(sector.sum.col[ cn[j] ], sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])),
+			if(sector.index1 == sector.index2) {
+				circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]]))*0.50000001,
+							sector.index2, c(sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])/2, sector.sum.row[ cn[j] ] + abs(mat[rn[i], cn[j]])),
 							col = col[rn[i], cn[j]], rou1 = rou, border = link.border[rn[i], cn[j]], lwd = link.lwd[rn[i], cn[j]], 
 							lty = link.lty[rn[i], cn[j]], ...)
+	            sector.sum.row[ rn[i] ] = sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])
+			} else {
+				if(directional) {
+					if(setequal(direction.type, c("diffHeight", "arrows"))) {
+						if(fromRows) {
+							circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
+										sector.index2, c(sector.sum.col[ cn[j] ], sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])),
+										directional = 1, col = col[rn[i], cn[j]], rou1 = rou - diffHeight, rou2 = rou, border = link.border[rn[i], cn[j]], 
+										lwd = link.lwd[rn[i], cn[j]], lty = link.lty[rn[i], cn[j]], 
+										arr.length = link.arr.length[rn[i], cn[j]], arr.width = link.arr.width[rn[i], cn[j]],
+										arr.type = link.arr.type[rn[i], cn[j]], arr.col = link.arr.col[rn[i], cn[j]],
+										arr.lty = link.arr.lty[rn[i], cn[j]], arr.lwd = link.arr.lwd[rn[i], cn[j]],
+										...)
+						} else {
+							circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
+										sector.index2, c(sector.sum.col[ cn[j] ], sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])),
+										directional = -1, col = col[rn[i], cn[j]], rou1 = rou, rou2 = rou - diffHeight, border = link.border[rn[i], cn[j]],
+										lwd = link.lwd[rn[i], cn[j]], lty = link.lty[rn[i], cn[j]],
+										arr.length = link.arr.length[rn[i], cn[j]], arr.width = link.arr.width[rn[i], cn[j]],
+										arr.type = link.arr.type[rn[i], cn[j]], arr.col = link.arr.col[rn[i], cn[j]],
+										arr.lty = link.arr.lty[rn[i], cn[j]], arr.lwd = link.arr.lwd[rn[i], cn[j]], ...)
+						}
+					} else if(setequal(direction.type, "diffHeight")) {
+						if(fromRows) {
+							circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
+										sector.index2, c(sector.sum.col[ cn[j] ], sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])),
+										col = col[rn[i], cn[j]], rou1 = rou - diffHeight, rou2 = rou, border = link.border[rn[i], cn[j]], 
+										lwd = link.lwd[rn[i], cn[j]], lty = link.lty[rn[i], cn[j]], ...)
+						} else {
+							circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
+									sector.index2, c(sector.sum.col[ cn[j] ], sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])),
+									col = col[rn[i], cn[j]], rou1 = rou, rou2 = rou - diffHeight, border = link.border[rn[i], cn[j]],
+									lwd = link.lwd[rn[i], cn[j]], lty = link.lty[rn[i], cn[j]], ...)
+						}
+					} else if(setequal(direction.type, "arrows")) {
+						if(fromRows) {
+							circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
+										sector.index2, c(sector.sum.col[ cn[j] ], sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])),
+										directional = 1, col = col[rn[i], cn[j]], rou1 = rou, border = link.border[rn[i], cn[j]], 
+										lwd = link.lwd[rn[i], cn[j]], lty = link.lty[rn[i], cn[j]], 
+										arr.length = link.arr.length[rn[i], cn[j]], arr.width = link.arr.width[rn[i], cn[j]],
+										arr.type = link.arr.type[rn[i], cn[j]], arr.col = link.arr.col[rn[i], cn[j]],
+										arr.lty = link.arr.lty[rn[i], cn[j]], arr.lwd = link.arr.lwd[rn[i], cn[j]],
+										...)
+						} else {
+							circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
+										sector.index2, c(sector.sum.col[ cn[j] ], sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])),
+										directional = -1, col = col[rn[i], cn[j]], rou1 = rou, border = link.border[rn[i], cn[j]],
+										lwd = link.lwd[rn[i], cn[j]], lty = link.lty[rn[i], cn[j]],
+										arr.length = link.arr.length[rn[i], cn[j]], arr.width = link.arr.width[rn[i], cn[j]],
+										arr.type = link.arr.type[rn[i], cn[j]], arr.col = link.arr.col[rn[i], cn[j]],
+										arr.lty = link.arr.lty[rn[i], cn[j]], arr.lwd = link.arr.lwd[rn[i], cn[j]], ...)
+						}
+					}
+				} else {
+					circos.link(sector.index1, c(sector.sum.row[ rn[i] ], sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])),
+								sector.index2, c(sector.sum.col[ cn[j] ], sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])),
+								col = col[rn[i], cn[j]], rou1 = rou, border = link.border[rn[i], cn[j]], lwd = link.lwd[rn[i], cn[j]], 
+								lty = link.lty[rn[i], cn[j]], ...)
+				}
+				
+	            sector.sum.row[ rn[i] ] = sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])
+				sector.sum.col[ cn[j] ] = sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])
 			}
-			
-            sector.sum.row[ rn[i] ] = sector.sum.row[ rn[i] ] + abs(mat[rn[i], cn[j]])
-			sector.sum.col[ cn[j] ] = sector.sum.col[ cn[j] ] + abs(mat[rn[i], cn[j]])
         }
 		
     }
@@ -394,4 +462,47 @@ parsePreAllocateTracksValue = function(preAllocateTracks) {
 	} else {
 		stop("Wrong `preAllocateTracks` value.\n")
 	}
+}
+
+# values can be:
+# - a scalar
+# - a matrix
+# - a three column data frame
+.normalize_to_mat = function(value, rn, cn, default) {
+	var_name = deparse(substitute(value))
+	mat = matrix(default, nrow = length(rn), ncol = length(cn))
+	rownames(mat) = rn
+	colnames(mat) = cn
+	if(inherits(value, "data.frame")) {
+		if(ncol(value) == 3) {
+			value[[1]] = as.vector(value[[1]])
+			value[[2]] = as.vector(value[[2]])
+			value[[3]] = as.vector(value[[3]])
+
+			l = value[, 1] %in% rn & value[, 2] %in% cn
+			value = value[l, , drop = FALSE]
+			for(i in seq_len(nrow(value))) {
+				mat[ value[i, 1], value[i, 2] ] = value[i, 3]
+			}
+		} else {
+			stop(paste0("If ", var_name, " is set as a data frame, it should have three columns."))
+		}
+	} else if(is.atomic(value) && length(value) == 1) {
+		mat[,] = value
+	} else {
+		if(!is.null(rownames(value)) && !is.null(colnames(value))) {
+			common_rn = intersect(rownames(value), rn)
+			common_cn = intersect(colnames(value), cn)
+			mat[common_rn, common_cn] = value[common_rn, common_cn]
+		} else {
+			if(nrow(value) == length(rn) && ncol(value) == length(cn)) {
+				mat = value
+				rownames(mat) = rn
+				colnames(mat) = cn
+			} else {
+				stop(paste0("If ", var_name, " is a matrix, it should have both rownames and colnames.\n"))
+			}
+		}
+	}
+	return(mat)
 }
