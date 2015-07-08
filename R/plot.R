@@ -243,6 +243,19 @@ circos.trackPlotRegion = function(factors = NULL, x = NULL, y = NULL, ylim = NUL
 }
 
 # == title
+# Create plotting regions for a whole track
+#
+# == param
+# -... pass to `circos.trackPlotRegion`
+#
+# == details
+# shortcut function of `circos.trackPlotRegion`.
+#
+circos.track = function(...) {
+	circos.trackPlotRegion(...)
+}
+
+# == title
 # Update the plotting region in an existed cell
 #
 # == param
@@ -279,6 +292,19 @@ circos.updatePlotRegion = function(sector.index = get.cell.meta.data("sector.ind
     circos.rect(cell.xlim[1], cell.ylim[1], cell.xlim[2], cell.ylim[2], 
         col = bg.col, border = bg.border, lty = bg.lty, lwd = bg.lwd)
     return(invisible(NULL))
+}
+
+# == title
+# Create plotting regions for a whole track
+#
+# == param
+# -... pass to `circos.updatePlotRegion`
+#
+# == details
+# shortcut function of `circos.updatePlotRegion`.
+#
+circos.update = function(...)  {
+	circos.updatePlotRegion(...)
 }
 
 # internal, so we do not need to check arguments
@@ -648,10 +674,7 @@ circos.trackLines = function(factors, x, y, track.index = get.cell.meta.data("tr
 # -ytop         y for the right top points
 # -sector.index Index for the sector
 # -track.index  Index for the track
-# -col          filled color
-# -border       color for the border
-# -lty          line style for the border
-# -lwd          line width for the border
+# -... pass to `graphics::polygon`
 #
 # == details
 # Currently, ``xleft``, ``ybottom``, ``xright``, ``ytop`` are all single values, which means
@@ -663,43 +686,54 @@ circos.trackLines = function(factors, x, y, track.index = get.cell.meta.data("tr
 # `graphics::rect` does.
 circos.rect = function(xleft, ybottom, xright, ytop,
 	sector.index = get.cell.meta.data("sector.index"), 
-	track.index = get.cell.meta.data("track.index"),
-    col = NA, border = "black", lty = par("lty"), lwd = par("lwd")) {
-    if(! (length(xleft) == 1 &&
-          length(ybottom) == 1 &&
-          length(xright) == 1 &&
-          length(ytop) == 1) ) {
-        stop("There should only be one data points in 'xleft', 'ybottom', 'xright' or 'ytop'.\n")  
-    }
+	track.index = get.cell.meta.data("track.index"), ...) {
+
+    # if(! (length(xleft) == 1 &&
+    #       length(ybottom) == 1 &&
+    #       length(xright) == 1 &&
+    #       length(ytop) == 1) ) {
+    #     stop("There should only be one data points in 'xleft', 'ybottom', 'xright' or 'ytop'.\n")  
+    # }
 
     if(!has.cell(sector.index, track.index)) {
         stop("'circos.rect' can only be used after the plotting region been created\n")
     }
+
+    if(! (length(xleft) == length(ybottom) && length(ybottom) == length(xright) && length(xright) == length(ytop)) ) {
+		stop("xleft, ybottom, xright, ytop should have same length.")
+	}
     
-    # no filled colors, just four edges, here edges colors are controled by ``border``
-    if(is.na(col)) {
-        # vertical lines in the original coordinate system are still straight lines
-        # in the new coordinate system except they now pointing to the circle center.
-        circos.lines(c(xleft, xleft), c(ybottom, ytop),
-                     sector.index = sector.index, track.index = track.index,
-                     col = border, lty = lty, lwd = lwd, straight = TRUE)
-        # horizontal lines in the original coordinate system are now arcs and the arcs
-        # share the same circle center as the polar coordinate system
-        circos.lines(c(xleft, xright), c(ytop, ytop),
-                   sector.index = sector.index, track.index = track.index,
-                   col = border, lty = lty, lwd = lwd)
-        circos.lines(c(xright, xright), c(ytop, ybottom),
-                     sector.index = sector.index, track.index = track.index,
-                     col = border, lty = lty, lwd = lwd, straight = TRUE)
-        circos.lines(c(xleft, xright), c(ybottom, ybottom),
-                   sector.index = sector.index, track.index = track.index,
-                   col = border, lty = lty, lwd = lwd)
-    } else {
-        circos.polygon(c(xleft, xleft, xright, xright, xleft),
-                       c(ybottom, ytop, ytop, ybottom, ybottom),
-                       sector.index = sector.index, track.index = track.index,
-                       col = col, border = border, lty = lty, lwd = lwd)
-    }
+    # # no filled colors, just four edges, here edges colors are controled by ``border``
+    # if(is.na(col)) {
+    #     # vertical lines in the original coordinate system are still straight lines
+    #     # in the new coordinate system except they now pointing to the circle center.
+    #     circos.lines(c(xleft, xleft), c(ybottom, ytop),
+    #                  sector.index = sector.index, track.index = track.index,
+    #                  col = border, lty = lty, lwd = lwd, straight = TRUE)
+    #     # horizontal lines in the original coordinate system are now arcs and the arcs
+    #     # share the same circle center as the polar coordinate system
+    #     circos.lines(c(xleft, xright), c(ytop, ytop),
+    #                sector.index = sector.index, track.index = track.index,
+    #                col = border, lty = lty, lwd = lwd)
+    #     circos.lines(c(xright, xright), c(ytop, ybottom),
+    #                  sector.index = sector.index, track.index = track.index,
+    #                  col = border, lty = lty, lwd = lwd, straight = TRUE)
+    #     circos.lines(c(xleft, xright), c(ybottom, ybottom),
+    #                sector.index = sector.index, track.index = track.index,
+    #                col = border, lty = lty, lwd = lwd)
+    # } else {
+    #     circos.polygon(c(xleft, xleft, xright, xright, xleft),
+    #                    c(ybottom, ytop, ytop, ybottom, ybottom),
+    #                    sector.index = sector.index, track.index = track.index,
+    #                    col = col, border = border, lty = lty, lwd = lwd)
+    # }
+
+    x = unlist(lapply(seq_along(xleft), function(i) c(xleft[i], xleft[i], xright[i], xright[i], xleft[i], NA)))
+    y = unlist(lapply(seq_along(ybottom), function(i) c(ybottom[i], ytop[i], ytop[i], ybottom[i], ybottom[i], NA)))
+    x = x[-length(x)]
+    y = y[-length(y)]
+    circos.polygon(x, y, sector.index = sector.index, track.index = track.index, ...)
+
     return(invisible(NULL))
 }
 
@@ -711,16 +745,15 @@ circos.rect = function(xleft, ybottom, xright, ytop,
 # -y            Data points on y-axis
 # -sector.index Index for the sector
 # -track.index  Index for the track
-# -col          filled color
-# -border       color for the border
-# -lty          line style for the border
-# -lwd          line width for the border
+# -... pass to `graphics::polygon`
 #
 # == details
-# similar as `graphics::polygon`
+# similar as `graphics::polygon`.
+#
+# Note: start point should overlap with the end point,
+#
 circos.polygon = function(x, y, sector.index = get.cell.meta.data("sector.index"),
-	track.index = get.cell.meta.data("track.index"),
-    col = NA, border = "black", lty = par("lty"), lwd = par("lwd")) {
+	track.index = get.cell.meta.data("track.index"), ...) {
     
     if(!has.cell(sector.index, track.index)) {
         stop("'circos.polygon' can only be used after the plotting region been created\n")
@@ -728,12 +761,55 @@ circos.polygon = function(x, y, sector.index = get.cell.meta.data("sector.index"
     
     # whether the points that are out of the plotting region.
     check.points.position(x, y, sector.index, track.index)
-    
+
     d = lines.expand(x, y, sector.index, track.index)
     d2 = circlize(d[, 1], d[, 2], sector.index, track.index)
-    polygon(polar2Cartesian(d2), col = col, border = border,
-            lty = lty, lwd = lwd)
+    polygon(polar2Cartesian(d2), ...)
     return(invisible(NULL))
+}
+
+# == title
+# Draw segments through pairwise of points
+#
+# == param
+# -x0 x coordinates for starting points
+# -y0 y coordinates for ending points 
+# -x1 x coordinates for starting points
+# -y1 y coordinates for ending points
+# -sector.index Index for the sector
+# -track.index  Index for the track
+# -straight whether the segment is a straight line
+# -... pass to `graphics::lines`
+#
+circos.segments = function(x0, y0, x1, y1, sector.index = get.cell.meta.data("sector.index"),
+	track.index = get.cell.meta.data("track.index"), straight = FALSE, ...) {
+
+	if(!has.cell(sector.index, track.index)) {
+        stop("'circos.polygon' can only be used after the plotting region been created\n")
+    }
+
+	if(! (length(x0) == length(y0) && length(y0) == length(x1) && length(x1) == length(y1)) ) {
+		stop("x0, y0, x1, y1 should have same length.")
+	}
+
+	if(length(straight) == 1) straight = rep(straight, length(x0))
+	x = NULL
+	y = NULL
+	for(i in seq_along(x0)) {
+		if(straight[i]) {
+			x = c(x, c(x0[i], x1[i], NA))
+			y = c(y, c(y0[i], y1[i], NA))
+		} else {
+			d = lines.expand(c(x0[i], x1[i]), c(y0[i], y1[i]), sector.index, track.index)
+			x = c(x, c(d[, 1], NA))
+			y = c(y, c(d[, 2], NA))
+		}
+	}
+	x = x[-length(x)]
+	y = y[-length(y)]
+	d2 = circlize(x, y, sector.index, track.index)
+	d3 = polar2Cartesian(d2)
+	lines(d3[,1], d3[,2], ...)
 }
 
 # == title
@@ -782,6 +858,8 @@ circos.text = function(x, y, labels, sector.index = get.cell.meta.data("sector.i
 	if(length(adj) == 1) {
 		adj = c(adj, adj)
 	}
+
+	labels = as.vector(labels)
 	
     # whether the points that are out of the plotting region.
     check.points.position(x, y, sector.index, track.index)
@@ -854,13 +932,13 @@ circos.text = function(x, y, labels, sector.index = get.cell.meta.data("sector.i
 		if(sum(l1)) {
 			circos.text(x[l1], y[l1], labels[l1], sector.index = sector.index,
 				track.index = track.index, facing = facing1, niceFacing = FALSE, adj = adj1,
-				cex = cex, col = col, font = font, ...)
+				cex = cex[l1], col = col[l1], font = font[l1], ...)
 		}
 		
 		if(sum(l2)) {
 			circos.text(x[l2], y[l2], labels[l2], sector.index = sector.index,
 				track.index = track.index, facing = facing2, niceFacing = FALSE, adj = adj2,
-				cex = cex, col = col, font = font, ...)
+				cex = cex[l2], col = col[l2], font = font[l2], ...)
 		}
 		return(invisible(NULL))
 	}
@@ -1084,16 +1162,21 @@ circos.axis = function(h = "top", major.at = NULL, labels = TRUE, major.tick = T
 	
 	op = circos.par("points.overflow.warning")
 	circos.par("points.overflow.warning" = FALSE)
-	for(i in seq_along(major.at)) {
-		
-		if(major.at[i] < xlim2[1] || major.at[i] > xlim2[2]) {
-			next
-		}
-	
-		if(major.tick) {
-			circos.lines(c(major.at[i], major.at[i]), c(h, h + major.tick.length*ifelse(direction == "outside", 1, -1)), straight = TRUE,
+	l = major.at >= xlim2[1] & major.at <= xlim2[2]
+	if(major.tick) {
+		circos.segments(major.at[l], rep(h, sum(l)), major.at[l], rep(h, sum(l)) + major.tick.length*ifelse(direction == "outside", 1, -1), straight = TRUE,
 			             sector.index = sector.index, track.index = track.index, lwd = lwd)
-		}
+	}
+	#for(i in seq_along(major.at)) {
+		
+		# if(major.at[i] < xlim2[1] || major.at[i] > xlim2[2]) {
+		# 	next
+		# }
+	
+		# if(major.tick) {
+		# 	circos.lines(c(major.at[i], major.at[i]), c(h, h + major.tick.length*ifelse(direction == "outside", 1, -1)), straight = TRUE,
+		# 	             sector.index = sector.index, track.index = track.index, lwd = lwd)
+		# }
 		
 		labels.adj = NULL
 		if(direction == "outside") {
@@ -1127,29 +1210,33 @@ circos.axis = function(h = "top", major.at = NULL, labels = TRUE, major.tick = T
 		}
 		
 		if(is.logical(labels) && labels) {
-			circos.text(major.at[i], h + (major.tick.length+yrange*labels.away.percentage)*ifelse(direction == "outside", 1, -1),
-			           labels = major.at[i], adj = labels.adj,
+			circos.text(major.at[l], rep(h, sum(l)) + (major.tick.length+yrange*labels.away.percentage)*ifelse(direction == "outside", 1, -1),
+			           labels = major.at[l], adj = labels.adj,
 			           font = labels.font, cex = labels.cex, sector.index = sector.index, track.index = track.index,
 			           facing = labels.facing, niceFacing = labels.niceFacing)
 		} else if(is.logical(labels) && !labels) {
                           
         } else if(length(labels)) {
-			circos.text(major.at[i], h + (major.tick.length+yrange*labels.away.percentage)*ifelse(direction == "outside", 1, -1),
-			            labels = labels[i], adj = labels.adj,
+			circos.text(major.at[l], rep(h, sum(l)) + (major.tick.length+yrange*labels.away.percentage)*ifelse(direction == "outside", 1, -1),
+			            labels = labels[l], adj = labels.adj,
 			            font = labels.font, cex = labels.cex, sector.index = sector.index, track.index = track.index,
 				        facing = labels.facing, niceFacing = labels.niceFacing)
 		}				
 		
-	}
+	#}
 	if(major.tick) {
-		for(i in seq_along(minor.at)) {
-			if(minor.at[i] < xlim2[1] || minor.at[i] > xlim2[2]) {
-				next
-			}
+		# for(i in seq_along(minor.at)) {
+		# 	if(minor.at[i] < xlim2[1] || minor.at[i] > xlim2[2]) {
+		# 		next
+		# 	}
 		
-			circos.lines(c(minor.at[i], minor.at[i]), c(h, h + major.tick.length/2*ifelse(direction == "outside", 1, -1)), straight = TRUE,
-			             sector.index = sector.index, track.index = track.index, lwd = lwd)
-		}
+		# 	circos.lines(c(minor.at[i], minor.at[i]), c(h, h + major.tick.length/2*ifelse(direction == "outside", 1, -1)), straight = TRUE,
+		# 	             sector.index = sector.index, track.index = track.index, lwd = lwd)
+		# }
+
+		l = minor.at >= xlim2[1] & minor.at <= xlim2[2]
+		circos.segments(minor.at[l], rep(h, sum(l)), minor.at[l], rep(h, sum(l)) + major.tick.length/2*ifelse(direction == "outside", 1, -1), straight = TRUE,
+			sector.index = sector.index, track.index = track.index, lwd = lwd)
 	}
 	
 	circos.par("points.overflow.warning" = op)
@@ -1551,6 +1638,10 @@ circos.dendrogram = function(dend, facing = c("outside", "inside"), max_height =
     lines_par = function(col = par("col"), lty = par("lty"), lwd = par("lwd"), ...) {
     	return(list(col = col, lty = lty, lwd = lwd))
     }
+
+    points_par = function(col = par("col"), pch = par("pch"), cex = par("cex"), ...) {
+    	return(list(col = col, pch = pch, cex = cex))
+    }
     
     draw.d = function(dend, max_height, facing = "outside", max_width = 0) {
         leaf = attr(dend, "leaf")
@@ -1577,26 +1668,58 @@ circos.dendrogram = function(dend, facing = c("outside", "inside"), max_height =
         # only for lines, there are lwd, col, lty
         edge_par1 = do.call("lines_par", as.list(attr(d1, "edgePar")))  # as.list to convert NULL to list()
         edge_par2 = do.call("lines_par", as.list(attr(d2, "edgePar")))
+        node_par = attr(dend, "nodePar")
+        if(!is.null(node_par)) node_par = do.call("points_par", as.list(attr(dend, "nodePar")))
         
         # plot the connection line
-        
         if(facing == "outside") {
         	circos.lines(c(x1, x1), max_height - c(y1, height), col = edge_par1$col, lty = edge_par1$lty, lwd = edge_par1$lwd, straight = TRUE)
         	circos.lines(c(x1, (x1+x2)/2), max_height - c(height, height), col = edge_par1$col, lty = edge_par1$lty, lwd = edge_par1$lwd)
        		circos.lines(c(x2, x2), max_height - c(y2, height), col = edge_par2$col, lty = edge_par2$lty, lwd = edge_par2$lwd, straight = TRUE)
        		circos.lines(c(x2, (x1+x2)/2), max_height - c(height, height), col = edge_par2$col, lty = edge_par2$lty, lwd = edge_par2$lwd)
+       		if(!is.null(node_par)) {
+       			circos.points((x1+x2)/2, max_height - height, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
+       		}
        	} else if(facing == "inside") {
       		circos.lines(c(x1, x1), c(y1, height), col = edge_par1$col, lty = edge_par1$lty, lwd = edge_par1$lwd, straight = TRUE)
         	circos.lines(c(x1, (x1+x2)/2), c(height, height), col = edge_par1$col, lty = edge_par1$lty, lwd = edge_par1$lwd)
         	circos.lines(c(x2, x2), c(y2, height), col = edge_par2$col, lty = edge_par2$lty, lwd = edge_par2$lwd, straight = TRUE)
        		circos.lines(c(x2, (x1+x2)/2), c(height, height), col = edge_par2$col, lty = edge_par2$lty, lwd = edge_par2$lwd)
+       		if(!is.null(node_par)) {
+       			circos.points((x1+x2)/2, height, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
+       		}
        	}
   
         # do it recursively
-        if(!is.leaf(d1)) {
+        if(is.leaf(d1)) {
+        	node_par = attr(d1, "nodePar")
+        	if(!is.null(node_par)) node_par = do.call("points_par", as.list(attr(d1, "nodePar")))
+        	if(facing == "outside") {
+        		if(!is.null(node_par)) {
+	       			circos.points(x1, max_height, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
+	       		}
+        	} else if(facing == "inside") {
+        		if(!is.null(node_par)) {
+	       			circos.points(x1, 0, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
+	       		}
+        	}
+        } else {
             draw.d(d1, max_height, facing, max_width)
         }
-        if(!is.leaf(d2)) {
+
+        if(is.leaf(d2)) {
+        	node_par = attr(d2, "nodePar")
+        	if(!is.null(node_par)) node_par = do.call("points_par", as.list(attr(d2, "nodePar")))
+        	if(facing == "outside") {
+        		if(!is.null(node_par)) {
+	       			circos.points(x2, max_height, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
+	       		}
+        	} else if(facing == "inside") {
+        		if(!is.null(node_par)) {
+	       			circos.points(x2, 0, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
+	       		}
+        	}
+        } else {
             draw.d(d2, max_height, facing, max_width)
         }
     }

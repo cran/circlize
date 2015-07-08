@@ -4,7 +4,7 @@ opts_chunk$set(fig.pos = "")
 
 library(circlize)
 chordDiagram = function(...) {
-    circos.par(unit.circle.segments = 300)
+    circos.par(unit.circle.segments = 280)
     circlize::chordDiagram(...)
 }
 
@@ -306,8 +306,17 @@ mat3
 #  chordDiagram(mat, directional = TRUE, direction.type = c("diffHeight", "arrows"),
 #      link.arr.col = arr.col, link.arr.length = 0.2)
 
-## ----chord_diagram_directional, echo = FALSE, fig.align = "center", out.width = "0.6\\textheight", out.height = "0.9\\textheight", fig.width = 7, fig.height = 10.5, fig.cap = "Visualization of directional matrix. A) with default settings; B) set difference of two feet of links; C) set the starting feet; D) row names and column names have overlaps; E, F) directions are represented by arrows."----
-par(mfrow = c(3, 2))
+## ----chord_diagram_directional_arrow3, eval = FALSE----------------------
+#  matx = matrix(rnorm(64), 8)
+#  chordDiagram(matx, directional = TRUE, direction.type = c("diffHeight", "arrows"),
+#      link.arr.type = "big.arrow")
+
+## ----chord_diagram_directional_arrow4, eval = FALSE----------------------
+#  chordDiagram(matx, directional = TRUE, direction.type = c("diffHeight", "arrows"),
+#      link.arr.type = "big.arrow", diffHeight = -0.04)
+
+## ----chord_diagram_directional, echo = FALSE, fig.align = "center", out.width = "\\textwidth", out.height = "\\textwidth", fig.width = 10.5, fig.height = 10.5, fig.cap = "Visualization of directional matrix. A) with default settings; B) set difference of two feet of links; C) set the starting feet; D) row names and column names have overlaps; E, F, G, H) directions are represented by arrows."----
+par(mfrow = c(3, 3))
 chordDiagram(mat, directional = TRUE)
 text(-0.9, 0.9, "A", cex = 1.5)
 chordDiagram(mat, directional = TRUE, diffHeight = 0.08)
@@ -326,6 +335,13 @@ arr.col = data.frame(c("S1", "S2", "S3"), c("E5", "E6", "E4"),
 chordDiagram(mat, directional = TRUE, direction.type = c("diffHeight", "arrows"),
     link.arr.col = arr.col, link.arr.length = 0.2)
 text(-0.9, 0.9, "F", cex = 1.5)
+matx = matrix(rnorm(64), 8)
+chordDiagram(matx, directional = TRUE, direction.type = c("diffHeight", "arrows"),
+    link.arr.type = "big.arrow")
+text(-0.9, 0.9, "G", cex = 1.5)
+chordDiagram(matx, directional = TRUE, direction.type = c("diffHeight", "arrows"),
+    link.arr.type = "big.arrow", diffHeight = -0.04)
+text(-0.9, 0.9, "H", cex = 1.5)
 par(mfrow = c(1, 1))
 
 ## ----chord_diagram_symmetric_show, eval = FALSE--------------------------

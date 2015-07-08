@@ -1,33 +1,30 @@
 \name{circos.dendrogram}
 \alias{circos.dendrogram}
 \title{
-Add circlized dendrograms  
-
+Add circlized dendrograms
 
 }
 \description{
-Add circlized dendrograms  
-
+Add circlized dendrograms
 
 }
 \usage{
-circos.dendrogram(dend, facing = c("outside", "inside"), max_height = NULL)
-}
+circos.dendrogram(dend, facing = c("outside", "inside"), max_height = NULL)}
 \arguments{
 
   \item{dend}{A \code{\link[stats]{dendrogram}} object.}
   \item{facing}{Is the dendromgrams facing inside to the circle or outside.}
-  \item{max_height}{Maximum height of the dendrogram. This is important if more than one dendrograms are drawn in one track and making them comparable.}
-
+  \item{max_height}{Maximum height of the dendrogram. This is important if more than one dendrogramsare drawn in one track and making them comparable.}
 }
 \details{
-Assuming there are \code{n} nodes in the dendrogram, the positions for leaves on x-axis is \code{0.5, 1.5, ..., n - 0.5}. So you must be careful with \code{xlim} when you initialize the cirular layout.  
+Assuming there are \code{n} nodes in the dendrogram, the positions for leaves on x-axis is \code{0.5, 1.5, ..., n - 0.5}.
+So you must be careful with \code{xlim} when you initialize the cirular layout.
 
-You can use the \code{dendextend} package to render the dendrograms.  
-
+You can use the \code{dendextend} package to render the dendrograms.
 
 }
 \examples{
+\dontrun{
 load(paste0(system.file(package = "circlize"), "/extdata/bird.orders.RData"))
 
 labels = hc$labels  # name of birds
@@ -49,9 +46,11 @@ circos.trackPlotRegion(ylim = c(0, 1), bg.border = NA, track.height = 0.3,
 
 require(dendextend)
 dend = color_branches(dend, k = 6, col = 1:6)
+
 circos.trackPlotRegion(ylim = c(0, max_height), bg.border = NA, 
     track.height = 0.4, panel.fun = function(x, y) {
         circos.dendrogram(dend, max_height = max_height)
 })
 circos.clear()
+}
 }
