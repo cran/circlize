@@ -4,12 +4,12 @@ opts_chunk$set(fig.pos = "", fig.align = "center")
 
 library(circlize)
 circos.genomicInitialize = function(...) {
-    circos.par(unit.circle.segments = 300)
+    circos.par(unit.circle.segments = 200)
     circlize::circos.genomicInitialize(...)
 }
 
 circos.initializeWithIdeogram = function(...) {
-    circos.par(unit.circle.segments = 280)
+    circos.par(unit.circle.segments = 200)
     circlize::circos.initializeWithIdeogram(...)
 }
 
@@ -93,50 +93,6 @@ invisible(dev.off())
 #  circos.clear()
 #  text(0, 0, "'gap.degree' = rep(c(2, 4), 12)", cex = 0.7)
 #  text(-0.9, 0.9, "I", cex = 1.5)
-
-## ----genomic_initialize_ideogram, echo = FALSE, out.width = '\\textwidth', fig.cap = "Different ways to initialize genomic circos plot. A) default; B) select subset of chromosomes; C) read from a data frame; D) the first column of the data frame is a factor; E) sort chromosomes; F) do not add ideogram; G) initialize the plot while plot nothing; H) set start degree of the plot; I) set gap degree."----
-par(mfrow = c(3, 3), mar = c(1, 1, 1, 1))
-par(mar = c(1, 1, 1, 1))
-circos.initializeWithIdeogram()
-text(0, 0, "default", cex = 0.7)
-text(-0.9, 0.9, "A", cex = 1.5)
-circos.initializeWithIdeogram(chromosome.index = paste0("chr", 10:1))
-text(0, 0, "subset of chromosomes", cex = 0.7)
-text(-0.9, 0.9, "B", cex = 1.5)
-cytoband = cytoband.df
-circos.initializeWithIdeogram(cytoband, sort.chr = TRUE)
-text(0, 0, "read from cytoband df\nsort.chr = TRUE", cex = 0.7)
-text(-0.9, 0.9, "C", cex = 1.5)
-
-cytoband = cytoband.df
-circos.initializeWithIdeogram(cytoband, sort.chr = FALSE)
-text(0, 0, "read from a data frame\nunique(cytoband[[1]])", cex = 0.7)
-text(-0.9, 0.9, "D", cex = 1.5)
-
-cytoband[[1]] = factor(cytoband[[1]], levels = paste0("chr", c(22:1, "X", "Y")))
-circos.initializeWithIdeogram(cytoband, sort.chr = FALSE)
-text(0, 0, "read from cytoband file\nfirst column converted to factor\nlevels = paste0('chr', c(22:1, 'X', 'Y'))", cex = 0.7)
-text(-0.9, 0.9, "E", cex = 1.5)
-circos.initializeWithIdeogram(plotType = c("axis", "labels"))
-text(0, 0, "plotType = c('axis', 'labels')", cex = 0.7)
-text(-0.9, 0.9, "F", cex = 1.5)
-circos.initializeWithIdeogram(plotType = NULL)
-text(0, 0, "plotType = NULL", cex = 0.7)
-text(-0.9, 0.9, "G", cex = 1.5)
-
-circos.clear()
-circos.par("start.degree" = 90)
-circos.initializeWithIdeogram()
-circos.clear()
-text(0, 0, "'start.degree' = 90", cex = 0.7)
-text(-0.9, 0.9, "H", cex = 1.5)
-
-circos.par("gap.degree" = rep(c(2, 4), 12))
-circos.initializeWithIdeogram()
-circos.clear()
-text(0, 0, "'gap.degree' = rep(c(2, 4), 12)", cex = 0.7)
-text(-0.9, 0.9, "I", cex = 1.5)
-par(mfrow = c(1, 1))
 
 ## ----genomic_customize_ideogram, out.width = "0.8\\textwidth", fig.cap = "Customize ideogram."----
 par(mar = c(1, 1, 1, 1))

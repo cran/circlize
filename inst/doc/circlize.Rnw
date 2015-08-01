@@ -35,7 +35,7 @@ opts_chunk$set(fig.pos = "", fig.align = "center")
 
 library(circlize)
 circos.initialize = function(...) {
-    circos.par(unit.circle.segments = 280)
+    circos.par(unit.circle.segments = 200)
     circlize::circos.initialize(...)
 }
 @
@@ -277,7 +277,7 @@ text(-0.9, 0.9, "F", cex = 1.5)
 par(mfrow = c(1, 1))
 @
 
-You can get a summary of your circular layout by {\tt circos.info()}.
+You can get a summary of your circular layout by {\tt circos.info}.
 
 <<eval = FALSE>>=
 circos.info()
@@ -676,8 +676,7 @@ There is also a {\tt circos.trackText} in the package.
 
 \subsection{Rectangle}
 If you imagine the plotting region in a cell as Cartesian coordinate, then {\tt circos.rect} draws rectangles.
-In the circle, the up and bottom edge become two arcs. Usage is similar as {\tt rect}, but it
-can only draw one rectangle at a time.
+In the circle, the up and bottom edge become two arcs. This function can be vectorized.
 
 <<eval = FALSE>>=
 circos.rect(xleft, ybottom, xright, ytop)
@@ -763,7 +762,7 @@ source("src/intro-12-link.R")
 @
 
 The position of link `root' is controlled by {\tt rou}. By default, it is the end position of the most recently created track.
-So normally, you don't need to care about this setting. The default value of {\tt rou} is calculated by an interval function {\tt get\_most\_inside\_radius}:
+So normally, you don't need to care about this setting. The default value of {\tt rou} is calculated by an interval function {\tt get\_most\_inside\_radius()}:
 
 <<tidy = TRUE>>=
 circlize:::get_most_inside_radius
@@ -1019,7 +1018,7 @@ circos.clear()
 @
 
 If the purpose is simply highlight complete cells, there is a shortcut function
-{\tt code highlight.sector} for which you only need to specify index for sectors
+{\tt highlight.sector} for which you only need to specify index for sectors
 and tracks that you want to to highlight (figure \ref{fig:circlize_highlight} B).
 
 <<circlize_highlight_sector, eval = FALSE>>=
