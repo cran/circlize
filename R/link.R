@@ -22,6 +22,7 @@
 # -lty           Line (or border) style
 # -border        If the link is a ribbon, then it is the color for the ribbon border.
 # -directional   0 for no direction, 1 for direction from point1 to point2, -1 for direction from point2 to point1.
+#                2 for two directional
 # -arr.length    Length of the arrows, measured in 'cm', pass to `shape::Arrowhead`. If ``arr.type`` is set to ``big.arrow``,
 #                the value is percent to the radius of the unit circle.
 # -arr.width     Width of the arrows, pass to `shape::Arrowhead`.
@@ -61,7 +62,7 @@ circos.link = function(sector.index1, point1, sector.index2, point2,
 		d = getQuadraticPoints(theta1, theta2, rou1, rou2, h = h, w = w)
         lines(d, col = col, lwd = lwd, lty = lty)
         if(nrow(d) > 1) {
-	        if(directional == 1) {  # point1 to point2
+	        if(directional %in% c(1,2)) {  # point1 to point2
 	        	nr = nrow(d)
 	        	alpha = line_degree(d[nr-1, 1], d[nr-1, 2], d[nr, 1], d[nr, 2])
 	        	oljoin = par("ljoin")
@@ -69,7 +70,8 @@ circos.link = function(sector.index1, point1, sector.index2, point2,
 	        	Arrowhead(d[nr, 1], d[nr, 2], alpha, arr.length = arr.length, arr.width = arr.width, 
 	        		arr.adj = 1, arr.type = arr.type, arr.col = col, lcol = col)
 	        	par(ljoin = oljoin)
-	        } else if(directional == -1) {  # point2 to point2
+	        } 
+	        if(directional %in% c(-1,2)) {  # point2 to point2
 	        	nr = nrow(d)
 	        	alpha = line_degree(d[2, 1], d[2, 2], d[1, 1], d[1,2])
 	        	oljoin = par("ljoin")
@@ -121,7 +123,7 @@ circos.link = function(sector.index1, point1, sector.index2, point2,
 			
 			polygon(d, col = col, lty = lty, lwd = lwd, border = border)
 			if(nrow(dcenter) > 1 & arr.type != "big.arrow") {
-		        if(directional == 1) {  # point1 to point2
+		        if(directional %in% c(1, 2)) {  # point1 to point2
 		        	lines(dcenter, col = arr.col, lwd = arr.lwd, lty = arr.lty)
 		        	nr = nrow(dcenter)
 		        	alpha = line_degree(dcenter[nr-1, 1], dcenter[nr-1, 2], dcenter[nr, 1], dcenter[nr, 2])
@@ -130,7 +132,8 @@ circos.link = function(sector.index1, point1, sector.index2, point2,
 		        	Arrowhead(dcenter[nr, 1], dcenter[nr, 2], alpha, arr.length = arr.length, arr.width = arr.width, 
 		        		arr.adj = 1, arr.type = arr.type, arr.col = arr.col, lcol = arr.col)
 		        	par(ljoin = oljoin)
-		        } else if(directional == -1) {  # point2 to point1
+		        } 
+		        if(directional %in% c(-1,2)) {  # point2 to point1
 		        	lines(dcenter, col = arr.col, lwd = arr.lwd, lty = arr.lty)
 		        	nr = nrow(dcenter)
 		        	alpha = line_degree(dcenter[2, 1], dcenter[2, 2], dcenter[1, 1], dcenter[1,2])
@@ -184,7 +187,7 @@ circos.link = function(sector.index1, point1, sector.index2, point2,
 			}
 			polygon(d, col = col, lty = lty, lwd = lwd, border = border)
 			if(nrow(dcenter) > 1 && arr.type != "big.arrow") {
-		        if(directional == 1) {  # point1 to point2
+		        if(directional %in% c(1,2)) {  # point1 to point2
 		        	lines(dcenter, col = arr.col, lwd = arr.lwd, lty = arr.lty)
 		        	nr = nrow(dcenter)
 		        	alpha = line_degree(dcenter[nr-1, 1], dcenter[nr-1, 2], dcenter[nr, 1], dcenter[nr, 2])
@@ -193,7 +196,8 @@ circos.link = function(sector.index1, point1, sector.index2, point2,
 	        		Arrowhead(dcenter[nr, 1], dcenter[nr, 2], alpha, arr.length = arr.length, arr.width = arr.width, 
 		        		arr.adj = 1, arr.type = arr.type, arr.col = arr.col, lcol = arr.col)
 	        		par(ljoin = oljoin)
-		        } else if(directional == -1) {  # point2 to point2
+		        } 
+		        if(directional %in% c(-1,2)) {  # point2 to point2
 		        	lines(dcenter, col = arr.col, lwd = arr.lwd, lty = arr.lty)
 		        	nr = nrow(dcenter)
 		        	alpha = line_degree(dcenter[2, 1], dcenter[2, 2], dcenter[1, 1], dcenter[1,2])
@@ -214,13 +218,13 @@ circos.link = function(sector.index1, point1, sector.index2, point2,
         theta22 = circlize(point2[2], 0, sector.index = sector.index2, track.index = 0)[1, "theta"]
 
 		if(degreeDiff2(theta12, theta21) <= degreeDiff2(theta22, theta21) + degreeDiff2(theta12, theta11) &
-		   degreeDiff2(theta12, theta21) >= degreeDiff2(theta22, theta11)) {
+		   degreeDiff2(theta12, theta21) >= degreeDiff2(theta22, theta11) && abs(rou1 - rou2) < 1e-5) {
 			d = getQuadraticPoints(theta12, theta21, max(rou1,rou2), max(rou1,rou2), h = h, w = w)
 			r = arc.points(theta12, theta21, rou)
 			d = rbind(d, revMat(r))
 			polygon(d, col = col, lty = lty, lwd = lwd, border = border)
 		} else if(degreeDiff2(theta22, theta11) <= degreeDiff2(theta12, theta11) + degreeDiff2(theta22, theta21) &
-			      degreeDiff2(theta22, theta11) >= degreeDiff2(theta12, theta21)) {
+			      degreeDiff2(theta22, theta11) >= degreeDiff2(theta12, theta21) && abs(rou1 - rou2) < 1e-5) {
 			d = getQuadraticPoints(theta22, theta11, max(rou1,rou2), max(rou1,rou2), h = h, w = w)
 			r = arc.points(theta22, theta11, rou)
 			d = rbind(d, revMat(r))
@@ -274,7 +278,13 @@ circos.link = function(sector.index1, point1, sector.index2, point2,
 			    	d = rbind(d1x, r2)
 			        d = rbind(d, revMat(d2x))
 			        d = rbind(d, r1)
-			    } 
+			    } else if(directional == 2) {
+			    	r1 = arc.midpoint(theta12, theta11, rou1)
+			    	r2 = arc.midpoint(theta22, theta21, rou2)
+					d = rbind(d1x, r2)
+			        d = rbind(d, revMat(d2x))
+			        d = rbind(d, r1)
+			    }
 			} else {
 		        d = rbind(d1, r2)
 		        d = rbind(d, revMat(d2))
@@ -282,7 +292,7 @@ circos.link = function(sector.index1, point1, sector.index2, point2,
 		    }
 			polygon(d, col = col, lty = lty, lwd = lwd, border = border)
 			if(nrow(dcenter) > 1 && arr.type != "big.arrow") {
-		        if(directional == 1) {  # point1 to point2
+		        if(directional %in% c(1,2)) {  # point1 to point2
 		        	lines(dcenter, col = arr.col, lwd = arr.lwd, lty = arr.lty)
 		        	nr = nrow(dcenter)
 		        	alpha = line_degree(dcenter[nr-1, 1], dcenter[nr-1, 2], dcenter[nr, 1], dcenter[nr, 2])
@@ -291,7 +301,8 @@ circos.link = function(sector.index1, point1, sector.index2, point2,
 		        	Arrowhead(dcenter[nr, 1], dcenter[nr, 2], alpha, arr.length = arr.length, arr.width = arr.width, 
 		        		arr.adj = 1, arr.type = arr.type, arr.col = arr.col, lcol = arr.col)
 		        	par(ljoin = oljoin)
-		        } else if(directional == -1) {  # point2 to point2
+		        } 
+		        if(directional %in% c(-1,2)) {  # point2 to point2
 		        	lines(dcenter, col = arr.col, lwd = arr.lwd, lty = arr.lty)
 		        	nr = nrow(dcenter)
 		        	alpha = line_degree(dcenter[2, 1], dcenter[2, 2], dcenter[1, 1], dcenter[1,2])

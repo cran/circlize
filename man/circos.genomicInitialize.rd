@@ -2,16 +2,15 @@
 \alias{circos.genomicInitialize}
 \title{
 Initialize circos plot with any genomic data
-
 }
 \description{
 Initialize circos plot with any genomic data
-
 }
 \usage{
 circos.genomicInitialize(data, sector.names = NULL, major.by = NULL,
     plotType = c("axis", "labels"), tickLabelsStartFromZero = TRUE,
-    track.height = 0.05, ...)}
+    track.height = 0.05, ...)
+}
 \arguments{
 
   \item{data}{A data frame containing genomic data.}
@@ -21,6 +20,7 @@ circos.genomicInitialize(data, sector.names = NULL, major.by = NULL,
   \item{tickLabelsStartFromZero}{Whether axis tick labels start from 0? This will only affect the axis labels while not affect x-values in cells.}
   \item{track.height}{If \code{PlotType} is not \code{NULL}, height of the annotation track.}
   \item{...}{Pass to \code{\link{circos.initialize}}}
+
 }
 \details{
 The function will initialize circos plot from genomic data. If \code{plotType} is set with value in \code{axis} or \code{labels}, there will
@@ -30,10 +30,11 @@ The order of sectors related to data structure of \code{data}. If the first colu
 is \code{levels(data[[1]])}; If the first column is just a simple vector, the order of sectors is \code{unique(data[[1]]}.
 
 For more details on initializing genomic plot, please refer to the vignettes.
-
 }
 \references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.}
+Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
+
+}
 \examples{
 \dontrun{
 
@@ -63,4 +64,6 @@ df[[1]] = factor(df[[1]], levels = c("TP73", "TP63", "TP53"))
 circos.genomicInitialize(df)
 circos.clear()
 
-}}
+}
+
+}

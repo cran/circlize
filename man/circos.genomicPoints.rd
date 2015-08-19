@@ -2,17 +2,16 @@
 \alias{circos.genomicPoints}
 \title{
 Add points to a plotting region, specifically for genomic graphics
-
 }
 \description{
 Add points to a plotting region, specifically for genomic graphics
-
 }
 \usage{
 circos.genomicPoints(region, value, numeric.column = NULL,
     sector.index = get.cell.meta.data("sector.index"),
     track.index = get.cell.meta.data("track.index"), posTransform = NULL,
-    pch = par("pch"), col = par("col"), cex = par("cex"), ...)}
+    pch = par("pch"), col = par("col"), cex = par("cex"), ...)
+}
 \arguments{
 
   \item{region}{A data frame contains 2 columns which correspond to start positions and end positions}
@@ -25,13 +24,15 @@ circos.genomicPoints(region, value, numeric.column = NULL,
   \item{pch}{Type of points. Settings are similar as \code{col}. Pass to \code{\link{circos.points}}}
   \item{cex}{Size of points. Settings are similar as \code{col}. Pass to \code{\link{circos.points}}}
   \item{...}{Mysterious parameters}
+
 }
 \details{
 The function is a low-level graphical function and usually is put in \code{panel.fun} when using \code{\link{circos.genomicTrackPlotRegion}}.
-
 }
 \references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.}
+Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
+
+}
 \examples{
 \dontrun{
 par(mar = c(1, 1, 1, 1))
@@ -88,4 +89,6 @@ circos.genomicTrackPlotRegion(bed, stack = TRUE, panel.fun = function(region, va
 
 circos.clear()
 
-}}
+}
+
+}

@@ -2,11 +2,9 @@
 \alias{circos.genomicLines}
 \title{
 Add lines to a plotting region, specifically for genomic graphics
-
 }
 \description{
 Add lines to a plotting region, specifically for genomic graphics
-
 }
 \usage{
 circos.genomicLines(region, value, numeric.column = NULL,
@@ -15,7 +13,8 @@ circos.genomicLines(region, value, numeric.column = NULL,
     col = ifelse(area, "grey", "black"), lwd = par("lwd"),
     lty = par("lty"), type = "l",
     area = FALSE, area.baseline = NULL, border = "black", baseline = "bottom",
-    pt.col = par("col"), cex = par("cex"), pch = par("pch"), ...)}
+    pt.col = par("col"), cex = par("cex"), pch = par("pch"), ...)
+}
 \arguments{
 
   \item{region}{A data frame contains 2 column which correspond to start position and end position}
@@ -36,13 +35,15 @@ circos.genomicLines(region, value, numeric.column = NULL,
   \item{cex}{Settings are similar as \code{col}. Pass to \code{\link{circos.lines}}}
   \item{pch}{Settings are similar as \code{col}. Pass to \code{\link{circos.lines}}}
   \item{...}{mysterious parameters}
+
 }
 \details{
 The function is a low-level graphical function and usually is put in \code{panel.fun} when using \code{\link{circos.genomicTrackPlotRegion}}.
-
 }
 \references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.}
+Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
+
+}
 \examples{
 \dontrun{
 
@@ -92,4 +93,6 @@ circos.genomicTrackPlotRegion(bed, panel.fun = function(region, value, ...) {
 
 circos.clear()
 
-}}
+}
+
+}

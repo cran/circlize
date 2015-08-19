@@ -172,10 +172,12 @@ mat2df = function(mat) {
 #             Length should be same as number of columns in ``mat``. This argument only works when ``col`` and ``row.col`` is set to ``NULL``.
 # -order Order of sectors. Default order is ``union(df[[1]], df[[2]])``.
 # -directional Whether links have directions. 1 means the direction is from the first column in ``df`` to the second column, -1
-#              is the reverse and 0 is no direction.
+#              is the reverse, 0 is no direction, and 2 for two directional. Same setting as ``link.border``.
 # -direction.type type for representing directions. Can be one or two values in "diffHeight" and "arrows". If the value contains "diffHeight",
 #            different heights of the links are used to represent the directions for which starting root has long height to give people feeling
 #            that something is comming out. If the value contains "arrows", users can customize arrows with following arguments.
+#            Same setting as ``link.border``. Note if you want to set both ``diffHeight``
+#             and ``arrows`` for certain links, you need to embed these two options into one string such as ``"diffHeight+arrows"``.
 # -diffHeight The difference of height between two 'roots' if ``directional`` is set to ``TRUE``. If the value is set to
 #             a positive value, start root is shorter than end root and if it is set to a negative value, start root is longer
 #             than the end root.
@@ -222,6 +224,12 @@ chordDiagramFromMatrix = function(mat, grid.col = NULL, grid.border = NA, transp
 	
 	if(!is.matrix(mat)) {
 		stop("`mat` can only be a matrix.\n")
+	}
+
+	if(length(mat) != 2) {
+		if(identical(direction.type, c("diffHeight", "arrows")) || identical(direction.type, c("arrows", "diffHeight"))) {
+			direction.type = "diffHeight+arrows"
+		}
 	}
 
 	transparency = ifelse(transparency < 0, 0, ifelse(transparency > 1, 1, transparency))
@@ -414,11 +422,18 @@ chordDiagramFromMatrix = function(mat, grid.col = NULL, grid.border = NA, transp
 	link.arr.lwd = .normalize_to_mat(link.arr.lwd, rn, cn, default = 1)
 	link.arr.col = .normalize_to_mat(link.arr.col, rn, cn, default = NA)
 
+	directional = .normalize_to_mat(directional, rn, cn, default = 0)
+	direction.type = .normalize_to_mat(direction.type, rn, cn, default = "diffHeight")
+	diffHeight = .normalize_to_mat(diffHeight, rn, cn, default = 0.04)
+
 	df = mat2df(mat)
 
-	chordDiagramFromDataFrame(df, grid.col = grid.col, grid.border = grid.border, transparency = NA,
-		col = psubset(col, df$ri, df$ci), order = order, directional = directional,
-		direction.type = direction.type, diffHeight = diffHeight, reduce = 0, self.link = self.link,
+	chordDiagramFromDataFrame(df[c(1, 2, 5)], grid.col = grid.col, grid.border = grid.border, transparency = NA,
+		col = psubset(col, df$ri, df$ci), order = order, 
+		directional = psubset(directional, df$ri, df$ci),
+		direction.type = psubset(direction.type, df$ri, df$ci), 
+		diffHeight = psubset(diffHeight, df$ri, df$ci), 
+		reduce = 0, self.link = self.link,
 		preAllocateTracks = preAllocateTracks,
 		annotationTrack = annotationTrack, annotationTrackHeight = annotationTrackHeight,
 		link.sort = link.sort, link.decreasing = link.decreasing,
@@ -455,13 +470,15 @@ chordDiagramFromMatrix = function(mat, grid.col = NULL, grid.border = NA, transp
 #      may use `colorRamp2` to generate a function which maps values to colors.
 # -order Order of sectors. Default order is ``union(df[[1]], df[[2]])``.
 # -directional Whether links have directions. 1 means the direction is from the first column in ``df`` to the second column, -1
-#              is the reverse and 0 is no direction.
+#              is the reverse, 0 is no direction, and 2 for two directional. The value can be a vector which has same length as number of rows in ``df``.
 # -direction.type type for representing directions. Can be one or two values in "diffHeight" and "arrows". If the value contains "diffHeight",
 #            different heights of the links are used to represent the directions for which starting root has long height to give people feeling
-#            that something is comming out. If the value contains "arrows", users can customize arrows with following arguments.
+#            that something is comming out. If the value contains "arrows", users can customize arrows with following arguments. 
+#             The value can be a vector which has same length as number of rows in ``df``. Note if you want to set both ``diffHeight``
+#             and ``arrows`` for certain links, you need to embed these two options into one string such as ``"diffHeight+arrows"``.
 # -diffHeight The difference of height between two 'roots' if ``directional`` is set to ``TRUE``. If the value is set to
 #             a positive value, start root is shorter than end root and if it is set to a negative value, start root is longer
-#             than the end root.
+#             than the end root. The value can be a vector which has same length as number of rows in ``df``.
 # -reduce if the ratio of the width of certain grid compared to the whole circle is less than this value, the grid is removed on the plot.
 #         Set it to value less than zero if you want to keep all tiny grid.
 # -self.link if there is a self link in one sector, 1 means the link will be degenerated as a 'mountain' and the width corresponds to the value for this connection.
@@ -497,6 +514,12 @@ chordDiagramFromDataFrame = function(df, grid.col = NULL, grid.border = NA, tran
 	link.arr.type = "triangle", link.arr.lty = par("lty"), 
 	link.arr.lwd = par("lwd"), link.arr.col = par("col"), ...) {
 
+	if(nrow(df) != 2) {
+		if(identical(direction.type, c("diffHeight", "arrows")) || identical(direction.type, c("arrows", "diffHeight"))) {
+			direction.type = "diffHeight+arrows"
+		}
+	}
+
 	# check the format of the data frame
 	if(!inherits(df, "data.frame")) {
 		stop("`df` must be a data frame.")
@@ -507,10 +530,10 @@ chordDiagramFromDataFrame = function(df, grid.col = NULL, grid.border = NA, tran
 	if(ncol(df) == 2) {
 		df$value = rep(1, nrow(df))
 	}
-
+	df = df[1:3]
 	df[[1]] = as.character(df[[1]])
 	df[[2]] = as.character(df[[2]])
-	colnames(df) = c("rn", "cn", colnames(df)[-(1:2)])
+	colnames(df) = c("rn", "cn", "value")
 	nr = nrow(df)
 
 	transparency = ifelse(transparency < 0, 0, ifelse(transparency > 1, 1, transparency))
@@ -583,6 +606,9 @@ chordDiagramFromDataFrame = function(df, grid.col = NULL, grid.border = NA, tran
 	link.arr.lwd = rep(link.arr.lwd, nr)[1:nr]
 	link.arr.lty = rep(link.arr.lty, nr)[1:nr]
 	link.arr.col = rep(link.arr.col, nr)[1:nr]
+	directional = rep(directional, nr)[1:nr]
+	direction.type = rep(direction.type, nr)[1:nr]
+	diffHeight = rep(diffHeight, nr)[1:nr]
 
 	#### reduce the data frame
 	xsum = structure(rep(0, length(cate)), names = cate)
@@ -614,6 +640,9 @@ chordDiagramFromDataFrame = function(df, grid.col = NULL, grid.border = NA, tran
 	link.arr.lwd = link.arr.lwd[l]
 	link.arr.lty = link.arr.lty[l]
 	link.arr.col = link.arr.col[l]
+	directional = directional[l]
+	direction.type = direction.type[l]
+	diffHeight = diffHeight[l]
 
 	nr = nrow(df)
 	# re-calcualte xsum
@@ -736,45 +765,57 @@ chordDiagramFromDataFrame = function(df, grid.col = NULL, grid.border = NA, tran
 	}
     
     rou = get_most_inside_radius()
-	if(directional) {
-		if("diffHeight" %in% direction.type) {
-			if(directional > 0) {
-				if(diffHeight > 0) {
-					rou1 = rou - diffHeight
-					rou2 = rou
-				} else {
-					rou1 = rou
-					rou2 = rou + diffHeight
+    rou1 = numeric(nr)
+    rou2 = numeric(nr)
+    for(i in seq_len(nr)) {
+		if(directional[i]) {
+			if(grepl("diffHeight", direction.type[i])) {
+				if(directional[i] == 1) {
+					if(diffHeight[i] > 0) {
+						rou1[i] = rou - diffHeight[i]
+						rou2[i] = rou
+					} else {
+						rou1[i] = rou
+						rou2[i] = rou + diffHeight[i]
+					}
+				} else if(directional[i] == -1) {
+					if(diffHeight[i] > 0) {
+						rou1[i] = rou
+						rou2[i] = rou - diffHeight[i]
+					} else {
+						rou1[i] = rou + diffHeight[i]
+						rou2[i] = rou
+					}
+				} else  if(directional[i] == 2) {
+					if(diffHeight[i] > 0) {
+						rou1[i] = rou - diffHeight[i]
+						rou2[i] = rou - diffHeight[i]
+					} else {
+						rou1[i] = rou + diffHeight[i]
+						rou2[i] = rou + diffHeight[i]
+					}
 				}
 			} else {
-				if(diffHeight > 0) {
-					rou1 = rou
-					rou2 = rou - diffHeight
-				} else {
-					rou1 = rou + diffHeight
-					rou2 = rou
-				}
+				rou1[i] = rou
+				rou2[i] = rou
 			}
 		} else {
-			rou1 = rou
-			rou2 = rou
+			rou1[i] = rou
+			rou2[i] = rou
 		}
-	} else {
-		rou1 = rou
-		rou2 = rou
 	}
 
 	for(k in seq_len(nrow(df))) {
 		if(setequal(direction.type, c("diffHeight"))) {
 			circos.link(df$rn[k], c(df$x1[k] - abs(df$value[k]), df$x1[k]),
 					df$cn[k], c(df$x2[k] - abs(df$value[k]), df$x2[k]),
-					directional = 0, col = col[k], rou1 = rou1, rou2 = rou2, 
+					directional = 0, col = col[k], rou1 = rou1[k], rou2 = rou2[k], 
 					border = link.border[k], lwd = link.lwd[k], lty = link.lty[k],
 					...)	
-		} else if("arrows" %in% direction.type) {
+		} else if(grepl("arrows", direction.type[k])) {
 			circos.link(df$rn[k], c(df$x1[k] - abs(df$value[k]), df$x1[k]),
 						df$cn[k], c(df$x2[k] - abs(df$value[k]), df$x2[k]),
-						directional = directional, col = col[k], rou1 = rou1, rou2 = rou2, 
+						directional = directional[k], col = col[k], rou1 = rou1[k], rou2 = rou2[k], 
 						border = link.border[k], 
 						lwd = link.lwd[k], lty = link.lty[k], 
 						arr.length = link.arr.length[k], arr.width = link.arr.width[k],

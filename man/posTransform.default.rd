@@ -2,18 +2,18 @@
 \alias{posTransform.default}
 \title{
 Genomic position transformation function
-
 }
 \description{
 Genomic position transformation function
-
 }
 \usage{
-posTransform.default(region, ...)}
+posTransform.default(region, ...)
+}
 \arguments{
 
   \item{region}{Genomic positions at a single chromosome. It is a data frame with twocolumns which are start position and end position.}
   \item{...}{other arguments}
+
 }
 \details{
 The default position transformation functions transforms position to be equally distributed
@@ -22,10 +22,11 @@ is that the returned value should be a data frame with two columns: transformed 
 and transformed end position. The returned value should have same number of rows as the input one.
 
 For details why need to use position transformation, please refer to \code{\link{circos.genomicPosTransformLines}}.
-
 }
 \references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.}
+Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
+
+}
 \examples{
 \dontrun{
 library(circlize)
@@ -70,4 +71,6 @@ circos.genomicTrackPlotRegion(cytoband, stack = TRUE, panel.fun = function(regio
 
 circos.clear()
 
-}}
+}
+
+}

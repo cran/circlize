@@ -2,19 +2,19 @@
 \alias{circos.par}
 \title{
 Parameters for circos layout
-
 }
 \description{
 Parameters for circos layout
-
 }
 \usage{
-circos.par(..., RESET = FALSE, READ.ONLY = NULL)}
+circos.par(..., RESET = FALSE, READ.ONLY = NULL)
+}
 \arguments{
 
   \item{...}{Arguments for the parameters, see "details" section}
   \item{RESET}{reset to default values}
   \item{READ.ONLY}{whether only return read-only options}
+
 }
 \details{
 Global parameters for the circos layout. Currently supported parameters are:
@@ -41,8 +41,9 @@ only be set before the initialization of circos layout
 (i.e. before calling \code{\link{circos.initialize}}) because these values will not be changed after
 adding sectors on the circle. The left and right padding for \code{cell.padding} will also be
 ignored after the initialization because all cells in a sector would share the same
-left and right paddings. 
-
+left and right paddings.
 }
 \references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.}
+Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
+
+}

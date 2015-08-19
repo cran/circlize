@@ -2,16 +2,15 @@
 \alias{circos.genomicDensity}
 \title{
 Calculate and add genomic density track
-
 }
 \description{
 Calculate and add genomic density track
-
 }
 \usage{
 circos.genomicDensity(data, ylim.force = FALSE, window.size = NULL, overlap = TRUE,
     col = ifelse(area, "grey", "black"), lwd = par("lwd"), lty = par("lty"), type = "l",
-    area = TRUE, area.baseline = NULL, baseline = 0, border = NA, ...)}
+    area = TRUE, area.baseline = NULL, baseline = 0, border = NA, ...)
+}
 \arguments{
 
   \item{data}{A bed-file-like data frame or a list of data frames}
@@ -27,13 +26,15 @@ circos.genomicDensity(data, ylim.force = FALSE, window.size = NULL, overlap = TR
   \item{baseline}{See \code{\link{circos.lines}}}
   \item{border}{See \code{\link{circos.lines}}}
   \item{...}{Pass to \code{\link{circos.trackPlotRegion}}}
+
 }
 \details{
 This function is a high-level graphical function, and it will create a new track.
-
 }
 \references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.}
+Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
+
+}
 \examples{
 \dontrun{
 library(circlize)
@@ -53,4 +54,6 @@ circos.genomicDensity(bed_list[[2]], col = c("#0000FF80"), track.height = 0.1)
 
 circos.clear()
 
-}}
+}
+
+}

@@ -2,16 +2,15 @@
 \alias{posTransform.text}
 \title{
 Genomic position transformation function specifically for text
-
 }
 \description{
 Genomic position transformation function specifically for text
-
 }
 \usage{
 posTransform.text(region, y, labels, cex = 1, font = par("font"),
     sector.index = get.cell.meta.data("sector.index"),
-    track.index = get.cell.meta.data("track.index"), padding = 0, ...)}
+    track.index = get.cell.meta.data("track.index"), padding = 0, ...)
+}
 \arguments{
 
   \item{region}{Genomic positions at a single chromosome. It is a data frame with twocolumns which are start position and end position.}
@@ -23,11 +22,11 @@ posTransform.text(region, y, labels, cex = 1, font = par("font"),
   \item{track.index}{track index}
   \item{padding}{padding of text}
   \item{...}{other arguments}
+
 }
 \details{
 This position transformation function is designed specifically for text.
 Under the transformation, texts will be as close as possible to the original positions.
-
 }
 \examples{
 \dontrun{
@@ -154,4 +153,6 @@ text(0, 0.05, "posTransform.text\ndirection = 'inside'\npadding = 0.2", adj = c(
 
 par(op)
 
-}}
+}
+
+}

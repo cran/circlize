@@ -199,49 +199,77 @@ as.degree = function(radian) {
 # -breaks A vector indicating numeric breaks
 # -colors A vector of colors which correspond to values in ``breaks``
 # -transparency A single value in [0, 1]. 0 refers to no transparency and 1 refers to full transparency
+# -space color space in which colors are interpolated. Value should be one of "RGB", "HSV", "HLS", "LAB", "XYZ", "sRGB", "LUV", see `colorspace::color-class` for detail.
 #
 # == details
-# Colors are interpolated according to break values and corresponding colors. Values exceeding breaks will be assigned with maximum or minimum colors.
+# Colors are interpolated according to break values and corresponding colors by default through CIE Lab color space (`colorspace::LAB`). 
+# Values exceeding breaks will be assigned with maximum or minimum colors.
 #
 # == values
 # It returns a function which accepts a vector of numbers and returns interpolated colors.
-colorRamp2 = function(breaks, colors, transparency = 0) {
-    if(length(breaks) != length(colors)) {
-        stop("Length of `breaks` should be equal to `colors`.\n")
-    }
-	
-	if(length(unique(breaks)) != length(breaks)) {
-		stop("Duplicated values are not allowed in `breaks`\n")
-	}
+colorRamp2 = function(breaks, colors, transparency = 0, space = "LAB") {
 
-    colors = colors[order(breaks)]
-	colors = col2rgb(colors)
-    breaks = sort(breaks)
-	
-    transparency = ifelse(transparency > 1, 1, ifelse(transparency < 0, 0, transparency))
+  if(length(breaks) != length(colors)) {
+    stop("Length of `breaks` should be equal to `colors`.\n")
+  }
+  
+  colors = colors[order(breaks)]
+  breaks = sort(breaks)
 
-    fun = function(x = NULL) {
-    	if(is.null(x)) {
-    		stop("Please specify `x`\n")
-    	}
+  l = duplicated(breaks)
+  breaks = breaks[!l]
+  colors = colors[!l]
 
-		att = attributes(x)
-        x = ifelse(x < breaks[1], breaks[1],
-                  ifelse(x > breaks[length(breaks)], breaks[length(breaks)],
-                        x
-                    ))
-		ibin = .bincode(x, breaks, right = TRUE, include.lowest = TRUE)
-		res_col = character(length(x))
-		for(i in unique(ibin)) {
-			l = ibin == i
-			res_col[l] = .get_color(x[l], breaks[i], breaks[i+1], colors[, i], colors[, i+1], transparency)
-		}
-		attributes(res_col) = att
-		return(res_col)
+  if(length(breaks) == 1) {
+    stop("You should have at least two distinct break values.")
+  } 
+
+
+  if(! space %in% c("RGB", "HSV", "HLS", "LAB", "XYZ", "sRGB", "LUV")) {
+    stop("`space` should be in 'RGB', 'HSV', 'HLS', 'LAB', 'XYZ', 'sRGB', 'LUV'")
+  }
+  
+  colors = t(col2rgb(colors)/255)
+  
+
+  if(space == "LUV") {
+    i = which(apply(colors, 1, function(x) all(x == 0)))
+    colors[i, ] = 1e-5
+  }
+  
+  transparency = 1-ifelse(transparency > 1, 1, ifelse(transparency < 0, 0, transparency))[1]
+  transparency_str = sprintf("%X", round(transparency*255))
+  if(nchar(transparency_str) == 1) transparency_str = paste0("0", transparency_str)
+  
+  fun = function(x = NULL) {
+    if(is.null(x)) {
+      stop("Please specify `x`\n")
     }
     
-    attr(fun, "breaks") = breaks
-    return(fun)
+    att = attributes(x)
+    x = ifelse(x < breaks[1], breaks[1],
+               ifelse(x > breaks[length(breaks)], breaks[length(breaks)],
+                      x
+               ))
+    ibin = .bincode(x, breaks, right = TRUE, include.lowest = TRUE)
+    res_col = character(length(x))
+    for(i in unique(ibin)) {
+      l = ibin == i
+      res_col[l] = .get_color(x[l], breaks[i], breaks[i+1], colors[i, ], colors[i+1, ], space = space)
+    }
+    res_col = paste(res_col, transparency_str[1], sep = "")
+    attributes(res_col) = att
+    return(res_col)
+  }
+  
+  attr(fun, "breaks") = breaks
+  return(fun)
+}
+
+.restrict_in = function(x, lower, upper) {
+  x[x > upper] = upper
+  x[x < lower] = lower
+  x
 }
 
 # x: vector
@@ -249,14 +277,23 @@ colorRamp2 = function(breaks, colors, transparency = 0) {
 # break2 single value
 # rgb1 vector with 3 elements
 # rgb2 vector with 3 elements
-.get_color = function(x, break1, break2, rgb1, rgb2, transparency) {
-	res_rgb = matrix(nrow = 3, ncol = length(x))
-	for(i in seq_along(x)) {
-		xx = abs((x[i] - break2)*(rgb2 - rgb1) / (break2 - break1) + rgb2)
-		xx = round(xx)
-		res_rgb[, i] = xx
-	}
-	return(rgb(t(res_rgb)/255, alpha = 1-transparency))
+.get_color = function(x, break1, break2, col1, col2, space) {
+
+  col1 = coords(as(RGB(col1[1], col1[2], col1[3]), space))
+  col2 = coords(as(RGB(col2[1], col2[2], col2[3]), space))
+
+  res_col = matrix(ncol = 3, nrow = length(x))
+  for(i in seq_along(x)) {
+    xx = (x[i] - break2)*(col2 - col1) / (break2 - break1) + col2
+    res_col[i,] = xx
+  }
+  
+  res_col = eval(parse(text = paste0(space, "(res_col)")))
+  res_col = coords(as(res_col, "RGB"))
+  res_col[, 1] = .restrict_in(res_col[,1], 0, 1)
+  res_col[, 2] = .restrict_in(res_col[,2], 0, 1)
+  res_col[, 3] = .restrict_in(res_col[,3], 0, 1)
+  hex(RGB(res_col))
 }
 
 # will be considered in the future

@@ -2,18 +2,17 @@
 \alias{circos.initializeWithIdeogram}
 \title{
 Initialize the circos layout with an ideogram
-
 }
 \description{
 Initialize the circos layout with an ideogram
-
 }
 \usage{
 circos.initializeWithIdeogram(cytoband = paste(system.file(package = "circlize"),
     "/extdata/cytoBand.txt", sep=""), species = NULL, sort.chr = TRUE,
     chromosome.index = NULL, major.by = NULL,
     plotType = c("ideogram", "axis", "labels"),
-    track.height = 0.05, ideogram.height = 0.05, ...)}
+    track.height = 0.05, ideogram.height = 0.05, ...)
+}
 \arguments{
 
   \item{cytoband}{A path of the cytoband file or a data frame that already contains cytoband data. By default it is cytoband for hg19.Pass to \code{\link{read.cytoband}}.}
@@ -25,6 +24,7 @@ circos.initializeWithIdeogram(cytoband = paste(system.file(package = "circlize")
   \item{track.height}{Height of the track which contains "axis" and "labels".}
   \item{ideogram.height}{Height of the ideogram track}
   \item{...}{Pass to \code{\link{circos.initialize}}}
+
 }
 \details{
 The function will initialize the circos plot in which each sector corresponds to a chromosome. You can control the order of 
@@ -34,10 +34,11 @@ to find out how to control a proper \code{cytoband}).
 The function finally pass data to \code{\link{circos.genomicInitialize}} to initialize the circos plot.
 
 The style of ideogram is almost fixed, but you can customize it with your self-sefined code. Refer to vignette for demonstration.
-
 }
 \references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.}
+Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
+
+}
 \examples{
 \dontrun{
 circos.initializeWithIdeogram()
@@ -78,4 +79,6 @@ circos.clear()
 circos.par("gap.degree" = rep(c(2, 4), 12))
 circos.initializeWithIdeogram()
 circos.clear()
-}}
+}
+
+}

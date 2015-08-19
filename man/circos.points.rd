@@ -2,16 +2,15 @@
 \alias{circos.points}
 \title{
 Add points to a plotting region
-
 }
 \description{
 Add points to a plotting region
-
 }
 \usage{
 circos.points(x, y, sector.index = get.cell.meta.data("sector.index"),
     track.index = get.cell.meta.data("track.index"),
-    pch = par("pch"), col = par("col"), cex = par("cex"))}
+    pch = par("pch"), col = par("col"), cex = par("cex"))
+}
 \arguments{
 
   \item{x}{Data points on x-axis}
@@ -21,6 +20,7 @@ circos.points(x, y, sector.index = get.cell.meta.data("sector.index"),
   \item{pch}{Point type}
   \item{col}{Point color}
   \item{cex}{Point size}
+
 }
 \details{
 This function can only add points in one specified cell. Pretending a low-level plotting 
@@ -35,7 +35,8 @@ Data points out of the plotting region will also be added, but with warning mess
 
 Other graphics parameters which are available in the function are \code{pch}, \code{col}
 and \code{cex} which have same meaning as those in the \code{\link[graphics]{par}}.
-
 }
 \references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.}
+Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
+
+}

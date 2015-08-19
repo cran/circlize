@@ -2,24 +2,25 @@
 \alias{highlight.chromosome}
 \title{
 Highlight chromosomes
-
 }
 \description{
 Highlight chromosomes
-
 }
 \usage{
-highlight.chromosome(...)}
+highlight.chromosome(...)
+}
 \arguments{
 
   \item{...}{pass to \code{\link{highlight.sector}}}
+
 }
 \details{
 This is only a shortcut function of \code{\link{highlight.sector}}.
-
 }
 \references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.}
+Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
+
+}
 \examples{
 \dontrun{
 
@@ -57,4 +58,6 @@ highlight.chromosome("chr7", col = NA, border = "green", lwd = 2,
     track.index = c(2, 4, 5))
 circos.clear()
 
-}}
+}
+
+}

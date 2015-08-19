@@ -2,11 +2,9 @@
 \alias{chordDiagramFromMatrix}
 \title{
 Plot Chord Diagram from a matrix
-
 }
 \description{
 Plot Chord Diagram from a matrix
-
 }
 \usage{
 chordDiagramFromMatrix(mat, grid.col = NULL, grid.border = NA, transparency = 0.5,
@@ -19,7 +17,8 @@ chordDiagramFromMatrix(mat, grid.col = NULL, grid.border = NA, transparency = 0.
     link.arr.length = ifelse(link.arr.type == "big.arrow", 0.02, 0.4),
     link.arr.width = link.arr.length/2,
     link.arr.type = "triangle", link.arr.lty = par("lty"),
-    link.arr.lwd = par("lwd"), link.arr.col = par("col"), ...)}
+    link.arr.lwd = par("lwd"), link.arr.col = par("col"), ...)
+}
 \arguments{
 
   \item{mat}{A table which represents as a numeric matrix.}
@@ -30,8 +29,8 @@ chordDiagramFromMatrix(mat, grid.col = NULL, grid.border = NA, transparency = 0.
   \item{row.col}{Colors for links. Links from the same row in \code{mat} will have the same color.Length should be same as number of rows in \code{mat}. This argument only works when \code{col} is set to \code{NULL}.}
   \item{column.col}{Colors for links. Links from the same column in \code{mat} will have the same color.Length should be same as number of columns in \code{mat}. This argument only works when \code{col} and \code{row.col} is set to \code{NULL}.}
   \item{order}{Order of sectors. Default order is \code{union(df[[1]], df[[2]])}.}
-  \item{directional}{Whether links have directions. 1 means the direction is from the first column in \code{df} to the second column, -1is the reverse and 0 is no direction.}
-  \item{direction.type}{type for representing directions. Can be one or two values in "diffHeight" and "arrows". If the value contains "diffHeight",different heights of the links are used to represent the directions for which starting root has long height to give people feelingthat something is comming out. If the value contains "arrows", users can customize arrows with following arguments.}
+  \item{directional}{Whether links have directions. 1 means the direction is from the first column in \code{df} to the second column, -1is the reverse, 0 is no direction, and 2 for two directional. Same setting as \code{link.border}.}
+  \item{direction.type}{type for representing directions. Can be one or two values in "diffHeight" and "arrows". If the value contains "diffHeight",different heights of the links are used to represent the directions for which starting root has long height to give people feelingthat something is comming out. If the value contains "arrows", users can customize arrows with following arguments.Same setting as \code{link.border}. Note if you want to set both \code{diffHeight}and \code{arrows} for certain links, you need to embed these two options into one string such as \code{"diffHeight+arrows"}.}
   \item{diffHeight}{The difference of height between two 'roots' if \code{directional} is set to \code{TRUE}. If the value is set toa positive value, start root is shorter than end root and if it is set to a negative value, start root is longerthan the end root.}
   \item{reduce}{if the ratio of the width of certain grid compared to the whole circle is less than this value, the grid is removed on the plot.Set it to value less than zero if you want to keep all tiny grid.}
   \item{self.link}{if there is a self link in one sector, 1 means the link will be degenerated as a 'mountain' and the width corresponds to the value for this connection.2 means the width of the starting root and the ending root all have the width that corresponds to the value for the connection.}
@@ -52,8 +51,8 @@ chordDiagramFromMatrix(mat, grid.col = NULL, grid.border = NA, transparency = 0.
   \item{link.arr.lwd}{line width ofthe single line link which is put in the center of the belt, same settings as \code{link.lwd}.}
   \item{link.arr.lty}{line type of the single line link which is put in the center of the belt, same settings as \code{link.lwd}.}
   \item{...}{pass to \code{\link{circos.link}}}
+
 }
 \details{
 Internally, the matrix is transformed to a data frame and sent to \code{\link{chordDiagramFromDataFrame}}.
-
 }

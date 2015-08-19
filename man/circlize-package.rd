@@ -3,11 +3,9 @@
 \alias{circlize-package}
 \title{
 Circular layout in R
-
 }
 \description{
 Circular layout in R
-
 }
 \details{
 This package aims to implement circular layout in R.
@@ -15,7 +13,7 @@ This package aims to implement circular layout in R.
 Since most of the figures are composed of points, lines and polygons, 
 we just need to implement low-level functions for drawing points, lines and polygons.
 
-Current there are following low-level graphical functions: 
+Current there are following low-level graphical functions:
 
 \itemize{
   \item \code{\link{circos.points}}
@@ -89,5 +87,4 @@ Finally, function that draws chord diagram:
 }
 
 Please refer to the vignettes to find out how to draw basic and advanced circular plots by this package.
-
 }

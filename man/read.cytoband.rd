@@ -2,21 +2,21 @@
 \alias{read.cytoband}
 \title{
 Read/parse cytoband data from a data frame/file/UCSC database
-
 }
 \description{
 Read/parse cytoband data from a data frame/file/UCSC database
-
 }
 \usage{
 read.cytoband(cytoband = paste0(system.file(package = "circlize"),
-    "/extdata/cytoBand.txt"), species = NULL, chromosome.index = NULL, sort.chr = TRUE)}
+    "/extdata/cytoBand.txt"), species = NULL, chromosome.index = NULL, sort.chr = TRUE)
+}
 \arguments{
 
   \item{cytoband}{Path of the cytoband file or a data frame that already contains cytoband data}
   \item{species}{Abbreviations of species. e.g. hg19 for human, mm10 for mouse. If thisvalue is specified, the function will download \code{cytoBand.txt.gz} or \code{chromInfo.txt.gz} fromUCSC website automatically.}
   \item{chromosome.index}{subset of chromosomes, also used to re-set chromosome orders.}
   \item{sort.chr}{Whether chromosome names should be sorted (first sort by numbers then by letters).If \code{chromosome.index} is set, this argument is enforced to \code{FALSE}}
+
 }
 \details{
 The function read the cytoband data, sort the chromosome names and calculate the length of each chromosome. 
@@ -31,7 +31,6 @@ which is read from the file; If \code{cytoband}
 is set as a data frame and the first column is a factor, the order of chromosomes is \code{levels(chromosome)}; If \code{cytoband} is a data frame
 and the first column is just a character vector, the order of chromosomes is \code{unique(chromosome)}. Please not this concept is really
 important since the order of chromosomes will be used to control the order of sectors when initializing the circos plot.
-
 }
 \value{
 \describe{
@@ -39,12 +38,15 @@ important since the order of chromosomes will be used to control the order of se
   \item{chromosome}{Sorted chromosome names}
   \item{chr.len}{Length of chromosomes. Orders are same as \code{chromosome}}
 }
-
 }
 \references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.}
+Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
+
+}
 \examples{
 \dontrun{
 cytoband = read.cytoband(species = "hg19")
 cytoband = read.cytoband(species = "mm10")
-}}
+}
+
+}
