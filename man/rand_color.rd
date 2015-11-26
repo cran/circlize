@@ -18,3 +18,8 @@ rand_color(n = 1, transparency = 0)
 \value{
 a vector of colors
 }
+\examples{
+# There is no example
+NULL
+
+}

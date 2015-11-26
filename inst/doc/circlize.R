@@ -343,7 +343,7 @@ source("src/intro-09-text-niceFacing.R")
 ## ----circlize_errorline, echo = FALSE, out.width = "0.8\\textwidth", fig.cap = "Area of standard deviation of the smoothed line."----
 source("src/intro-10-smooth.R")
 
-## ----circlize_axis, echo = FALSE, out.width = "0.8\\textwidth", fig.cap = "Axes"----
+## ----circlize_axis, echo = FALSE, out.width = "0.6\\textwidth", out.height = "1.2\\textwidth", fig.width = 6, fig.height = 12, fig.cap = "Axes"----
 source("src/intro-11-axis.R")
 
 ## ----eval = FALSE--------------------------------------------------------
@@ -354,6 +354,10 @@ source("src/intro-11-axis.R")
 #              labels.facing, labels.away.percentage)
 #  circos.axis(h, major.at, labels, major.tick, minor.ticks,
 #              major.tick.percentage, lwd)
+
+## ----eval = FALSE--------------------------------------------------------
+#  circos.yaxis(side)
+#  circos.yaxis(at, labels, sector.index, track.index)
 
 ## ----eval = FALSE--------------------------------------------------------
 #  circos.link(sector.index1, 0, sector.index2, 0)
