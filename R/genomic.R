@@ -984,8 +984,8 @@ circos.genomicLink = function(region1, region2,
 	rou = get_most_inside_radius(), rou1 = rou, rou2 = rou,
     col = "black", lwd = par("lwd"), lty = par("lty"), border = NA, ...) {
 	
-	region1 = normalizeToDataFrame(region1)
-	region2 = normalizeToDataFrame(region2)
+	region1 = normalizeToDataFrame(region1, sort = FALSE)
+	region2 = normalizeToDataFrame(region2, sort = FALSE)
 	
 	if(is.dataFrameList(region1)) {
 		stop("`region1` can not be a region list.\n")
@@ -1382,7 +1382,7 @@ is.dataFrameList = function(data) {
 }
 
 
-normalizeToDataFrame = function(data) {
+normalizeToDataFrame = function(data, sort = TRUE) {
 
 	all.chr = get.all.sector.index()
 	
@@ -1391,7 +1391,9 @@ normalizeToDataFrame = function(data) {
 			stop("Your data frame is less than 3 column!.\n")
 		}
 		data = data[data[[1]] %in% all.chr, , drop = FALSE]
-		data = data[order(data[[1]], data[[2]]), , drop = FALSE]
+		if(sort) {
+			data = data[order(data[[1]], data[[2]]), , drop = FALSE]
+		}
 		return(data)
 	} else if(is.list(data) && all(sapply(data, is.data.frame))) {
 		df = lapply(data, function(gr) {
@@ -1399,7 +1401,9 @@ normalizeToDataFrame = function(data) {
 				stop("Your data frame is less than 3 column!.\n")
 			}
 			gr = gr[gr[[1]] %in% all.chr, , drop = FALSE]
-			gr = gr[order(gr[[1]], gr[[2]]), ]
+			if(sort) {
+				gr = gr[order(gr[[1]], gr[[2]]), ]
+			}
 		})
 		return(df)
 	} else {
@@ -1607,7 +1611,16 @@ posTransform.text = function(region, y, labels, cex = 1, font = par("font"),
 	return(smartAlign(x1_new, x2_new, xlim = xlim))
 }
 
-# x1 should be sorted
+# == title
+# Adjust positions of text
+#
+# == param
+# -x1 position which corresponds to the top of the text
+# -x2 position which corresponds to the bottom of the text 
+# -xlim ranges on x-axis
+#
+# == details
+# used internally
 smartAlign = function(x1, x2, xlim) {
 	
 	ncluster.before = -1
