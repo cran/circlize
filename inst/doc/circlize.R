@@ -64,7 +64,7 @@ a = data.frame(factor = sample(letters[1:8], n, replace = TRUE),
 #  circos.link("a", 0, "b", 0, h = 0.4)
 #  circos.link("c", c(-0.5, 0.5), "d", c(-0.5,0.5), col = "red",
 #      border = "blue", h = 0.2)
-#  circos.link("e", 0, "g", c(-1,1), col = "green", lwd = 2, lty = 2)
+#  circos.link("e", 0, "g", c(-1,1), col = "green", border = "black", lwd = 2, lty = 2)
 
 ## ----circlize_glance, echo = FALSE, out.width = "0.6\\textheight", out.height = "0.9\\textheight", fig.width = 7, fig.height = 10.5, fig.cap = "A step-by-step example by \\textbf{circlize}."----
 par(mfrow = c(3, 2), mar = c(1, 1, 1, 1))
@@ -228,7 +228,7 @@ circos.trackLines(a$factor[1:100], a$x[1:100], a$y[1:100], type = "h")
 circos.link("a", 0, "b", 0, h = 0.4)
 circos.link("c", c(-0.5, 0.5), "d", c(-0.5,0.5), col = "red",
     border = "blue", h = 0.2)
-circos.link("e", 0, "g", c(-1,1), col = "green", lwd = 2, lty = 2)
+circos.link("e", 0, "g", c(-1,1), col = "green", border = "black", lwd = 2, lty = 2)
 circos.clear()
 text(-0.9, 0.9, "F", cex = 1.5)
 par(mfrow = c(1, 1))
@@ -326,6 +326,9 @@ source("src/intro-09-text.R")
 #  circos.text(x, y, labels)
 #  circos.text(x, y, labels, sector.index, track.index)
 #  circos.text(x, y, labels, facing, adj, cex, col, font)
+
+## ----eval = FALSE--------------------------------------------------------
+#  circos.text(x, y, labels, adj = c(0, degree(5)), facing = "clockwise")
 
 ## ----circlize_text_easy, echo = FALSE, out.width = "0.6\\textheight", out.height = "0.9\\textheight", fig.width = 6, fig.height = 9, fig.cap = "Human easy text facing. When {\\tt niceFacing} is on, settings in the same row are actually identical. Red dots represent positions of the texts."----
 source("src/intro-09-text-niceFacing.R")
@@ -765,7 +768,7 @@ for(i in 1:9) {
     for(i in 1:20) {
         se = sample(1:8, 2)
         circos.link(se[1], runif(2), se[2], runif(2), 
-            col = rand_color(1, transparency = 0.4))
+            col = rand_color(1, transparency = 0.4), border = NA)
     }
     circos.clear()
 }

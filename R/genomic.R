@@ -191,11 +191,11 @@ circos.genomicInitialize = function(data, sector.names = NULL, major.by = NULL,
 				}
 				
 			
-				if(any(plotType %in% "axis")) {
+				if(all(c("axis", "labels") %in% plotType)) {
 					circos.axis(h = 0, major.at = major.at, labels = major.tick.labels, labels.cex = 0.3*par("cex"), labels.facing = "clockwise", major.tick.percentage = 0.2)
-				}
-				if(any(plotType %in% "labels")) {
 					circos.text(mean(xlim), 1.2, labels = sector.names[sector.index], cex = par("cex"), adj = c(0.5, 0), niceFacing = TRUE)
+				} else if("labels" %in% plotType) {
+					circos.text(mean(xlim), 0, labels = sector.names[sector.index], cex = par("cex"), adj = c(0.5, 0), niceFacing = TRUE)
 				}
 			}
 		)
@@ -273,7 +273,7 @@ circos.genomicTrackPlotRegion = function(data = NULL, ylim = NULL, stack = FALSE
 
 	# now `data` is either a data frame or a list of data frame
 	data = normalizeToDataFrame(data)
-	
+
 	# excluding the first three columns
 	if(!is.null(numeric.column)) {
 		if(is.numeric(numeric.column)) {
@@ -325,7 +325,7 @@ circos.genomicTrackPlotRegion = function(data = NULL, ylim = NULL, stack = FALSE
 	if(!(length(args) == 3 && names(args)[3] == "...")) {
 		stop("The `panel.fun` need a third argument `...` to pass special parameters to graphical functions.\n")
 	}
-	
+
 	if(stack) {
 	
 		if(is.dataFrameList(data)) {
@@ -393,7 +393,6 @@ circos.genomicTrackPlotRegion = function(data = NULL, ylim = NULL, stack = FALSE
 		}			
 		
 	} else {
-	
 		# auto calculate ylim
 		if(is.null(ylim)) {
 			if(is.dataFrameList(data)) {
@@ -411,7 +410,6 @@ circos.genomicTrackPlotRegion = function(data = NULL, ylim = NULL, stack = FALSE
 				ylim = range(unlist(lapply(data[-(1:3)][numeric.column], range)))
 			}
 		}
-		
 		if(is.dataFrameList(data)) {
 			circos.trackPlotRegion(ylim = ylim, panel.fun = function(x, y) {
 					
@@ -956,7 +954,7 @@ circos.genomicText = function(region, value = NULL, y = NULL, labels = NULL, lab
 
 	circos.text( (region[[1]] + region[[2]])/2, value[[ numeric.column ]], value[[labels.column]],
 		facing = facing, niceFacing = niceFacing, adj = adj, cex = cex, col = col, font = font,
-		sector.index = sector.index, track.index = track.index )
+		sector.index = sector.index, track.index = track.index)
 
 }
 
@@ -982,7 +980,7 @@ circos.genomicText = function(region, value = NULL, y = NULL, labels = NULL, lab
 # If you want to have more controls on links, please use `circos.link` directly.
 circos.genomicLink = function(region1, region2, 
 	rou = get_most_inside_radius(), rou1 = rou, rou2 = rou,
-    col = "black", lwd = par("lwd"), lty = par("lty"), border = NA, ...) {
+    col = "black", lwd = par("lwd"), lty = par("lty"), border = col, ...) {
 	
 	region1 = normalizeToDataFrame(region1, sort = FALSE)
 	region2 = normalizeToDataFrame(region2, sort = FALSE)
@@ -1007,7 +1005,7 @@ circos.genomicLink = function(region1, region2,
 	lwd = .normalizeGraphicalParam(lwd, 1, nr, "lwd")
 	lty = .normalizeGraphicalParam(lty, 1, nr, "lty")
 	border = .normalizeGraphicalParam(border, 1, nr, "border")
-	
+
 	for(i in seq_len(nr)) {
 		if(region1[i, 2] == region1[i, 3]) {
 			point1 = region1[i, 2]
@@ -1382,10 +1380,10 @@ is.dataFrameList = function(data) {
 }
 
 
-normalizeToDataFrame = function(data, sort = TRUE) {
+normalizeToDataFrame = function(data, sort = FALSE) {
 
 	all.chr = get.all.sector.index()
-	
+
 	if(is.data.frame(data)) {
 		if(ncol(data) < 3) {
 			stop("Your data frame is less than 3 column!.\n")
@@ -1404,6 +1402,7 @@ normalizeToDataFrame = function(data, sort = TRUE) {
 			if(sort) {
 				gr = gr[order(gr[[1]], gr[[2]]), ]
 			}
+			return(gr)
 		})
 		return(df)
 	} else {

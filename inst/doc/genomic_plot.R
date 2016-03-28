@@ -221,7 +221,7 @@ extend_zoomed_chromosome_in_bed = function(bed, chromosome, prefix = "zoom_") {
 ## ----genomic_zoom_3, eval = FALSE----------------------------------------
 #  circos.link("chr1", get.cell.meta.data("cell.xlim", sector.index = "chr1"),
 #      "zoom_chr1", get.cell.meta.data("cell.xlim", sector.index = "zoom_chr1"),
-#      col = "#00000020")
+#      col = "#00000020", border = NA)
 #  circos.clear()
 
 ## ----genomic_zoom, echo = FALSE, out.width = "0.8\\textwidth", fig.cap = "Zoom chromosomes."----
@@ -235,7 +235,7 @@ circos.genomicTrackPlotRegion(extend_zoomed_chromosome_in_bed(bed, chromosome[1:
 })
 circos.link("chr1", get.cell.meta.data("cell.xlim", sector.index = "chr1"),
     "zoom_chr1", get.cell.meta.data("cell.xlim", sector.index = "zoom_chr1"),
-    col = "#00000020")
+    col = "#00000020", border = NA)
 circos.clear()
 
 ## ----eval=FALSE----------------------------------------------------------
