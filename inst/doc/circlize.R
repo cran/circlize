@@ -478,7 +478,8 @@ draw.sector(0, 360, rou1 = 0.7, rou2 = 0.6, col = "#0000FF80")
 #  }
 #  circos.info(plot = TRUE)
 #  
-#  highlight.sector(c("a", "h"), track.index = 1)
+#  highlight.sector(c("a", "h"), track.index = 1, text = "a and h belong to a same group",
+#      facing = "bending.inside", niceFacing = TRUE, text.vjust = -3)
 #  highlight.sector("c", col = "#00FF0040")
 #  highlight.sector("d", col = NA, border = "red", lwd = 2)
 #  highlight.sector("e", col = "#0000FF40", track.index = c(2, 3))
@@ -520,7 +521,8 @@ for(i in 1:4) {
 }
 circos.info(plot = TRUE)
 
-highlight.sector(c("a", "h"), track.index = 1)
+highlight.sector(c("a", "h"), track.index = 1, text = "a and h belong to a same group",
+    facing = "bending.inside", niceFacing = TRUE, text.vjust = -3)
 highlight.sector("c", col = "#00FF0040")
 highlight.sector("d", col = NA, border = "red", lwd = 2)
 highlight.sector("e", col = "#0000FF40", track.index = c(2, 3))
@@ -560,7 +562,7 @@ circos.trackPlotRegion(ylim = c(0.5, length(percent)+0.5), , track.height = 0.8,
 
         for(i in seq_along(percent)) {
             circos.text(xlim[1], i, paste0(category[i], " - ", percent[i], "%"), 
-                adj = c(1.1, 0.5)) 
+                facing = "downward", adj = c(1.1, 0.5)) 
         }
 
         breaks = seq(0, 90, by = 5)
