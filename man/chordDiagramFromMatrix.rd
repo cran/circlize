@@ -17,7 +17,8 @@ chordDiagramFromMatrix(mat, grid.col = NULL, grid.border = NA, transparency = 0.
     link.arr.length = ifelse(link.arr.type == "big.arrow", 0.02, 0.4),
     link.arr.width = link.arr.length/2,
     link.arr.type = "triangle", link.arr.lty = par("lty"),
-    link.arr.lwd = par("lwd"), link.arr.col = par("col"), ...)
+    link.arr.lwd = par("lwd"), link.arr.col = par("col"),
+    link.largest.ontop = FALSE, ...)
 }
 \arguments{
 
@@ -42,7 +43,7 @@ chordDiagramFromMatrix(mat, grid.col = NULL, grid.border = NA, transparency = 0.
   \item{link.border}{border for links, single scalar or a matrix with names or a data frame with three columns}
   \item{link.lwd}{width for link borders, single scalar or a matrix with names or a data frame with three columns}
   \item{link.lty}{style for link borders, single scalar or a matrix with names or a data frame with three columns}
-  \item{link.sort}{whether sort links on every sector based on the width of the links on it.}
+  \item{link.sort}{whether sort links on every sector based on the width of the links on it. If it is set to "overall", all links are sorted regardless whether they are from rows or columns.}
   \item{link.decreasing}{for \code{link.sort}}
   \item{link.arr.length}{pass to \code{\link{circos.link}}, same settings as \code{link.lwd}.}
   \item{link.arr.width}{pass to \code{\link[shape]{Arrowhead}}, same settings as \code{link.lwd}.}
@@ -50,11 +51,15 @@ chordDiagramFromMatrix(mat, grid.col = NULL, grid.border = NA, transparency = 0.
   \item{link.arr.col}{color or the single line link which is put in the center of the belt, same settings as \code{link.lwd}.}
   \item{link.arr.lwd}{line width ofthe single line link which is put in the center of the belt, same settings as \code{link.lwd}.}
   \item{link.arr.lty}{line type of the single line link which is put in the center of the belt, same settings as \code{link.lwd}.}
+  \item{link.largest.ontop}{controls the order of adding links, whether based on the absolute value?}
   \item{...}{pass to \code{\link{circos.link}}}
 
 }
 \details{
 Internally, the matrix is transformed to a data frame and sent to \code{\link{chordDiagramFromDataFrame}}.
+}
+\value{
+A data frame which contains positions of links, see explanation in \code{\link{chordDiagram}}.
 }
 \examples{
 # There is no example

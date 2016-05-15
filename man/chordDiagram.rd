@@ -19,7 +19,8 @@ chordDiagram(x, grid.col = NULL, grid.border = NA, transparency = 0.5,
     link.arr.length = ifelse(link.arr.type == "big.arrow", 0.02, 0.4),
     link.arr.width = link.arr.length/2,
     link.arr.type = "triangle", link.arr.lty = par("lty"),
-    link.arr.lwd = par("lwd"), link.arr.col = par("col"), ...)
+    link.arr.lwd = par("lwd"), link.arr.col = par("col"),
+    link.largest.ontop = FALSE, ...)
 }
 \arguments{
 
@@ -52,6 +53,7 @@ chordDiagram(x, grid.col = NULL, grid.border = NA, transparency = 0.5,
   \item{link.arr.lty}{pass to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}}}
   \item{link.arr.lwd}{pass to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}}}
   \item{link.arr.col}{pass to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}}}
+  \item{link.largest.ontop}{pass to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}}}
   \item{...}{pass to \code{\link{circos.link}}.}
 
 }
@@ -62,6 +64,19 @@ visualize tables in a circular way.
 
 This function is flexible and contains some settings that may be a little difficult to understand. 
 Please refer to vignette for better explanation.
+}
+\value{
+A data frame which contains positions of links, columns are:
+
+\describe{
+  \item{rn}{sector name corresponding to rows in the adjacency matrix or the first column in the adjacency list}
+  \item{cn}{sector name corresponding to columns in the adjacency matrix or the second column in the adjacency list}
+  \item{value}{value for the interaction or relation}
+  \item{o1}{order of the link on the "from" sector}
+  \item{o2}{order of the link on the "to" sector}
+  \item{x1}{and position of the link on the "from" sector, the interval for the link on the "from" sector is \code{c(x1-abs(value), x1)}}
+  \item{x2}{and position of the link on the "to" sector, the interval for the link on the "from" sector is \code{c(x2-abs(value), x2)}}
+}
 }
 \references{
 Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.

@@ -33,6 +33,7 @@
 # -link.arr.lty pass to `chordDiagramFromMatrix` or `chordDiagramFromDataFrame`
 # -link.arr.lwd pass to `chordDiagramFromMatrix` or `chordDiagramFromDataFrame`
 # -link.arr.col pass to `chordDiagramFromMatrix` or `chordDiagramFromDataFrame`
+# -link.largest.ontop  pass to `chordDiagramFromMatrix` or `chordDiagramFromDataFrame`
 # -... pass to `circos.link`.
 #
 # == details
@@ -43,6 +44,17 @@
 # This function is flexible and contains some settings that may be a little difficult to understand. 
 # Please refer to vignette for better explanation.
 #
+# == value
+# A data frame which contains positions of links, columns are:
+#
+# -rn sector name corresponding to rows in the adjacency matrix or the first column in the adjacency list
+# -cn sector name corresponding to columns in the adjacency matrix or the second column in the adjacency list
+# -value value for the interaction or relation
+# -o1 order of the link on the "from" sector
+# -o2 order of the link on the "to" sector
+# -x1 and position of the link on the "from" sector, the interval for the link on the "from" sector is ``c(x1-abs(value), x1)``
+# -x2 and position of the link on the "to" sector, the interval for the link on the "from" sector is ``c(x2-abs(value), x2)``
+# 
 chordDiagram = function(x, grid.col = NULL, grid.border = NA, transparency = 0.5,
 	col = NULL, row.col = NULL, column.col = NULL, 
 	order = NULL, directional = 0,
@@ -55,7 +67,8 @@ chordDiagram = function(x, grid.col = NULL, grid.border = NA, transparency = 0.5
 	link.arr.length = ifelse(link.arr.type == "big.arrow", 0.02, 0.4), 
 	link.arr.width = link.arr.length/2, 
 	link.arr.type = "triangle", link.arr.lty = par("lty"), 
-	link.arr.lwd = par("lwd"), link.arr.col = par("col"), ...) {
+	link.arr.lwd = par("lwd"), link.arr.col = par("col"), 
+	link.largest.ontop = FALSE, ...) {
 	
 	if(inherits(x, "matrix")) {
 		chordDiagramFromMatrix(x, grid.col = grid.col, grid.border = grid.border, transparency = transparency,
@@ -65,7 +78,7 @@ chordDiagram = function(x, grid.col = NULL, grid.border = NA, transparency = 0.5
 			preAllocateTracks = preAllocateTracks, annotationTrack = annotationTrack, annotationTrackHeight = annotationTrackHeight,
 			link.border = link.border, link.lwd = link.lwd, link.lty = link.lty, link.sort = link.sort, link.decreasing = link.decreasing,
 			link.arr.length = link.arr.length, link.arr.width = link.arr.width, link.arr.type = link.arr.type, link.arr.lty = link.arr.lty,
-			link.arr.lwd = link.arr.lwd, link.arr.col = link.arr.col, ...)
+			link.arr.lwd = link.arr.lwd, link.arr.col = link.arr.col, link.largest.ontop = link.largest.ontop, ...)
 	} else if(inherits(x, "data.frame")) {
 		if(ncol(x) > 3) {
 			if(all(sapply(x, inherits, "numeric"))) {
@@ -77,7 +90,7 @@ chordDiagram = function(x, grid.col = NULL, grid.border = NA, transparency = 0.5
 					preAllocateTracks = preAllocateTracks, annotationTrack = annotationTrack, annotationTrackHeight = annotationTrackHeight,
 					link.border = link.border, link.lwd = link.lwd, link.lty = link.lty, link.sort = link.sort, link.decreasing = link.decreasing,
 					link.arr.length = link.arr.length, link.arr.width = link.arr.width, link.arr.type = link.arr.type, link.arr.lty = link.arr.lty,
-					link.arr.lwd = link.arr.lwd, link.arr.col = link.arr.col, ...)))
+					link.arr.lwd = link.arr.lwd, link.arr.col = link.arr.col, link.largest.ontop = link.largest.ontop, ...)))
 			}
 		}
 		chordDiagramFromDataFrame(x, grid.col = grid.col, grid.border = grid.border, transparency = transparency,
@@ -86,7 +99,7 @@ chordDiagram = function(x, grid.col = NULL, grid.border = NA, transparency = 0.5
 			preAllocateTracks = preAllocateTracks, annotationTrack = annotationTrack, annotationTrackHeight = annotationTrackHeight,
 			link.border = link.border, link.lwd = link.lwd, link.lty = link.lty, link.sort = link.sort, link.decreasing = link.decreasing,
 			link.arr.length = link.arr.length, link.arr.width = link.arr.width, link.arr.type = link.arr.type, link.arr.lty = link.arr.lty,
-			link.arr.lwd = link.arr.lwd, link.arr.col = link.arr.col, ...)
+			link.arr.lwd = link.arr.lwd, link.arr.col = link.arr.col, link.largest.ontop = link.largest.ontop, ...)
 	} else {
 		stop("`x` can only be a matrix or a data frame.")
 	}
@@ -100,7 +113,8 @@ parsePreAllocateTracksValue = function(preAllocateTracks) {
 			  bg.col = NA,
 			  bg.border = NA,
 			  bg.lty = par("lty"),
-			  bg.lwd = par("lwd"))
+			  bg.lwd = par("lwd"),
+			  track.margin = circos.par("track.margin"))
 	if(length(preAllocateTracks) && is.numeric(preAllocateTracks)) {
 		res = vector("list", length = preAllocateTracks)
 		for(i in seq_len(preAllocateTracks)) {
@@ -265,7 +279,8 @@ mat2df = function(mat) {
 # -link.border border for links, single scalar or a matrix with names or a data frame with three columns
 # -link.lwd width for link borders, single scalar or a matrix with names or a data frame with three columns
 # -link.lty style for link borders, single scalar or a matrix with names or a data frame with three columns
-# -link.sort whether sort links on every sector based on the width of the links on it.
+# -link.sort whether sort links on every sector based on the width of the links on it. If it is set to "overall", all links are sorted regardless
+#            whether they are from rows or columns.
 # -link.decreasing for ``link.sort``
 # -link.arr.length pass to `circos.link`, same settings as ``link.lwd``.
 # -link.arr.width pass to `shape::Arrowhead`, same settings as ``link.lwd``.
@@ -273,10 +288,14 @@ mat2df = function(mat) {
 # -link.arr.col color or the single line link which is put in the center of the belt, same settings as ``link.lwd``.
 # -link.arr.lwd line width ofthe single line link which is put in the center of the belt, same settings as ``link.lwd``.
 # -link.arr.lty line type of the single line link which is put in the center of the belt, same settings as ``link.lwd``.
+# -link.largest.ontop controls the order of adding links, whether based on the absolute value?
 # -... pass to `circos.link`
 #
 # == details
 # Internally, the matrix is transformed to a data frame and sent to `chordDiagramFromDataFrame`.
+#
+# == value
+# A data frame which contains positions of links, see explanation in `chordDiagram`.
 #
 chordDiagramFromMatrix = function(mat, grid.col = NULL, grid.border = NA, transparency = 0.5,
 	col = NULL, row.col = NULL, column.col = NULL, order = NULL, directional = 0,
@@ -288,7 +307,8 @@ chordDiagramFromMatrix = function(mat, grid.col = NULL, grid.border = NA, transp
 	link.arr.length = ifelse(link.arr.type == "big.arrow", 0.02, 0.4), 
 	link.arr.width = link.arr.length/2, 
 	link.arr.type = "triangle", link.arr.lty = par("lty"), 
-	link.arr.lwd = par("lwd"), link.arr.col = par("col"), ...) {
+	link.arr.lwd = par("lwd"), link.arr.col = par("col"), 
+	link.largest.ontop = FALSE, ...) {
 	
 	if(!is.matrix(mat)) {
 		stop("`mat` can only be a matrix.\n")
@@ -514,6 +534,7 @@ chordDiagramFromMatrix = function(mat, grid.col = NULL, grid.border = NA, transp
 		link.arr.lwd = psubset(link.arr.lwd, df$ri, df$ci),
 		link.arr.lty = psubset(link.arr.lty, df$ri, df$ci),
 		link.arr.col = psubset(link.arr.col, df$ri, df$ci),
+		link.largest.ontop = link.largest.ontop,
 		...)
 	
 }
@@ -560,7 +581,8 @@ chordDiagramFromMatrix = function(mat, grid.col = NULL, grid.border = NA, transp
 # -link.border border for links, single scalar or a vector which has the same length as nrows of ``df``
 # -link.lwd width for link borders, single scalar or a vector which has the same length as nrows of ``df``
 # -link.lty style for link borders, single scalar or a vector which has the same length as nrows of ``df``
-# -link.sort whether sort links on every sector based on the width of the links on it.
+# -link.sort whether sort links on every sector based on the width of the links on it. If it is set to "overall", all links are sorted regardless
+#            whether they are from the first column or the second column.
 # -link.decreasing for ``link.sort``
 # -link.arr.length pass to `circos.link`, same settings as ``link.lwd``.
 # -link.arr.width pass to `shape::Arrowhead`, same settings as ``link.lwd``.
@@ -568,7 +590,11 @@ chordDiagramFromMatrix = function(mat, grid.col = NULL, grid.border = NA, transp
 # -link.arr.col color or the single line link which is put in the center of the belt, same settings as ``link.lwd``.
 # -link.arr.lwd line width ofthe single line link which is put in the center of the belt, same settings as ``link.lwd``.
 # -link.arr.lty line type of the single line link which is put in the center of the belt, same settings as ``link.lwd``.
+# -link.largest.ontop controls the order of adding links, whether based on the absolute value?
 # -... pass to `circos.link`
+#
+# == value
+# A data frame which contains positions of links, see explanation in `chordDiagram`.
 #
 chordDiagramFromDataFrame = function(df, grid.col = NULL, grid.border = NA, transparency = 0.5,
 	col = NULL, order = NULL, directional = 0,
@@ -580,7 +606,8 @@ chordDiagramFromDataFrame = function(df, grid.col = NULL, grid.border = NA, tran
 	link.arr.length = ifelse(link.arr.type == "big.arrow", 0.02, 0.4), 
 	link.arr.width = link.arr.length/2, 
 	link.arr.type = "triangle", link.arr.lty = par("lty"), 
-	link.arr.lwd = par("lwd"), link.arr.col = par("col"), ...) {
+	link.arr.lwd = par("lwd"), link.arr.col = par("col"), 
+	link.largest.ontop = FALSE, ...) {
 
 	if(nrow(df) != 2) {
 		if(identical(direction.type, c("diffHeight", "arrows")) || identical(direction.type, c("arrows", "diffHeight"))) {
@@ -750,46 +777,76 @@ chordDiagramFromDataFrame = function(df, grid.col = NULL, grid.border = NA, tran
 	if(length(link.sort) == 1) link.sort = rep(link.sort, 2)
 	if(length(link.decreasing) == 1) link.decreasing = rep(link.decreasing, 2)
 
-	# position of root 1
-	od = tapply(abs(df$value), df$rn, .order, link.sort[1], link.decreasing[1])
-	for(nm in names(od)) {  # for each sector
-		l = df$rn == nm # rows in df that correspond to current sector
-		df$o1[l] = od[[nm]] # adjust rows according to the order in current sector
-		df$x1[l][od[[nm]]] = cumsum(abs(df$value[l])[od[[nm]]]) # position
+	if(is.logical(link.sort)) {
+		# position of root 1
+		od = tapply(abs(df$value), df$rn, .order, link.sort[1], link.decreasing[1])
+		for(nm in names(od)) {  # for each sector
+			l = df$rn == nm # rows in df that correspond to current sector
+			df$o1[l] = od[[nm]] # adjust rows according to the order in current sector
+			df$x1[l][od[[nm]]] = cumsum(abs(df$value[l])[od[[nm]]]) # position
 
-		l2 = df$rn == nm & df$cn == nm 
-		if(sum(l2)) { # there is a self link
-			if(self.link == 1) {
-				df$x2[l2] = df$x1[l2]+abs(df$value[l2])*0.000001
+			l2 = df$rn == nm & df$cn == nm 
+			if(sum(l2)) { # there is a self link
+				if(self.link == 1) {
+					df$x2[l2] = df$x1[l2]+abs(df$value[l2])*0.000001
+				}
 			}
 		}
-	}
-	max_o1 = sapply(od, max)
-	sum_1 = tapply(abs(df$value), df$rn, sum)
-	# position of root 2
-	od = tapply(abs(df$value), df$cn, .order, link.sort[2], link.decreasing[2])
-	for(nm in names(od)) {
-		if(!is.na(max_o1[nm])) { # if cn already in rn
-			l = df$cn == nm
-			if(self.link == 1) {
-				l2 = ! df$rn[l] == nm # self link
-				od[[nm]] = order(od[[nm]][l2])
+		max_o1 = sapply(od, max)
+		sum_1 = tapply(abs(df$value), df$rn, sum)
+		# position of root 2
+		od = tapply(abs(df$value), df$cn, .order, link.sort[2], link.decreasing[2])
+		for(nm in names(od)) {
+			if(!is.na(max_o1[nm])) { # if cn already in rn
+				l = df$cn == nm
+				if(self.link == 1) {
+					l2 = ! df$rn[l] == nm # self link
+					od[[nm]] = order(od[[nm]][l2])
+				} else {
+					l2 = rep(TRUE, sum(l))
+				}
+				df$o2[l][l2] = od[[nm]] + max_o1[nm]
+				df$x2[l][l2][ od[[nm]] ] = cumsum(abs(df$value[l][l2])[ od[[nm]] ]) + sum_1[nm]
 			} else {
-				l2 = rep(TRUE, sum(l))
+				l = df$cn == nm
+				df$o2[l] = od[[nm]]
+				df$x2[l][od[[nm]]] = cumsum(abs(df$value[l])[od[[nm]]])
 			}
-			df$o2[l][l2] = od[[nm]] + max_o1[nm]
-			df$x2[l][l2][ od[[nm]] ] = cumsum(abs(df$value[l][l2])[ od[[nm]] ]) + sum_1[nm]
-		} else {
-			l = df$cn == nm
-			df$o2[l] = od[[nm]]
-			df$x2[l][od[[nm]]] = cumsum(abs(df$value[l])[od[[nm]]])
+		}
+		if(self.link == 1) {
+			l = df$rn == df$cn
+			df$x1[l] = pmin(df$x1[l], df$x2[l])
+			df$x2[l] = pmin(df$x1[l], df$x2[l])
+		}
+	} else {
+		for(nm in unique(c(df$rn, df$cn))) {
+			l = df$rn == nm | df$cn == nm
+			od = order(abs(df$value[l]), decreasing = link.decreasing[1])
+			cum_pos = cumsum(abs(df$value[l])[od])
+			if(self.link == 2) {
+				ii = which(df$rn[l] == nm & df$cn[l] == nm)
+				if(length(ii)) {
+					iii = which(od == ii)
+					if(iii < length(cum_pos)) {
+						cum_pos[(iii+1):length(cum_pos)] = cum_pos[(iii+1):length(cum_pos)] + df$value[l][ii]
+					}
+				}
+			}
+			xx = NULL
+			xx[od] = cum_pos
+			l1 = df$rn == nm
+			l2 = l & !l1
+			df$x1[l1] = xx[l1[l]]
+			df$x2[l2] = xx[l2[l]]
+		}
+		l = df$rn == df$cn
+		if(self.link == 1) {
+			df$x2[l] = df$x1[l]
+		} else if(self.link == 2) {
+			df$x2[l] = df$x1[l] + abs(df$value[l])
 		}
 	}
-	if(self.link == 1) {
-		l = df$rn == df$cn
-		df$x1[l] = pmin(df$x1[l], df$x2[l])
-		df$x2[l] = pmin(df$x1[l], df$x2[l])
-	}
+
 	#######################################
 
 	o.cell.padding = circos.par("cell.padding")
@@ -802,7 +859,8 @@ chordDiagramFromDataFrame = function(df, grid.col = NULL, grid.border = NA, tran
 		for(i in seq_along(pa)) {
 			va = pa[[i]]
 			circos.trackPlotRegion(ylim = va$ylim, track.height = va$track.height,
-				bg.col = va$bg.col, bg.border = va$bg.border, bg.lty = va$bg.lty, bg.lwd = va$bg.lwd)
+				bg.col = va$bg.col, bg.border = va$bg.border, bg.lty = va$bg.lty, bg.lwd = va$bg.lwd,
+				track.margin = va$track.margin)
 		}
 	}
 	if("name" %in% annotationTrack) {
@@ -873,7 +931,13 @@ chordDiagramFromDataFrame = function(df, grid.col = NULL, grid.border = NA, tran
 		}
 	}
 
-	for(k in seq_len(nrow(df))) {
+	if(link.largest.ontop) {
+		link_order = order(df$value, decreasing = FALSE)
+	} else {
+		link_order = seq_len(nrow(df))
+	}
+	
+	for(k in link_order) {
 		if (abs(df$value[k])/sum(abs(df$value)) < 1e-6) next
 
 		if(setequal(direction.type, c("diffHeight"))) {
@@ -896,6 +960,7 @@ chordDiagramFromDataFrame = function(df, grid.col = NULL, grid.border = NA, tran
     }
 	
 	circos.par("cell.padding" = o.cell.padding)
+	return(invisible(df))
 }
 
 psubset = function(mat, ri, ci) {
