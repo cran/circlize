@@ -195,8 +195,10 @@ circos.genomicInitialize = function(data, sector.names = NULL, major.by = NULL,
 					circos.text(mean(xlim), 1.2, labels = sector.names[sector.index], cex = par("cex"), adj = c(0.5, 0), niceFacing = TRUE)
 				} else if("labels" %in% plotType) {
 					circos.text(mean(xlim), 0, labels = sector.names[sector.index], cex = par("cex"), adj = c(0.5, 0), niceFacing = TRUE)
+				} else if("axis" %in% plotType) {
+					circos.axis(h = 0, major.at = major.at, labels = major.tick.labels, labels.cex = 0.3*par("cex"), labels.facing = "clockwise", major.tick.percentage = 0.2)
 				}
-			}
+ 			}
 		)
 	}
 	
@@ -498,6 +500,7 @@ getI = function(...) {
 #      Pass to `circos.points`
 # -pch Type of points. Settings are similar as ``col``. Pass to `circos.points`
 # -cex Size of points. Settings are similar as ``col``. Pass to `circos.points`
+# -bg background colors for points.
 # -... Mysterious parameters
 #
 # == details
@@ -505,7 +508,7 @@ getI = function(...) {
 circos.genomicPoints = function(region, value, numeric.column = NULL, 
 	sector.index = get.cell.meta.data("sector.index"),
     track.index = get.cell.meta.data("track.index"), posTransform = NULL, 
-	pch = par("pch"), col = par("col"), cex = par("cex"), ...) {
+	pch = par("pch"), col = par("col"), cex = par("cex"), bg = par("bg"), ...) {
 	
 	nr = nrow(region)
 	
@@ -558,15 +561,16 @@ circos.genomicPoints = function(region, value, numeric.column = NULL,
 	pch = .normalizeGraphicalParam(pch, nc, nr, "pch")
 	col = .normalizeGraphicalParam(col, nc, nr, "col")
 	cex = .normalizeGraphicalParam(cex, nc, nr, "cex")
+	bg = .normalizeGraphicalParam(bg, nc, nr, "cex")
 	
 	if(nc == 1) {
 		circos.points( (region[[1]] + region[[2]])/2, value[[ numeric.column ]], 
-			pch = pch, col = col, cex = cex, 
+			pch = pch, col = col, cex = cex, bg = bg,
 			sector.index = sector.index, track.index = track.index )
 	} else {
 		for(i in seq_len(nc)) {
 			circos.points( (region[[1]] + region[[2]])/2, value[[ numeric.column[i] ]], 
-				pch = pch[i], col = col[i], cex = cex[i], 
+				pch = pch[i], col = col[i], cex = cex[i], bg = bg[i],
 				sector.index = sector.index, track.index = track.index ) 
 		}
 	}
@@ -1503,36 +1507,43 @@ circos.genomicRainfall = function(data, ylim = c(0, 9), col = "black", pch = par
 # == values
 # If the input is a two-column data frame, the function returnes a data frame with three columns: start position, end position and distance.
 # And if the input is a bed-format data frame, there will be the chromosome column added.
-rainfallTransform = function(region, mode = c("min", "max", "mean")) {
+#
+# The row order of the returned data frame is as same as the input one.
+rainfallTransform = function(region, mode = c("min", "max", "mean", "left", "right")) {
 	
 	mode = match.arg(mode)[1]
 
 	if(is.character(region[, 1]) || is.factor(region[, 1])) {
 		region[, 1] = as.vector(region[, 1])
-		return(do.call("rbind", lapply(unique(region[, 1]), function(chr) {
+		region = region[1:3]
+		region$dist = NA
+		for(chr in unique(region[, 1])) {
 			l = region[, 1] == chr
 			df = rainfallTransform(region[l, 2:3, drop = FALSE], mode = mode)
-			cbind(chr = rep(chr, nrow(df)), df)
-		})))
+			region$dist[l] = df$dist
+		}
+		return(region)
 	}
 	if(ncol(region) >= 3) {
 		if(is.numeric(region[, 1])) {
 			if(max(region[, 1]) < 100) {
-				return(do.call("rbind", lapply(unique(region[, 1]), function(chr) {
-					l = region[, 1] == chr
-					df = rainfallTransform(region[l, 2:3, drop = FALSE], mode = mode)
-					cbind(chr = rep(chr, nrow(df)), df)
-				})))
+				region = as.data.frame(region)
+				region[[1]] = as.character(region[[1]])
+				rainfallTransform(region, mode = mode)
 			}
 		}
 	}
 	
-	region = as.data.frame(sort_region(region[1:2]))
+	region_order = order_region(region[1:2])
+	region_bk = as.data.frame(region[1:2])
+	region = as.data.frame(region[region_order, ])
 	n = nrow(region)
 	dist = numeric(n)
 		
 	if(n < 2) {
-		return(data.frame(start = numeric(0), end = numeric(0), dist = numeric(0)))
+		region = region_bk
+		region$dist = NA
+		return(region)
 	}
 		
 	dist[1] = region[2, 1] - region[1, 2]
@@ -1545,14 +1556,27 @@ rainfallTransform = function(region, mode = c("min", "max", "mean")) {
 			dist[2:(n-1)] = pmin(d1, d2)
 		} else if(mode == "max") {
 			dist[2:(n-1)] = pmax(d1, d2)
-		} else {
+		} else if(mode == "mean") {
 			dist[2:(n-1)] = apply(cbind(d1, d2), 1, mean)
+		} else if (mode == "left") {
+			dist[2:(n - 1)] = d2
+		} else if (mode == "right") {
+			dist[2:(n - 1)] = d1
 		}
 	}
 		
 	dist = ifelse(dist < 0, 0, dist)
+
+	if(mode == "left") {
+		dist[1] = NA
+	} else if(mode == "right") {
+		dist[n] = NA
+	}
+
+	region = region_bk
+	region$dist[region_order] = dist
 	
-	return(data.frame(start = region[, 1], end = region[, 2], dist = dist))
+	return(region)
 }
 
 # == title
@@ -1589,6 +1613,8 @@ posTransform.default = function(region, ...) {
 # -sector.index sector index
 # -track.index track index
 # -padding padding of text
+# -extend extend to allow labels to be put in an region which is wider than the current chromosome.
+#    The value should be a proportion value and the length is either one or two.
 # -... other arguments
 #
 # == details
@@ -1596,10 +1622,14 @@ posTransform.default = function(region, ...) {
 # Under the transformation, texts will be as close as possible to the original positions.
 posTransform.text = function(region, y, labels, cex = 1, font = par("font"),
 	sector.index = get.cell.meta.data("sector.index"),
-	track.index = get.cell.meta.data("track.index"), padding = 0, ...) {
+	track.index = get.cell.meta.data("track.index"), padding = 0, 
+	extend = 0, ...) {
 	
 	if(length(y) == 1) y = rep(y, nrow(region))
 	if(length(labels) == 1) labels = rep(labels, nrow(region))
+
+	if(length(extend) == 1) extend = rep(extend, 2)
+	if(length(extend) > 2) extend = extend[1:2]
 	
 	od = order(region[[1]])
 	region = region[od, ]
@@ -1615,6 +1645,8 @@ posTransform.text = function(region, y, labels, cex = 1, font = par("font"),
 	x2 = reverse.circlize(alpha2, d[, "rou"], sector.index = sector.index, track.index = track.index)[, "x"]
 	
 	xlim = get.cell.meta.data("xlim", sector.index = sector.index, track.index = track.index)
+	xrange = xlim[2] - xlim[1]
+	xlim = c(xlim[1] - extend[1]*xrange, xlim[2] + extend[2]*xrange)
 	
 	x1_new = x1
 	x2_new = x2

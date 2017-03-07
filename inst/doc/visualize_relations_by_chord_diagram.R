@@ -229,7 +229,7 @@ chordDiagram(mat, grid.col = grid.col, col = col_df)
 text(-0.9, 0.9, "D", cex = 1.5)
 par(mfrow = c(1, 1))
 
-## ----chord_diagram_link_order1, eval = FALSE, echo = c(1, 3)-------------
+## ----chord_diagram_link_order1, eval = FALSE-----------------------------
 #  chordDiagram(mat, grid.col = grid.col, link.border = 1,
 #      link.sort = TRUE, link.decreasing = TRUE)
 #  text(-0.9, 0.9, "A", cex = 1.5)
