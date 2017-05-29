@@ -1,10 +1,10 @@
 \name{degree}
 \alias{degree}
 \title{
-mark the value is degree value
+Mark the value as a degree value
 }
 \description{
-mark the value is degree value
+Mark the value as a degree value
 }
 \usage{
 degree(x)
@@ -15,7 +15,7 @@ degree(x)
 
 }
 \value{
-a list which only contains a single element
+a \code{degree} object
 }
 \examples{
 # There is no example

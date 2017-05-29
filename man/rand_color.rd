@@ -1,10 +1,10 @@
 \name{rand_color}
 \alias{rand_color}
 \title{
-generate random colors
+Generate random colors
 }
 \description{
-generate random colors
+Generate random colors
 }
 \usage{
 rand_color(n = 1, transparency = 0)
@@ -15,11 +15,13 @@ rand_color(n = 1, transparency = 0)
   \item{transparency}{transparency, numeric value between 0 and 1}
 
 }
+\details{
+Colors are randomly generated from RGB color space through uniform distributions.
+}
 \value{
 a vector of colors
 }
 \examples{
-# There is no example
-NULL
-
+rand_color(10)
+rand_color(10, transparency = 0.5)
 }

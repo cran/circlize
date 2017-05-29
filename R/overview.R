@@ -1,6 +1,6 @@
 
 # == title (package:circlize)
-# Circular layout in R
+# Circular visualization in R
 #
 # == details
 #
@@ -9,15 +9,16 @@
 # Since most of the figures are composed of points, lines and polygons, 
 # we just need to implement low-level functions for drawing points, lines and polygons.
 #
-# Current there are following low-level graphical functions: 
+# Current there are following low-level graphic functions: 
 #
 # - `circos.points`
 # - `circos.lines`
 # - `circos.rect`
 # - `circos.polygon`
+# - `circos.segments`
 # - `circos.text`
-# - `circos.axis`
-# - `circos.link`, This maybe the unique feature for circular layout to represent relationships between elements.
+# - `circos.axis`, `circos.xaxis`, `circos.yaxis`
+# - `circos.link`
 #  
 # For drawing points, lines and text through the whole track (among several sectors), the following 
 # functions are available:
@@ -28,8 +29,9 @@
 # 
 # Functions to arrange circular layout:
 # 
-# - `circos.trackPlotRegion`
-# - `circos.updatePlotRegion`
+# - `circos.initialize`
+# - `circos.track`
+# - `circos.update`
 # - `circos.par`
 # - `circos.info`
 # - `circos.clear`
@@ -45,7 +47,7 @@
 # 
 # Functions to arrange genomic circular layout:
 # 
-# - `circos.genomicTrackPlotRegion`
+# - `circos.genomicTrack`
 # 
 # Functions to add basic graphics in genomic scale:
 # 
@@ -59,12 +61,13 @@
 # 
 # - `circos.genomicDensity`
 # - `circos.genomicRainfall`
+# - `circos.genomicIdeogram`
+# - `circos.genomicHeatmap`
+# - `circos.genomicLabels`
 # 
-# Finally, function that draws chord diagram:
+# Finally, function that draws Chord diagram:
 # 
 # - `chordDiagram`
-# - `chordDiagramFromMatrix`
-# - `chordDiagramFromDataFrame`
-# 
-# Please refer to the vignettes to find out how to draw basic and advanced circular plots by this package.
+#
+# Please refer to the vignettes (http://jokergoo.github.io/circlize_book/book/ ) to find out how to draw basic and advanced circular plots by this package.
 # 

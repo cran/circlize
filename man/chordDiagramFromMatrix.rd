@@ -1,24 +1,27 @@
 \name{chordDiagramFromMatrix}
 \alias{chordDiagramFromMatrix}
 \title{
-Plot Chord Diagram from a matrix
+Plot Chord Diagram from an adjacency matrix
 }
 \description{
-Plot Chord Diagram from a matrix
+Plot Chord Diagram from an adjacency matrix
 }
 \usage{
 chordDiagramFromMatrix(mat, grid.col = NULL, grid.border = NA, transparency = 0.5,
     col = NULL, row.col = NULL, column.col = NULL, order = NULL, directional = 0,
-    direction.type = "diffHeight", diffHeight = 0.04, reduce = 1e-5, self.link = 2,
+    direction.type = "diffHeight", diffHeight = convert_height(2, "mm"),
+    reduce = 1e-5, self.link = 2,
     symmetric = FALSE, keep.diagonal = FALSE, preAllocateTracks = NULL,
-    annotationTrack = c("name", "grid", "axis"), annotationTrackHeight = c(0.05, 0.05),
+    annotationTrack = c("name", "grid", "axis"),
+    annotationTrackHeight = convert_height(c(3, 2), "mm"),
     link.border = NA, link.lwd = par("lwd"), link.lty = par("lty"),
     link.sort = FALSE, link.decreasing = TRUE,
     link.arr.length = ifelse(link.arr.type == "big.arrow", 0.02, 0.4),
     link.arr.width = link.arr.length/2,
     link.arr.type = "triangle", link.arr.lty = par("lty"),
     link.arr.lwd = par("lwd"), link.arr.col = par("col"),
-    link.largest.ontop = FALSE, ...)
+    link.largest.ontop = FALSE, link.visible = TRUE,
+    link.rank = NULL, ...)
 }
 \arguments{
 
@@ -45,13 +48,15 @@ chordDiagramFromMatrix(mat, grid.col = NULL, grid.border = NA, transparency = 0.
   \item{link.lty}{style for link borders, single scalar or a matrix with names or a data frame with three columns}
   \item{link.sort}{whether sort links on every sector based on the width of the links on it. If it is set to "overall", all links are sorted regardless whether they are from rows or columns.}
   \item{link.decreasing}{for \code{link.sort}}
-  \item{link.arr.length}{pass to \code{\link{circos.link}}, same settings as \code{link.lwd}.}
-  \item{link.arr.width}{pass to \code{\link[shape]{Arrowhead}}, same settings as \code{link.lwd}.}
-  \item{link.arr.type}{pass to \code{\link{circos.link}}, same settings as \code{link.lwd}. Default value is \code{triangle}.}
-  \item{link.arr.col}{color or the single line link which is put in the center of the belt, same settings as \code{link.lwd}.}
-  \item{link.arr.lwd}{line width ofthe single line link which is put in the center of the belt, same settings as \code{link.lwd}.}
-  \item{link.arr.lty}{line type of the single line link which is put in the center of the belt, same settings as \code{link.lwd}.}
+  \item{link.arr.length}{pass to \code{\link{circos.link}}. The format of this argument is same as \code{link.lwd}.}
+  \item{link.arr.width}{pass to \code{\link[shape]{Arrowhead}}. The format of this argument is same as \code{link.lwd}.}
+  \item{link.arr.type}{pass to \code{\link{circos.link}}, same format as \code{link.lwd}. Default value is \code{triangle}.}
+  \item{link.arr.col}{color or the single line link which is put in the center of the belt. The format of this argument is same as \code{link.lwd}.}
+  \item{link.arr.lwd}{line width ofthe single line link which is put in the center of the belt. The format of this argument is same as \code{link.lwd}.}
+  \item{link.arr.lty}{line type of the single line link which is put in the center of the belt. The format of this argument is same as \code{link.lwd}.}
   \item{link.largest.ontop}{controls the order of adding links, whether based on the absolute value?}
+  \item{link.visible}{whether plot the link. The value is logical, if it is set to \code{FALSE}, the corresponding link will not  plotted, but the space is still ocuppied. The format of this argument is same as \code{link.lwd}}
+  \item{link.rank}{order to add links to the circle, a large value means to add it later.}
   \item{...}{pass to \code{\link{circos.link}}}
 
 }

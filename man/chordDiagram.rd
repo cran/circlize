@@ -11,20 +11,23 @@ chordDiagram(x, grid.col = NULL, grid.border = NA, transparency = 0.5,
     col = NULL, row.col = NULL, column.col = NULL,
     order = NULL, directional = 0,
     symmetric = FALSE, keep.diagonal = FALSE,
-    direction.type = "diffHeight", diffHeight = 0.04, reduce = 1e-5, self.link = 2,
+    direction.type = "diffHeight", diffHeight = convert_height(2, "mm"),
+    reduce = 1e-5, self.link = 2,
     preAllocateTracks = NULL,
-    annotationTrack = c("name", "grid", "axis"), annotationTrackHeight = c(0.05, 0.05),
+    annotationTrack = c("name", "grid", "axis"),
+    annotationTrackHeight = convert_height(c(3, 2), "mm"),
     link.border = NA, link.lwd = par("lwd"), link.lty = par("lty"),
     link.sort = FALSE, link.decreasing = TRUE,
     link.arr.length = ifelse(link.arr.type == "big.arrow", 0.02, 0.4),
     link.arr.width = link.arr.length/2,
     link.arr.type = "triangle", link.arr.lty = par("lty"),
     link.arr.lwd = par("lwd"), link.arr.col = par("col"),
-    link.largest.ontop = FALSE, ...)
+    link.largest.ontop = FALSE, link.visible = TRUE,
+    link.rank = NULL, ...)
 }
 \arguments{
 
-  \item{x}{a matrix or a data frame. The function will pass all argument to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}} depending on the type of \code{x}, also format of other arguments depends of the type of \code{x}.}
+  \item{x}{a matrix or a data frame. The function will pass all argument to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}} depending on the type of \code{x}, also format of other arguments depends of the type of \code{x}. If it is in the form of a matrix, it should be an adjacency matrix. If it is in the form of a data frame, it should be an adjacency list.}
   \item{grid.col}{pass to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}}}
   \item{grid.border}{pass to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}}}
   \item{transparency}{pass to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}}}
@@ -54,6 +57,8 @@ chordDiagram(x, grid.col = NULL, grid.border = NA, transparency = 0.5,
   \item{link.arr.lwd}{pass to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}}}
   \item{link.arr.col}{pass to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}}}
   \item{link.largest.ontop}{pass to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}}}
+  \item{link.visible}{pass to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}}}
+  \item{link.rank}{order to add links to the circle, a large value means to add it later.}
   \item{...}{pass to \code{\link{circos.link}}.}
 
 }
@@ -65,17 +70,20 @@ visualize tables in a circular way.
 This function is flexible and contains some settings that may be a little difficult to understand. 
 Please refer to vignette for better explanation.
 }
+\seealso{
+\url{http://jokergoo.github.io/circlize_book/book/the-chorddiagram-function.html}
+}
 \value{
 A data frame which contains positions of links, columns are:
 
 \describe{
-  \item{rn}{sector name corresponding to rows in the adjacency matrix or the first column in the adjacency list}
-  \item{cn}{sector name corresponding to columns in the adjacency matrix or the second column in the adjacency list}
-  \item{value}{value for the interaction or relation}
-  \item{o1}{order of the link on the "from" sector}
-  \item{o2}{order of the link on the "to" sector}
-  \item{x1}{and position of the link on the "from" sector, the interval for the link on the "from" sector is \code{c(x1-abs(value), x1)}}
-  \item{x2}{and position of the link on the "to" sector, the interval for the link on the "from" sector is \code{c(x2-abs(value), x2)}}
+  \item{\code{rn}}{sector name corresponding to rows in the adjacency matrix or the first column in the adjacency list}
+  \item{\code{cn}}{sector name corresponding to columns in the adjacency matrix or the second column in the adjacency list}
+  \item{\code{value}}{value for the interaction or relation}
+  \item{\code{o1}}{order of the link on the "from" sector}
+  \item{\code{o2}}{order of the link on the "to" sector}
+  \item{\code{x1}}{and position of the link on the "from" sector, the interval for the link on the "from" sector is \code{c(x1-abs(value), x1)}}
+  \item{\code{x2}}{and position of the link on the "to" sector, the interval for the link on the "from" sector is \code{c(x2-abs(value), x2)}}
 }
 }
 \references{
@@ -83,67 +91,18 @@ Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioi
 
 }
 \examples{
-\dontrun{
+set.seed(999)
+mat = matrix(sample(18, 18), 3, 6) 
+rownames(mat) = paste0("S", 1:3)
+colnames(mat) = paste0("E", 1:6)
 
-############### example 1 ######################################
-set.seed(123)
-mat = matrix(sample(1:100, 18, replace = TRUE), 3, 6)
-rownames(mat) = letters[1:3]
-colnames(mat) = LETTERS[1:6]
-
-### basic settings
-par(mfrow = c(3, 2))
-par(mar = c(1, 1, 1, 1))
+df = data.frame(from = rep(rownames(mat), times = ncol(mat)),
+    to = rep(colnames(mat), each = nrow(mat)),
+    value = as.vector(mat),
+    stringsAsFactors = FALSE)
 
 chordDiagram(mat)
+chordDiagram(df)
 circos.clear()
-
-circos.par(gap.degree = c(rep(2, nrow(mat)-1), 10, rep(2, ncol(mat)-1), 10))
-chordDiagram(mat)
-circos.clear()
-
-circos.par(start.degree = 90)
-chordDiagram(mat)
-circos.clear()
-
-chordDiagram(mat, order = c("A", "B", "a", "C", "D", "b", "E", "F", "c"))
-
-chordDiagram(mat, directional = TRUE)
-chordDiagram(mat, directional = TRUE, diffHeight = 0.06)
-
-circos.clear()
-
-################ example 2 ###############################
-set.seed(123)
-mat = matrix(sample(1:100, 18, replace = TRUE), 3, 6)
-rownames(mat) = letters[1:3]
-colnames(mat) = LETTERS[1:6]
-
-
-### colors settings
-rand_color = function(n, alpha = 1) {
-    return(rgb(runif(n), runif(n), runif(n), alpha = alpha))
-}
-
-par(mfrow = c(3, 3))
-par(mar = c(1, 1, 1, 1))
-grid.col = NULL
-grid.col[letters[1:3]] = c("red", "green", "blue")
-grid.col[LETTERS[1:6]] = "grey"
-chordDiagram(mat, grid.col = grid.col)
-chordDiagram(mat, grid.col = grid.col, transparency = 0.5)
-col_mat = rand_color(length(mat), alpha = 0.5)
-dim(col_mat) = dim(mat)
-chordDiagram(mat, grid.col = grid.col, col = col_mat)
-chordDiagram(mat, grid.col = grid.col,
-    col = colorRamp2(quantile(mat, seq(0, 1, by = 0.1)),
-                     rev(heat.colors(11))), transparency = 0.5)
-
-chordDiagram(mat, grid.col = grid.col, row.col = 1:3, transparency = 0.5)
-chordDiagram(mat, grid.col = grid.col, column.col = 1:6, transparency = 0.5)
-chordDiagram(mat, grid.col = grid.col, row.col = c("#FF000080", "#00FF0010", "#0000FF10"))
-circos.clear()
-
-}
 
 }
