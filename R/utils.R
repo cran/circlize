@@ -197,6 +197,8 @@ check.points.position = function(x, y, sector.index = get.cell.meta.data("sector
     x = x[!l]
     y = y[!l]
 
+    xrange = cell.xlim[2] - cell.xlim[1]
+    yrange = cell.ylim[2] - cell.ylim[1]
     l1 = x < cell.xlim[1] | x > cell.xlim[2]
     l2 = y < cell.ylim[1] | y > cell.ylim[2]
     l = l1 | l2
@@ -365,26 +367,6 @@ circos.approx = function(x, y, resolution = 0.1, sector.index = get.cell.meta.da
 	newy = newy[!is.na(newy)]
 	
 	return(list(x = newx, y = newy))
-}
-
-# == title
-# Generate random colors
-#
-# == param
-# -n number of colors
-# -transparency transparency, numeric value between 0 and 1
-#
-# == details
-# Colors are randomly generated from RGB color space through uniform distributions.
-#
-# == value
-# a vector of colors
-#
-# == example
-# rand_color(10)
-# rand_color(10, transparency = 0.5)
-rand_color = function(n = 1, transparency = 0) {
-    return(rgb(runif(n), runif(n), runif(n), 1 - transparency))
 }
 
 # == title
