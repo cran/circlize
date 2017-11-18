@@ -1,3 +1,15 @@
+Changes in version 0.4.2
+---------------------------------------------------------------------------
+
+* add startup message
+* add `xmax` argument in `chordDiagram()`
+* first column is refactorized in `circos.initialize()`
+* add names for CELL_META
+* add `labels.pos.adjust` in `circos.axis()`
+* add `fontsize()` function
+* `circos.nested()`: check whether sector order in the two circular plots are consistent
+* `getQuadraticPoints()`: add tiny offset when the curve is actually a straight line
+
 Changes in version 0.4.1
 ---------------------------------------------------------------------------
 

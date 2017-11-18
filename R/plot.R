@@ -129,6 +129,7 @@ circos.trackPlotRegion = function(factors = NULL, x = NULL, y = NULL, ylim = NUL
 			track.height = get.cell.meta.data("track.height", sector.index = factors[1], track.index = track.index)
 			# ignore track.margin 
 			circos.par("track.margin" = get.cell.meta.data("track.margin", sector.index = factors[1], track.index = track.index))
+			circos.par("cell.padding" = get.cell.meta.data("cell.padding", sector.index = factors[1], track.index = track.index))
 		}
         if(is.null(ylim) && is.null(y)) {
             for(sid in get.all.sector.index()) {
@@ -513,7 +514,7 @@ circos.lines = function(x, y, sector.index = get.cell.meta.data("sector.index"),
     type = "l", straight = FALSE, area = FALSE, area.baseline = NULL, 
     border = "black", baseline = "bottom", pt.col = par("col"), cex = par("cex"), 
     pch = par("pch")) {
-    
+
 	if(!is.null(area.baseline)) {
 		baseline = area.baseline
 		warning("`area.baseline` is deprecated, please use `baseline` instead.")
@@ -582,7 +583,7 @@ circos.lines = function(x, y, sector.index = get.cell.meta.data("sector.index"),
     } else {
         d = lines.expand(x, y, sector.index, track.index)
     }
-	
+
 	if(area) {
 		ylim = get.cell.meta.data("ylim", sector.index, track.index)
 		d = rbind(d, c(d[nrow(d), 1], baseline))
@@ -1102,6 +1103,7 @@ circos.text = function(x, y, labels, sector.index = get.cell.meta.data("sector.i
 		}
 
 		m = polar2Cartesian(d)
+		
 		for(i in seq_along(x)) {
 			text(m[i, 1], m[i, 2], labels = labels[i], srt = srt[i],
 				 cex = cex[i], col = col[i], font = font[i], adj = adj, ...)
@@ -1109,6 +1111,16 @@ circos.text = function(x, y, labels, sector.index = get.cell.meta.data("sector.i
     }
 	
     return(invisible(NULL))
+}
+
+# == title
+# Convert fontsize to cex
+#
+# == param
+# -x value for fontsize
+#
+fontsize = function(x) {
+	x/par("ps")
 }
 
 # == title
@@ -1221,6 +1233,8 @@ circos.trackText = function(factors, x, y, labels, track.index = get.cell.meta.d
 # -lwd              line width for ticks
 # -col              color for the axes
 # -labels.col       color for the labels
+# -labels.pos.adjust  whether to adjust the positions of the first label and the last label. The value can be a vector
+#                    of length two which correspond to the first label and the last label.
 #
 # == details
 # It can only draw axes on x-direction.
@@ -1235,7 +1249,7 @@ circos.axis = function(h = "top", major.at = NULL, labels = TRUE, major.tick = T
 	direction = c("outside", "inside"), minor.ticks = 4,
 	major.tick.percentage = 0.1, labels.away.percentage = major.tick.percentage/2, 
 	major.tick.length = convert_y(1, "mm", sector.index, track.index),
-	lwd = par("lwd"), col = par("col"), labels.col = par("col")) {
+	lwd = par("lwd"), col = par("col"), labels.col = par("col"), labels.pos.adjust = TRUE) {
 	
     if(!is.null(labels.direction)) {
         labels.facing = switch(labels.direction[1], 
@@ -1337,7 +1351,7 @@ circos.axis = function(h = "top", major.at = NULL, labels = TRUE, major.tick = T
 		}
 	}
 
-	add_axis_labels = function(x, y, labels, h, col, ...) {
+	add_axis_labels = function(x, y, labels, h, col, labels.pos.adjust, ...) {
 		arg_list = list(...)
 
 		n = length(x)
@@ -1368,6 +1382,14 @@ circos.axis = function(h = "top", major.at = NULL, labels = TRUE, major.tick = T
 			offset.last = last_label_width/2 - abs(x[n] - get.cell.meta.data("cell.xlim", sector.index, track.index)[2])
 		}
 
+		if(length(labels.pos.adjust) == 1) labels.pos.adjust = rep(labels.pos.adjust, 2)
+		if(!labels.pos.adjust[1]) {
+			offset.first = 0
+		}
+		if(!labels.pos.adjust[2]) {
+			offset.last = 0
+		}
+
 		if(n == 1) {
 			circos.text(x + ifelse(offset.first > 0, offset.first, 0), y, labels, col = col, ...)
 		} else if(n == 2) {
@@ -1386,14 +1408,16 @@ circos.axis = function(h = "top", major.at = NULL, labels = TRUE, major.tick = T
 		add_axis_labels(major.at[l], rep(h, sum(l)) + (major.tick.length + convert_y(0.5, "mm", sector.index, track.index))*ifelse(direction == "outside", 1, -1),
 		           labels = major.at[l], adj = labels.adj,
 		           font = labels.font, cex = labels.cex, sector.index = sector.index, track.index = track.index,
-		           facing = labels.facing, niceFacing = labels.niceFacing, h = h, col = labels.col)
+		           facing = labels.facing, niceFacing = labels.niceFacing, h = h, col = labels.col,
+		           labels.pos.adjust = labels.pos.adjust)
 	} else if(is.logical(labels) && !labels) {
                       
     } else if(length(labels)) {
 		add_axis_labels(major.at[l], rep(h, sum(l)) + (major.tick.length + convert_y(0.5, "mm", sector.index, track.index))*ifelse(direction == "outside", 1, -1),
 		            labels = labels[l], adj = labels.adj,
 		            font = labels.font, cex = labels.cex, sector.index = sector.index, track.index = track.index,
-			        facing = labels.facing, niceFacing = labels.niceFacing, h = h, col = labels.col)
+			        facing = labels.facing, niceFacing = labels.niceFacing, h = h, col = labels.col,
+			        labels.pos.adjust = labels.pos.adjust)
 	}				
 		
 	#}
