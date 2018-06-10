@@ -7,7 +7,7 @@ Parameters for the circular layout
 Parameters for the circular layout
 }
 \usage{
-circos.par(..., RESET = FALSE, READ.ONLY = NULL, LOCAL = FALSE)
+circos.par(..., RESET = FALSE, READ.ONLY = NULL, LOCAL = FALSE, ADD = FALSE)
 }
 \arguments{
 
@@ -15,7 +15,7 @@ circos.par(..., RESET = FALSE, READ.ONLY = NULL, LOCAL = FALSE)
   \item{RESET}{reset to default values}
   \item{READ.ONLY}{please ignore}
   \item{LOCAL}{please ignore}
-
+  \item{ADD}{please ignore}
 }
 \details{
 Global parameters for the circular layout. Currently supported parameters are:

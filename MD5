@@ -1,12 +1,13 @@
-423f1cffea907581f6b57a991d15fc73 *DESCRIPTION
+5790c14d7991e21b61345b4d17f53648 *DESCRIPTION
+7cb8eaab2011128afac9d2c9bdfd27e4 *LICENSE
 d1ed5a7abb34dcd49b5b342e1a27e26d *NAMESPACE
-ab33db8f60e3ef054b8dd709ddebe85c *NEWS
+0ce8e6999d092a0bff50d19475d5cd9d *NEWS
 0dfd21c87143ce01268d501fe3dfe6fb *R/chordDiagram.R
 246c00f72c11b9b3c934177902a65d01 *R/circos.arrow.R
 c138f6d050d581ecc6406738030ca25e *R/circos.nested.R
-683810027dbb981fb132300577f2277a *R/genomic.R
+caa919c5969a0a88f11fd280c579d035 *R/genomic.R
 83987d0bf06b0e6bd291aeaaa53e40f5 *R/genomic_utils.R
-ada3eebc8536bc9ff1d73780fec6aa77 *R/global.R
+f1fa06f65bb023b90abc409bbfa1117b *R/global.R
 b625dd872131d9007b3e21b16ca56b3f *R/link.R
 c11ddbfd721db0be78507da1c6c98d88 *R/overview.R
 0feb5a08eb2e95e5cf9b71b10d3ae15d *R/plot.R
@@ -15,7 +16,7 @@ ae9bb8475a9fcf2b74346868a217d793 *R/raster.R
 2e18d8e792e94a72a49cfaa3f1631512 *R/regions.R
 9fd5a8d2e19f0ab7b7e3204666cdca17 *R/utils.R
 67bb3c216ad48856be907f60b291adaa *R/zzz.R
-44049523be0e879d5920ac138428bf6c *build/vignette.rds
+f636a7b0472ff8e352376fee1000d531 *build/vignette.rds
 92eb7caa3ac39cb8e22d200aadaefb60 *demo/00Index
 169088b2aa652b202fc36a2fbf06c7e3 *demo/foo.R
 2dd33425365e389a57496f49869f3c15 *inst/CITATION
@@ -67,7 +68,7 @@ e646f29647c6733958f3d2350f4cc232 *man/circos.info.rd
 688af54c9f53448abd051128a31bf2ad *man/circos.lines.rd
 3ecb836f23baf2b42532623a88435826 *man/circos.link.rd
 aa4145f59ff26c04407278f00ab24e89 *man/circos.nested.rd
-98b7a2760f51fc31a79b1f677ca917b0 *man/circos.par.rd
+ba9bc2b61643427fb778d37fccb94038 *man/circos.par.rd
 cd3c5e77cd74bbf34aa9e02bbef23bb1 *man/circos.points.rd
 8c7bf536b5da018c9e48d45c3d861bea *man/circos.polygon.rd
 76355e1d0ef2311e34855ee371061c2d *man/circos.raster.rd
@@ -95,7 +96,7 @@ c8efb07d80d630d7b10340d31a4a2667 *man/cytoband.col.rd
 36787ec43e27672b3c6a3c0040b38bad *man/draw.sector.rd
 72c91ca3dff3d8252ac0d12b8c656d52 *man/fontsize.rd
 75f3039db63a57dca3a119facf001bc3 *man/generateRandomBed.rd
-be3da7c02f6af61828be7855b17deb44 *man/genomicDensity.rd
+21e8608d31dc4bfa3f5466f0d240273c *man/genomicDensity.rd
 856fda0c0c71b4448a0bce5618aae8d8 *man/get.all.sector.index.rd
 f69c22e0a597fdd1309b23565d1706c6 *man/get.all.track.index.rd
 7c311c02282907cbd105d7bdb784ba6f *man/get.cell.meta.data.rd

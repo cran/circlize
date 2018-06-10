@@ -1271,13 +1271,7 @@ circos.genomicDensity = function(data, ylim.force = FALSE, window.size = NULL, o
 	
 	df = vector("list", length = length(data))
 	for(i in seq_along(data)) {
-		all.chr = unique(data[[i]][[1]])
-		for(chr in all.chr) {
-			region = data[[i]][data[[i]][[1]] == chr, 2:3, drop = FALSE]
-			dn = genomicDensity(region, window.size = window.size, overlap = overlap)
-			dn = cbind(rep(chr, nrow(dn)), dn)
-			df[[i]] = rbind(df[[i]], dn)
-		}
+		df[[i]] = genomicDensity(data[[i]], window.size = window.size, overlap = overlap)
 	}
 	if(ylim.force) {
 		ymax = 1
@@ -1308,6 +1302,7 @@ circos.genomicDensity = function(data, ylim.force = FALSE, window.size = NULL, o
 # -window.size Window size to calculate genomic density
 # -n.window number of windows, if it is specified, ``window.size`` is ignored
 # -overlap Whether two neighbouring windows have half overlap
+# -chr.len the chromosome length. The value should be named vector
 #
 # == details
 # It calculate the percent of each genomic windows that is covered by the input regions.
@@ -1316,13 +1311,33 @@ circos.genomicDensity = function(data, ylim.force = FALSE, window.size = NULL, o
 # If the input is a two-column data frame, the function returns a data frame with three columns: 
 # start position, end position and percent of overlapping. And if the input is a bed-format
 # data frame, there will be an additionally chromosome name column.
-genomicDensity = function(region, window.size = 1e7, n.window = NULL, overlap = TRUE) {
+genomicDensity = function(region, window.size = 1e7, n.window = NULL, overlap = TRUE, chr.len = NULL) {
 	
 	if(is.character(region[, 1]) || is.factor(region[, 1])) {
 		region[, 1] = as.vector(region[, 1])
-		return(do.call("rbind", lapply(unique(region[, 1]), function(chr) {
+		all_chr = unique(region[, 1])
+		if(!is.null(chr.len)) {
+			if(length(all_chr) == 1 & length(chr.len) == 1) {
+				names(chr.len) = all_chr[1]
+			}
+		}
+		return(do.call("rbind", lapply(all_chr, function(chr) {
 			l = region[,1] == chr
-			df = genomicDensity(region[l, 2:3, drop = FALSE], window.size = window.size, overlap = overlap)
+			if(is.null(chr.len)) {
+				max_rg = NULL
+				if(is.circos.initialized()) {
+					if(chr %in% get.all.sector.index()) {
+						max_rg = get.sector.data(sector.index = chr)["max.data"]
+					} 
+				}
+			} else {
+				if(chr %in% names(chr.len)) {
+					max_rg = chr.len[chr]
+				} else {
+					max_rg = NULL
+				}
+			}
+			df = genomicDensity(region[l, 2:3, drop = FALSE], window.size = window.size, overlap = overlap, chr.len = max_rg)
 			cbind(chr = rep(chr, nrow(df)), df)
 		})))
 	}
@@ -1345,7 +1360,11 @@ genomicDensity = function(region, window.size = 1e7, n.window = NULL, overlap = 
 	region = reduce_region(region)
 
 	# make a segmentation
-	max_pos = max(region[[2]])
+	if(!is.null(chr.len)) {
+		max_pos = max(c(chr.len, max(region[[2]])))
+	} else {
+		max_pos = max(region[[2]])
+	}
 	if(overlap) {
 		if(missing(n.window)) {
 			b = seq(1, max_pos, by = window.size/2)
