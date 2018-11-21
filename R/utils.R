@@ -323,12 +323,12 @@ colorRamp2 = function(breaks, colors, transparency = 0, space = "LAB") {
   col2 = coords(as(sRGB(col2[1], col2[2], col2[3]), space))
 
   res_col = matrix(ncol = 3, nrow = length(x))
-  for(i in seq_along(x)) {
-    xx = (x[i] - break2)*(col2 - col1) / (break2 - break1) + col2
-    res_col[i,] = xx
+  for(j in 1:3) {
+    xx = (x - break2)*(col2[j] - col1[j]) / (break2 - break1) + col2[j]
+    res_col[, j] = xx
   }
   
-  res_col = eval(parse(text = paste0(space, "(res_col)")))
+  res_col = get(space)(res_col)
   res_col = coords(as(res_col, "sRGB"))
   res_col[, 1] = .restrict_in(res_col[,1], 0, 1)
   res_col[, 2] = .restrict_in(res_col[,2], 0, 1)
@@ -620,7 +620,7 @@ uh = function(...) {
     convert_length(...)
 }
 
-convert_unit_in_data_coordinate = function(x, unit = c("mm", "cm", "inches"),
+convert_unit_in_data_coordinate = function(x, unit = c("mm", "cm", "inches", "canvas"),
     direction = c("x", "y"),
     sector.index = get.current.sector.index(),
     track.index = get.current.track.index(),
@@ -649,6 +649,8 @@ convert_unit_in_data_coordinate = function(x, unit = c("mm", "cm", "inches"),
         len = x * pt_per_inche1 * inche_per_mm
     } else if(unit == "cm") {
         len = x * pt_per_inche1 * inche_per_mm * 10
+    } else if(unit == "canvas") {
+        len = x
     }
 
     xlim = get.cell.meta.data("xlim", sector.index = sector.index, track.index = track.index)
@@ -790,6 +792,32 @@ convert_y = function(x, unit = c("mm", "cm", "inches"),
 # NULL
 uy = function(...) {
     convert_y(...)
+}
+
+convert_unit_in_canvas_coordinate = function(x, unit = c("mm", "cm", "inches")) {
+
+    pin = par("pin")
+    usr = par("usr")
+
+    unit = match.arg(unit)
+
+    pt_per_inche1 = (usr[2] - usr[1])/pin[1]
+    pt_per_inche2 = (usr[4] - usr[3])/pin[2]
+
+    if(abs(pt_per_inche1 - pt_per_inche2) > 1e-3) {
+        warning("`convert_unit_in_data_coordinate()` only works when aspect of the coordinate is 1.")
+    }
+
+    inche_per_mm = 0.0393700787401575
+    # length in the data coordinate
+    if(unit == "inches") {
+        len = x * pt_per_inche1
+    } else if(unit == "mm") {
+        len = x * pt_per_inche1 * inche_per_mm
+    } else if(unit == "cm") {
+        len = x * pt_per_inche1 * inche_per_mm * 10
+    }
+    return(len)
 }
 
 stop_wrap = function(...) {

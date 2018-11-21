@@ -1,3 +1,16 @@
+Changes in version 0.4.5
+------------------------------------------------------------------------
+* vertical lines added for y-axis.
+* add `axis.labels.cex` and `labels.cex` in `circos.genomicInitialize()`.
+* remove `lwd` in `circos.genomicRect()` because `lwd` is not allowed to be vector.
+* fixed a bug when self.link = 1 in chordDiagram()
+* add `scale` in chordDiagram()
+* `circos.initialize()`: convert xlim and x to numeric
+* `colorRamp2()` is faster now.
+* add `circos.genomicAxis()`.
+* add `calc_gap()`.
+* `chordDiagram()`: consider tibble format as input.
+
 Changes in version 0.4.4
 -------------------------------------------------------------------------
 

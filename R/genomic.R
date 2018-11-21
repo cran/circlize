@@ -18,7 +18,7 @@
 #               If it is set to ``NULL``, the function just initialize the plot but draw nothing.
 # -track.height Height of the track which contains "axis" and "labels".
 # -ideogram.height Height of the ideogram track
-# -...    Pass to `circos.initialize`
+# -...    Pass to `circos.genomicInitialize`.
 #
 # == details
 # The function will initialize the circular plot in which each sector corresponds to a chromosome. You can control the order of 
@@ -32,7 +32,7 @@ circos.initializeWithIdeogram = function(cytoband = system.file(package = "circl
 	"extdata", "cytoBand.txt"), species = NULL, sort.chr = TRUE,
 	chromosome.index = NULL, major.by = NULL,
 	plotType = c("ideogram", "axis", "labels"), 
-	track.height = convert_height(3, "mm"), ideogram.height = convert_height(2, "mm"), 
+	track.height = NULL, ideogram.height = convert_height(2, "mm"), 
 	...) {
 	
 	# proper order will be returned depending on cytoband and sort.chr
@@ -134,6 +134,8 @@ circos.genomicIdeogram = function(cytoband = system.file(package = "circlize",
 # -plotType     If it is not ``NULL``, there will create a new track containing axis and names for sectors.
 #               This argument controls which part should be drawn, ``axis`` for genomic axis and ``labels`` for chromosome names
 # -tickLabelsStartFromZero Whether axis tick labels start from 0? This will only affect the axis labels while not affect x-values in cells.
+# -axis.labels.cex the font size for the axis tick labels.
+# -labels.cex   the font size for the labels.
 # -track.height If ``PlotType`` is not ``NULL``, height of the annotation track.
 # -...          Pass to `circos.initialize`
 #
@@ -146,8 +148,9 @@ circos.genomicIdeogram = function(cytoband = system.file(package = "circlize",
 #
 # For more details on initializing genomic plot, please refer to the vignettes.
 circos.genomicInitialize = function(data, sector.names = NULL, major.by = NULL,
-	plotType = c("axis", "labels"), tickLabelsStartFromZero = TRUE, 
-	track.height = convert_height(3, "mm"), ...) {
+	plotType = c("axis", "labels"), tickLabelsStartFromZero = TRUE,
+	axis.labels.cex = 0.4*par("cex"), labels.cex = 0.8*par("cex"), 
+	track.height = NULL, ...) {
 	
 	if(is.factor(data[[1]])) {
 		fa = levels(data[[1]])
@@ -173,7 +176,20 @@ circos.genomicInitialize = function(data, sector.names = NULL, major.by = NULL,
 	ow = circos.par("points.overflow.warning")
 	circos.par(cell.padding = c(0, 0, 0, 0), points.overflow.warning = FALSE)
 	circos.initialize(factor(fa, levels = fa), xlim = cbind(x1, x2), ...)
-	
+
+	if(is.null(track.height)) {
+		if(all(c("axis", "labels") %in% plotType)) {
+			track.height = convert_unit_in_canvas_coordinate(1.5, "mm") + strheight("0", cex = axis.labels.cex) + 
+				convert_unit_in_canvas_coordinate(0.5, "mm") + strheight("chr", cex = labels.cex)
+		} else if("labels" %in% plotType) {
+			track.height = strheight("chr", cex = labels.cex)
+		} else if("axis" %in% plotType) {
+			track.height = convert_unit_in_canvas_coordinate(1.5, "mm") + strheight("0", cex = axis.labels.cex)
+		} else {
+			track.height = convert_height(3, "mm")
+		}
+	}
+
 	# axis and chromosome names
 	if(any(plotType %in% c("axis", "labels"))) {
 		circos.genomicTrackPlotRegion(data, ylim = c(0, 1), bg.border = NA, track.height = track.height,
@@ -181,56 +197,86 @@ circos.genomicInitialize = function(data, sector.names = NULL, major.by = NULL,
 				sector.index = get.cell.meta.data("sector.index")
 				xlim = get.cell.meta.data("xlim")
 				
-				if(tickLabelsStartFromZero) {
-					offset = xlim[1]
-					if(is.null(major.by)) {
-						xlim = get.cell.meta.data("xlim")
-						major.by = .default.major.by()
-					}
-					major.at = seq(xlim[1], xlim[2], by = major.by)
-					major.at = c(major.at, major.at[length(major.at)] + major.by)
-					
-					if(major.by > 1e6) {
-						major.tick.labels = paste((major.at-offset)/1000000, "MB", sep = "")
-					} else if(major.by > 1e3) {
-						major.tick.labels = paste((major.at-offset)/1000, "KB", sep = "")
-					} else {
-						major.tick.labels = paste((major.at-offset), "bp", sep = "")
-					}
-					
-				} else {
-					if(is.null(major.by)) {
-						xlim = get.cell.meta.data("xlim")
-						major.by = .default.major.by()
-					}
-					major.at = seq(floor(xlim[1]/major.by)*major.by, xlim[2], by = major.by)
-					major.at = c(major.at, major.at[length(major.at)] + major.by)
-					
-					if(major.by > 1e6) {
-						major.tick.labels = paste(major.at/1000000, "MB", sep = "")
-					} else if(major.by > 1e3) {
-						major.tick.labels = paste(major.at/1000, "KB", sep = "")
-					} else {
-						major.tick.labels = paste(major.at, "bp", sep = "")
-					}
-				}
-				
-			
 				if(all(c("axis", "labels") %in% plotType)) {
-					circos.axis(h = 0, major.at = major.at, labels = major.tick.labels, labels.cex = 0.4*par("cex"))
-					circos.text(mean(xlim), 1.3, labels = sector.names[sector.index], cex = par("cex"), adj = c(0.5, 0), niceFacing = TRUE)
+					circos.genomicAxis(h = "bottom", major.by = major.by, tickLabelsStartFromZero = tickLabelsStartFromZero, labels.cex = axis.labels.cex)
+					circos.text(mean(xlim), convert_y(1.5, "mm") + convert_y(strheight("chr", cex = axis.labels.cex), "canvas") + convert_y(0.5, "mm"), 
+						labels = sector.names[sector.index], cex = labels.cex, adj = c(0.5, 0), niceFacing = TRUE)
 				} else if("labels" %in% plotType) {
-					circos.text(mean(xlim), 0, labels = sector.names[sector.index], cex = par("cex"), adj = c(0.5, 0), niceFacing = TRUE)
+					circos.text(mean(xlim), 0, labels = sector.names[sector.index], cex = labels.cex, adj = c(0.5, 0), niceFacing = TRUE)
 				} else if("axis" %in% plotType) {
-					circos.axis(h = 0, major.at = major.at, labels = major.tick.labels, labels.cex = 0.4*par("cex"))
+					circos.genomicAxis(h = "bottom", major.by = major.by, tickLabelsStartFromZero = tickLabelsStartFromZero,labels.cex = axis.labels.cex)
 				}
  			}
 		)
 	}
 	
-	
 	circos.par("cell.padding" = op, "points.overflow.warning" = ow)
 	return(invisible(NULL))
+}
+
+# == title
+# Add genomic axes
+#
+# == param
+# -h Position of the axes. "top" or "bottom".
+# -major.by     Increment of major ticks. It is calculated automatically if the value is not set (about every 10 degrees there is a major tick).
+# -tickLabelsStartFromZero Whether axis tick labels start from 0? This will only affect the axis labels while not affect x-values in cells.
+# -labels.cex the font size for the axis tick labels.
+# -sector.index Index for the sector
+# -track.index  Index for the track
+# -... Other arguments pass to `circos.axis`.
+#
+# == details
+# It assigns proper tick labels under genomic coordinate.
+# 
+# == example
+# circos.initializeWithIdeogram(plotType = NULL)
+# circos.track(ylim = c(0, 1), panel.fun = function(x, y) circos.genomicAxis())
+# circos.clear()
+#
+circos.genomicAxis = function(h = "top", major.by = NULL, tickLabelsStartFromZero = TRUE,
+	labels.cex = 0.4*par("cex"), sector.index = get.cell.meta.data("sector.index"),
+	track.index = get.cell.meta.data("track.index"), ...) {
+
+	if(!h %in% c("top", "bottom")) {
+		stop("`h` can only be 'top' or 'bottom'.")
+	}
+
+	xlim = get.cell.meta.data("xlim", sector.index = sector.index, track.index = track.index)
+	
+	if(tickLabelsStartFromZero) {
+		offset = xlim[1]
+		if(is.null(major.by)) {
+			major.by = .default.major.by()
+		}
+		major.at = seq(xlim[1], xlim[2], by = major.by)
+		major.at = c(major.at, major.at[length(major.at)] + major.by)
+		
+		if(major.by > 1e6) {
+			major.tick.labels = paste((major.at-offset)/1000000, "MB", sep = "")
+		} else if(major.by > 1e3) {
+			major.tick.labels = paste((major.at-offset)/1000, "KB", sep = "")
+		} else {
+			major.tick.labels = paste((major.at-offset), "bp", sep = "")
+		}
+		
+	} else {
+		if(is.null(major.by)) {
+			major.by = .default.major.by()
+		}
+		major.at = seq(floor(xlim[1]/major.by)*major.by, xlim[2], by = major.by)
+		major.at = c(major.at, major.at[length(major.at)] + major.by)
+		
+		if(major.by > 1e6) {
+			major.tick.labels = paste(major.at/1000000, "MB", sep = "")
+		} else if(major.by > 1e3) {
+			major.tick.labels = paste(major.at/1000, "KB", sep = "")
+		} else {
+			major.tick.labels = paste(major.at, "bp", sep = "")
+		}
+	}
+	circos.axis(h = h, major.at = major.at, labels = major.tick.labels, labels.cex = labels.cex,
+		sector.index = sector.index, track.index = track.index, ...)				
 }
 
 # == title
@@ -777,7 +823,6 @@ circos.genomicLines = function(region, value, numeric.column = NULL,
 # -col The length of ``col`` can be either one or number of rows of ``region``. Pass to `circos.rect`
 # -border Settings are similar as ``col``. Pass to `circos.rect`
 # -lty Settings are similar as ``col``. Pass to `circos.rect`
-# -lwd Settings are similar as ``col``. Pass to `circos.rect`
 # -... Mysterious parameters
 #
 # == details
@@ -786,7 +831,7 @@ circos.genomicRect = function(region, value = NULL,
 	ytop = NULL, ybottom = NULL, ytop.column = NULL, ybottom.column = NULL,
 	sector.index = get.cell.meta.data("sector.index"),
     track.index = get.cell.meta.data("track.index"), posTransform = NULL, 
-	col = NA, border = "black", lty = par("lty"), lwd = par("lwd"), ...) {
+	col = NA, border = "black", lty = par("lty"), ...) {
 	
 	nr = nrow(region)
 	
@@ -856,7 +901,6 @@ circos.genomicRect = function(region, value = NULL,
 
 	col = .normalizeGraphicalParam(col, 1, nr, "col")
 	border = .normalizeGraphicalParam(border, 1, nr, "border")
-	lwd = .normalizeGraphicalParam(lwd, 1, nr, "lwd")
 	lty = .normalizeGraphicalParam(lty, 1, nr, "lty")
 	
 	# for(i in seq_len(nr)) {
@@ -866,7 +910,7 @@ circos.genomicRect = function(region, value = NULL,
 	# }
 	circos.rect(region[, 1], value[, ybottom.column], region[, 2], value[, ytop.column],
 		            sector.index = sector.index, track.index = track.index,
-					col = col, border = border, lwd = lwd, lty = lty)
+					col = col, border = border, lty = lty)
 
 }
 
@@ -1516,11 +1560,13 @@ normalizeToDataFrame = function(data, sort = FALSE) {
 # == param
 # -data A bed-file-like data frame or a list of data frames
 # -mode how to calculate the distance of two neighbouring regions, pass to `rainfallTransform`
-# -ylim ylim for rainfall plot track. It's value should be log10(inter-distance+1)
+# -ylim ylim for rainfall plot track. If ``normalize_to_width`` is ``FALSE``, the value should correspond to log10(dist+1),
+#       and if ``normalize_to_width`` is ``TRUE``, the value should correspond to log2(rel_dist).
 # -col  Color of points. It should be length of one. If ``data`` is a list, the length of ``col``
 #       can also be the length of the list.
 # -pch  Style of points
 # -cex  Size of points
+# -normalize_to_width If it is ``TRUE``, the value is the relative distance divided by the width of the region.
 # -... Pass to `circos.trackPlotRegion`
 #
 # == details
@@ -1531,8 +1577,8 @@ normalizeToDataFrame = function(data, sort = FALSE) {
 # the plot, it means there is a cluster of regions at that area.
 #
 # On the plot, y-axis are log10-transformed.
-circos.genomicRainfall = function(data, mode = "min", ylim = c(0, 9), col = "black", 
-	pch = par("pch"), cex = par("cex"), ...) {
+circos.genomicRainfall = function(data, mode = "min", ylim = NULL, col = "black", 
+	pch = par("pch"), cex = par("cex"), normalize_to_width = FALSE, ...) {
 	
 	data = normalizeToDataFrame(data)
 	
@@ -1549,11 +1595,23 @@ circos.genomicRainfall = function(data, mode = "min", ylim = c(0, 9), col = "bla
 	if(length(cex) == 1) {
 		cex = rep(cex, length(data))
 	}
+
+	if(is.null(ylim)) {
+		if(normalize_to_width) {
+			ylim = c(-10, 10)
+		} else {
+			ylim = c(0, 9)
+		}
+ 	}
 	
 	circos.genomicTrackPlotRegion(data, ylim = ylim, panel.fun = function(region, value, ...) {
-		df = rainfallTransform(region, mode = mode)
+		df = rainfallTransform(region, mode = mode, normalize_to_width = normalize_to_width)
 		i = getI(...)
-		circos.genomicPoints(df[1:2], log10(df[3]+1), col = col[i], cex = cex[i], pch = pch[i])
+		if(normalize_to_width) {
+			circos.genomicPoints(df[1:2], log10(df[3]), col = col[i], cex = cex[i], pch = pch[i])
+		} else {
+			circos.genomicPoints(df[1:2], log10(df[3]+1), col = col[i], cex = cex[i], pch = pch[i])
+		}
 	}, ...)
 	
 }
@@ -1568,13 +1626,15 @@ circos.genomicRainfall = function(data, mode = "min", ylim = c(0, 9), col = "bla
 # -mode How to calculate inter-distance. For a region, there is a distance to the 
 #       prevous region and also there is a distance to the next region. ``mode``
 #       controls how to merge these two distances into one value.
+# -normalize_to_width If it is ``TRUE``, the value is the relative distance divided by the width of the region.
 #
 # == values
 # If the input is a two-column data frame, the function returnes a data frame with three columns: start position, end position and distance.
 # And if the input is a bed-format data frame, there will be the chromosome column added.
 #
 # The row order of the returned data frame is as same as the input one.
-rainfallTransform = function(region, mode = c("min", "max", "mean", "left", "right")) {
+rainfallTransform = function(region, mode = c("min", "max", "mean", "left", "right"),
+	normalize_to_width = FALSE) {
 	
 	mode = match.arg(mode)[1]
 
@@ -1640,6 +1700,10 @@ rainfallTransform = function(region, mode = c("min", "max", "mean", "left", "rig
 
 	region = region_bk
 	region$dist[region_order] = dist
+
+	if(normalize_to_width) {
+		region$dist = region$dist/(region[, 3] - region[, 2])
+	}
 	
 	return(region)
 }
