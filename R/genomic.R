@@ -937,6 +937,7 @@ circos.genomicRect = function(region, value = NULL,
 # -font Pass to `circos.text`. Settings are similar as ``col``
 # -padding pass to ``posTransform`` if it is set as `posTransform.text`
 # -extend pass to ``posTransform`` if it is set as `posTransform.text`
+# -align_to pass to ``posTransform`` if it is set as `posTransform.text`
 # -... Mysterious parameters
 #
 # == details
@@ -946,7 +947,7 @@ circos.genomicText = function(region, value = NULL, y = NULL, labels = NULL, lab
 	track.index = get.cell.meta.data("track.index"), posTransform = NULL, 
 	direction = NULL, facing = "inside", niceFacing = FALSE,
 	adj = par("adj"), cex = 1, col = "black", font = par("font"), padding = 0,
-	extend = 0, ...) {
+	extend = 0, align_to = "region", ...) {
 	
 	if(!is.null(direction)) {
 		facing = direction
@@ -1021,11 +1022,10 @@ circos.genomicText = function(region, value = NULL, y = NULL, labels = NULL, lab
 			if(! facing %in% c("clockwise", "reverse.clockwise")) {
 				stop("Only support `facing` in c('clockwise', 'reverse.clockwise') if `posTransform` is `posTransform.text`.")
 			}
-			region = posTransform(region, value[[ numeric.column ]], value[[labels.column]], cex, font, padding = padding, extend = extend)
+			region = posTransform(region, value[[ numeric.column ]], value[[labels.column]], cex, font, padding = padding, extend = extend, align_to = align_to)
 		} else {
 			region = posTransform(region)
 		}
-		
 	}
 	
 	nc = length(numeric.column)
@@ -1759,9 +1759,11 @@ posTransform.text = function(region, y, labels, cex = 1, font = par("font"),
 
 	if(length(extend) == 1) extend = rep(extend, 2)
 	if(length(extend) > 2) extend = extend[1:2]
-	
-	od = order(region[[1]])
-	region = region[od, ]
+
+	od = order(region[, 1] + region[, 2])
+	od_back = NULL
+	od_back[od] = seq_along(od)
+	region = region[od, ,drop = FALSE]
 	y = y[od]
 	labels = labels[od]
 
@@ -1782,7 +1784,8 @@ posTransform.text = function(region, y, labels, cex = 1, font = par("font"),
 	l = x2 - x1 >= xlim[2] - xlim[1]; x1_new[l] = xlim[1]; x2_new[l] = xlim[2]
 	l = x1 < xlim[1]; x1_new[l] = xlim[1]; x2_new[l] = x2[l] + xlim[1] - x1[l]
 	l = x2 > xlim[2]; x1_new[l] = x1[l] - (x2[l] - xlim[2]); x2_new[l] = xlim[2]
-	return(smartAlign(x1_new, x2_new, xlim = xlim))
+	df = smartAlign(x1_new, x2_new, xlim = xlim)
+	return(df[od_back, ,drop = FALSE])
 }
 
 
@@ -1902,6 +1905,8 @@ circos.genomicHeatmap = function(bed, col, numeric.column = NULL,
 # -bed a data frame in bed format
 # -labels a vector of labels corresponding to rows in ``bed``
 # -labels.column if the label column is already in ``bed``, the index for this column in ``bed``
+# -facing facing of the labels. The value can only be 'clockwise' or 'reverse.clockwise'.
+# -niceFacing whether automatically adjust the facing of the labels.
 # -col color for the labels
 # -cex size of the labels
 # -font font of the labels
@@ -1932,6 +1937,7 @@ circos.genomicHeatmap = function(bed, col, numeric.column = NULL,
 #     line_col = as.numeric(factor(bed[[1]])))
 # }
 circos.genomicLabels = function(bed, labels = NULL, labels.column = NULL,
+	facing = "clockwise", niceFacing = TRUE,
 	col = par("col"), cex = 0.8, font = par("font"), padding = 0.4,
 	connection_height = convert_height(5, "mm"), 
 	line_col = par("col"), line_lwd = par("lwd"), line_lty = par("lty"),
@@ -1973,6 +1979,10 @@ circos.genomicLabels = function(bed, labels = NULL, labels.column = NULL,
 	}
 	bed2[, 1] = chr
 
+	if(!facing %in% c("clockwise", "reverse.clockwise")) {
+		stop("facing can only be 'clockwise' or `reverse.clockwise`.")
+	}
+
 	op = circos.par("points.overflow.warning")
 	circos.par("points.overflow.warning" = FALSE)
 	if(side == "inside") {
@@ -1986,8 +1996,8 @@ circos.genomicLabels = function(bed, labels = NULL, labels.column = NULL,
 		# add labels
 		circos.genomicTrackPlotRegion(bed2, ylim = c(0, 1), panel.fun = function(region, value, ...) {
 			l = bed2[[1]] == CELL_META$sector.index
-			circos.genomicText(region, value, y = 1, labels.column = 1, facing = "clockwise", adj = c(1, 0.5),
-				posTransform = posTransform.text, col = col[l], cex = cex[l], font = font[l], niceFacing = TRUE,
+			circos.genomicText(region, value, y = 1, labels.column = 1, facing = facing, adj = c((facing == "clockwise") + 0, 0.5),
+				posTransform = posTransform.text, col = col[l], cex = cex[l], font = font[l], niceFacing = niceFacing,
 				padding = padding, extend = extend)
 		}, track.height = labels_height, bg.border = NA, track.margin = c(track.margin[1], 0),
 		cell.padding = c(0, 0, 0, 0))
@@ -2005,8 +2015,8 @@ circos.genomicLabels = function(bed, labels = NULL, labels.column = NULL,
 	} else {
 		circos.genomicTrackPlotRegion(bed2, ylim = c(0, 1), panel.fun = function(region, value, ...) {
 			l = bed2[[1]] == CELL_META$sector.index
-			circos.genomicText(region, value, y = 0, labels.column = 1, facing = "clockwise", adj = c(0, 0.5),
-				posTransform = posTransform.text, col = col[l], cex = cex[l], font = font[l], niceFacing = TRUE,
+			circos.genomicText(region, value, y = 0, labels.column = 1, facing = facing, adj = c((facing == "reverse.clockwise") + 0, 0.5),
+				posTransform = posTransform.text, col = col[l], cex = cex[l], font = font[l], niceFacing = niceFacing,
 				padding = padding, extend = extend)
 		}, track.height = labels_height, bg.border = NA, track.margin = c(0, track.margin[2]),
 		cell.padding = c(0, 0, 0, 0))
@@ -2026,6 +2036,7 @@ circos.genomicLabels = function(bed, labels = NULL, labels.column = NULL,
 	}
 	circos.par("points.overflow.warning" = op)
 }
+
 # == title
 # Adjust positions of text
 #

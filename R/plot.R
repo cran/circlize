@@ -399,6 +399,11 @@ circos.points = function(x, y, sector.index = get.cell.meta.data("sector.index")
     if(!has.cell(sector.index, track.index)) {
         stop("'circos.points' can only be used after the plotting region has been created")
     }
+
+    len_x = length(x)
+    len_y = length(y)
+    if(len_x == 1) x = rep(x, len_y)
+    if(len_y == 1) y = rep(y, len_x)
 	
 	if(length(x) != length(y)) {
 		stop("Length of x and y differ.")
@@ -719,6 +724,16 @@ circos.rect = function(xleft, ybottom, xright, ytop,
         stop("'circos.rect' can only be used after the plotting region been created.")
     }
 
+    n1 = length(xleft)
+    n2 = length(ybottom)
+    n3 = length(xright)
+    n4 = length(ytop)
+    n = max(c(n1, n2, n3, n4))
+    if(n1 == 1) xleft = rep(xleft, n)
+    if(n2 == 1) ybottom = rep(ybottom, n)
+    if(n3 == 1) xright = rep(xright, n)
+    if(n4 == 1) ytop = rep(ytop, n)
+
     if(! (length(xleft) == length(ybottom) && length(ybottom) == length(xright) && length(xright) == length(ytop)) ) {
 		stop("xleft, ybottom, xright, ytop should have same length.")
 	}
@@ -807,6 +822,16 @@ circos.polygon = function(x, y, sector.index = get.cell.meta.data("sector.index"
 circos.segments = function(x0, y0, x1, y1, sector.index = get.cell.meta.data("sector.index"),
 	track.index = get.cell.meta.data("track.index"), straight = FALSE,
 	col = par("col"), lwd = par("lwd"), lty = par("lty"), ...) {
+
+	n1 = length(x0)
+    n2 = length(y0)
+    n3 = length(x1)
+    n4 = length(y1)
+    n = max(c(n1, n2, n3, n4))
+    if(n1 == 1) x0 = rep(x0, n)
+    if(n2 == 1) y0 = rep(y0, n)
+    if(n3 == 1) x1 = rep(x1, n)
+    if(n4 == 1) y1 = rep(y1, n)
 
 	if(! (length(x0) == length(y0) && length(y0) == length(x1) && length(x1) == length(y1)) ) {
 		stop("x0, y0, x1, y1 should have same length.")
@@ -905,6 +930,11 @@ circos.text = function(x, y, labels, sector.index = get.cell.meta.data("sector.i
 	"downward", "bending", "bending.inside", "bending.outside"), niceFacing = FALSE, 
 	adj = par("adj"), cex = 1, col = par("col"), font = par("font"), ...) {
     
+    len_x = length(x)
+    len_y = length(y)
+    if(len_x == 1) x = rep(x, len_y)
+    if(len_y == 1) y = rep(y, len_x)
+	
 	if(length(x) != length(y)) {
 		stop("Length of x and y differ.")
 	}
@@ -1511,8 +1541,9 @@ circos.yaxis = function(side = c("left", "right"), at = NULL, labels = TRUE, tic
 	}
 	
 	ylim2 = ylim
-	circos.lines(c(CELL_META$cell.xlim[1], CELL_META$cell.xlim[1]),
-		CELL_META$cell.ylim, sector.index = sector.index, track.index = track.index, lwd = lwd)
+	circos.lines(rep(get.cell.meta.data("cell.xlim", sector.index, track.index)[1], 2),
+		get.cell.meta.data("cell.ylim", sector.index, track.index), 
+		sector.index = sector.index, track.index = track.index, lwd = lwd)
 	
 	# ticks
 	yrange = get.cell.meta.data("yrange", sector.index, track.index)
