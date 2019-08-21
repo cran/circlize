@@ -30,7 +30,7 @@
 # The style of ideogram is almost fixed, but you can customize it with your self-sefined code. Refer to vignette for demonstration.
 circos.initializeWithIdeogram = function(cytoband = system.file(package = "circlize",
 	"extdata", "cytoBand.txt"), species = NULL, sort.chr = TRUE,
-	chromosome.index = NULL, major.by = NULL,
+	chromosome.index = usable_chromosomes(species), major.by = NULL,
 	plotType = c("ideogram", "axis", "labels"), 
 	track.height = NULL, ideogram.height = convert_height(2, "mm"), 
 	...) {
@@ -42,7 +42,7 @@ circos.initializeWithIdeogram = function(cytoband = system.file(package = "circl
 		if(class(e2) == "try-error") {
 			message(e)
 			message(e2)
-			stop("Cannot download either cytoband or chromInfo file from UCSC.")
+			stop_wrap("Cannot download either cytoband or chromInfo file from UCSC.")
 		} else {
 			message_wrap("Downloading cytoBand file from UCSC failed. Use chromInfo file instead. Note ideogram track will be removed from the plot.")
 			plotType = setdiff(plotType, "ideogram")
@@ -67,7 +67,7 @@ circos.initializeWithIdeogram = function(cytoband = system.file(package = "circl
 	}
 	df = cytoband$df
 	chromosome = cytoband$chromosome
-	
+
 	if(is.null(chromosome.index)) {
 		chromosome.index = chromosome
 	}
@@ -113,7 +113,10 @@ circos.genomicIdeogram = function(cytoband = system.file(package = "circlize",
 		stop(e)
 	}
 	df = cytoband$df
-	
+	if(all(cytoband.col(df[, 5]) == "#FFFFFF")) {
+		warning_wrap("Cannot map colors to cytobands. The ideogram won't be drawn.")
+		return(invisible(NULL))
+	}
 	circos.genomicTrackPlotRegion(df, ylim = c(0, 1), bg.border = NA, track.height = track.height,
 		panel.fun = function(region, value, ...) {
 			col = cytoband.col(value[[2]])
@@ -151,6 +154,8 @@ circos.genomicInitialize = function(data, sector.names = NULL, major.by = NULL,
 	plotType = c("axis", "labels"), tickLabelsStartFromZero = TRUE,
 	axis.labels.cex = 0.4*par("cex"), labels.cex = 0.8*par("cex"), 
 	track.height = NULL, ...) {
+
+	data = validate_data_frame(data)
 	
 	if(is.factor(data[[1]])) {
 		fa = levels(data[[1]])
@@ -160,7 +165,7 @@ circos.genomicInitialize = function(data, sector.names = NULL, major.by = NULL,
 	
 	if(!is.null(sector.names)) {
 		if(length(sector.names) != length(fa)) {
-			stop("length of `sector.names` and length of sectors differ.")
+			stop_wrap("length of `sector.names` and length of sectors differ.")
 		}
 	} else {
 		sector.names = fa
@@ -219,7 +224,9 @@ circos.genomicInitialize = function(data, sector.names = NULL, major.by = NULL,
 #
 # == param
 # -h Position of the axes. "top" or "bottom".
-# -major.by     Increment of major ticks. It is calculated automatically if the value is not set (about every 10 degrees there is a major tick).
+# -major.at Major breaks. If ``major.at`` is set, ``major.by`` is ignored.
+# -labels labels corresponding to ``major.at``. If ``labels`` is set, ``major.at`` must be set.
+# -major.by Increment of major ticks. It is calculated automatically if the value is not set (about every 10 degrees there is a major tick).
 # -tickLabelsStartFromZero Whether axis tick labels start from 0? This will only affect the axis labels while not affect x-values in cells.
 # -labels.cex the font size for the axis tick labels.
 # -sector.index Index for the sector
@@ -234,45 +241,68 @@ circos.genomicInitialize = function(data, sector.names = NULL, major.by = NULL,
 # circos.track(ylim = c(0, 1), panel.fun = function(x, y) circos.genomicAxis())
 # circos.clear()
 #
-circos.genomicAxis = function(h = "top", major.by = NULL, tickLabelsStartFromZero = TRUE,
+circos.genomicAxis = function(h = "top", major.at = NULL, labels = NULL,
+	major.by = NULL, tickLabelsStartFromZero = TRUE,
 	labels.cex = 0.4*par("cex"), sector.index = get.cell.meta.data("sector.index"),
 	track.index = get.cell.meta.data("track.index"), ...) {
 
 	if(!h %in% c("top", "bottom")) {
-		stop("`h` can only be 'top' or 'bottom'.")
+		stop_wrap("`h` can only be 'top' or 'bottom'.")
 	}
 
 	xlim = get.cell.meta.data("xlim", sector.index = sector.index, track.index = track.index)
-	
+
+	if(!is.null(major.at) && !is.null(labels)) {
+		if(length(major.at) != length(labels)) {
+			stop_wrap("Length of major.at and labels should be the same.")
+		}
+	}
+	if(is.null(major.at) && !is.null(labels)) {
+		stop_wrap("If labels is set, major.at should also be set.")
+	}
+
 	if(tickLabelsStartFromZero) {
 		offset = xlim[1]
 		if(is.null(major.by)) {
 			major.by = .default.major.by()
 		}
-		major.at = seq(xlim[1], xlim[2], by = major.by)
-		major.at = c(major.at, major.at[length(major.at)] + major.by)
+
+		if(is.null(major.at)) {
+			major.at = seq(xlim[1], xlim[2], by = major.by)
+			major.at = c(major.at, major.at[length(major.at)] + major.by)
+		}
 		
-		if(major.by > 1e6) {
-			major.tick.labels = paste((major.at-offset)/1000000, "MB", sep = "")
-		} else if(major.by > 1e3) {
-			major.tick.labels = paste((major.at-offset)/1000, "KB", sep = "")
+		if(is.null(labels)) {
+			if(major.by > 1e6) {
+				major.tick.labels = paste((major.at-offset)/1000000, "MB", sep = "")
+			} else if(major.by > 1e3) {
+				major.tick.labels = paste((major.at-offset)/1000, "KB", sep = "")
+			} else {
+				major.tick.labels = paste((major.at-offset), "bp", sep = "")
+			}
 		} else {
-			major.tick.labels = paste((major.at-offset), "bp", sep = "")
+			major.tick.labels = labels
 		}
 		
 	} else {
 		if(is.null(major.by)) {
 			major.by = .default.major.by()
 		}
-		major.at = seq(floor(xlim[1]/major.by)*major.by, xlim[2], by = major.by)
-		major.at = c(major.at, major.at[length(major.at)] + major.by)
-		
-		if(major.by > 1e6) {
-			major.tick.labels = paste(major.at/1000000, "MB", sep = "")
-		} else if(major.by > 1e3) {
-			major.tick.labels = paste(major.at/1000, "KB", sep = "")
+		if(is.null(major.at)) {
+			major.at = seq(floor(xlim[1]/major.by)*major.by, xlim[2], by = major.by)
+			major.at = c(major.at, major.at[length(major.at)] + major.by)
+		}
+
+		if(is.null(labels)) {
+			if(major.by > 1e6) {
+				major.tick.labels = paste(major.at/1000000, "MB", sep = "")
+			} else if(major.by > 1e3) {
+				major.tick.labels = paste(major.at/1000, "KB", sep = "")
+			} else {
+				major.tick.labels = paste(major.at, "bp", sep = "")
+			}
 		} else {
-			major.tick.labels = paste(major.at, "bp", sep = "")
+			major.tick.labels = labels
 		}
 	}
 	circos.axis(h = h, major.at = major.at, labels = major.tick.labels, labels.cex = labels.cex,
@@ -377,7 +407,7 @@ circos.genomicTrackPlotRegion = function(data = NULL, ylim = NULL, stack = FALSE
 			}
 			for(i in seq_along(data)) {
 				if(!is.numeric(data[[i]][-(1:3)][numeric.column[i]])) {
-					stop("Some of your `numeric.column` are not numeric.")
+					stop_wrap("Some of your `numeric.column` are not numeric.")
 				}
 			}
 		} else {
@@ -397,7 +427,7 @@ circos.genomicTrackPlotRegion = function(data = NULL, ylim = NULL, stack = FALSE
 			numeric.column = which(as.logical(sapply(data[-(1:3)], is.numeric)))
 		} else {
 			if(!all(sapply(data[-(1:3)][numeric.column], is.numeric))) {
-				stop("Some of your `numeric.column` are not numeric.")
+				stop_wrap("Some of your `numeric.column` are not numeric.")
 			}
 		}
 	}
@@ -557,7 +587,7 @@ circos.genomicTrack = function(...) {
 getI = function(...) {
 	args = list(...)
 	if(is.null(args$.param)) {
-		stop("Maybe you should call like `getI(...)`")
+		stop_wrap("Maybe you should call like `getI(...)`")
 	}
 	.param = args$.param
 	return(.param$i)
@@ -591,6 +621,9 @@ circos.genomicPoints = function(region, value, numeric.column = NULL,
 	pch = par("pch"), col = par("col"), cex = par("cex"), bg = par("bg"), ...) {
 	
 	nr = nrow(region)
+	if(ncol(region) > 2 && inherits(region[, 1], c("character", "factor"))) {
+		region = region[, -1, drop = FALSE]
+	}
 	
 	if(is.atomic(value) && length(value) == 1) {
 		value = data.frame(value = rep(value, nr))
@@ -598,7 +631,7 @@ circos.genomicPoints = function(region, value, numeric.column = NULL,
 	if(is.atomic(value) && length(value) == nr) {
 		value = data.frame(value = value)
 	}
-	if(!is.data.frame(value)) stop("`value` should be a data frame.")
+	if(!is.data.frame(value)) stop_wrap("`value` should be a data frame.")
 	
 	args = list(...)
 	if(!is.null(args$.param)) {
@@ -632,7 +665,7 @@ circos.genomicPoints = function(region, value, numeric.column = NULL,
 	if(is.null(numeric.column)) {
 		numeric.column = which(as.logical(sapply(value, is.numeric)))
 		if(length(numeric.column) == 0) {
-			stop("Cannot find numeric column.")
+			stop_wrap("Cannot find numeric column.")
 		}
 	}
 	
@@ -695,16 +728,20 @@ circos.genomicLines = function(region, value, numeric.column = NULL,
 	
 	if(!is.null(area.baseline)) {
 		baseline = area.baseline
-		warning("`area.baseline` is deprecated, please use `baseline` instead.")
+		warning_wrap("`area.baseline` is deprecated, please use `baseline` instead.")
 	}
 	nr = nrow(region)
+	if(ncol(region) > 2 && inherits(region[, 1], c("character", "factor"))) {
+		region = region[, -1, drop = FALSE]
+	}
+
 	if(is.atomic(value) && length(value) == 1) {
 		value = data.frame(value = rep(value, nr))
 	}
 	if(is.atomic(value) && length(value) == nr) {
 		value = data.frame(value = value)
 	}
-	if(!is.data.frame(value)) stop("`value` should be a data frame.")
+	if(!is.data.frame(value)) stop_wrap("`value` should be a data frame.")
 	
 	args = list(...)
 	if(!is.null(args$.param)) {
@@ -736,7 +773,7 @@ circos.genomicLines = function(region, value, numeric.column = NULL,
 	if(is.null(numeric.column)) {
 		numeric.column = which(as.logical(sapply(value, is.numeric)))
 		if(length(numeric.column) == 0) {
-			stop("Cannot find numeric column.")
+			stop_wrap("Cannot find numeric column.")
 		}
 	}
 
@@ -833,6 +870,9 @@ circos.genomicRect = function(region, value = NULL,
     track.index = get.cell.meta.data("track.index"), posTransform = NULL, 
 	col = NA, border = "black", lty = par("lty"), ...) {
 	
+	if(ncol(region) > 2 && inherits(region[, 1], c("character", "factor"))) {
+		region = region[, -1, drop = FALSE]
+	}
 	nr = nrow(region)
 	
 	args = list(...)
@@ -872,7 +912,7 @@ circos.genomicRect = function(region, value = NULL,
 		ybottom.column = ncol(value)
 	}
 	if(is.matrix(value)) value = as.data.frame(value)
-	if(!is.data.frame(value)) stop("`value` should be a data frame.")
+	if(!is.data.frame(value)) stop_wrap("`value` should be a data frame.")
 	
 	ylim = get.cell.meta.data("ylim", sector.index = sector.index, track.index = track.index)
 	if(is.null(ybottom.column) && is.null(ytop.column)) {
@@ -893,10 +933,10 @@ circos.genomicRect = function(region, value = NULL,
 	}
 	
 	if(length(ytop.column) > 1) {
-		stop("Only one ytop columns is allowed.")
+		stop_wrap("Only one ytop columns is allowed.")
 	}
 	if(length(ybottom.column) > 1) {
-		stop("Only one ybottom columns is allowed.")
+		stop_wrap("Only one ybottom columns is allowed.")
 	}
 
 	col = .normalizeGraphicalParam(col, 1, nr, "col")
@@ -951,9 +991,12 @@ circos.genomicText = function(region, value = NULL, y = NULL, labels = NULL, lab
 	
 	if(!is.null(direction)) {
 		facing = direction
-		warning("`direction` is deprecated, please use `facing` instead.")
+		warning_wrap("`direction` is deprecated, please use `facing` instead.")
 	}
 	
+	if(ncol(region) > 2 && inherits(region[, 1], c("character", "factor"))) {
+		region = region[, -1, drop = FALSE]
+	}
 	nr = nrow(region)
 	
 	if(is.vector(value) && !is.list(value) && length(value) == 1) {
@@ -986,10 +1029,10 @@ circos.genomicText = function(region, value = NULL, y = NULL, labels = NULL, lab
 		numeric.column = ncol(value)
 	}
 	if(is.matrix(value)) value = as.data.frame(value)
-	if(!is.data.frame(value)) stop("`value` should be a data frame.")
+	if(!is.data.frame(value)) stop_wrap("`value` should be a data frame.")
 
 	if(is.null(labels) && is.null(labels.column)) {
-		stop("You should either specify `labels` or `labels.column`.")
+		stop_wrap("You should either specify `labels` or `labels.column`.")
 	}
 	
 	if(!is.null(labels)) {
@@ -1006,13 +1049,13 @@ circos.genomicText = function(region, value = NULL, y = NULL, labels = NULL, lab
 	if(is.null(numeric.column)) {
 		numeric.column = which(as.logical(sapply(value, is.numeric)))
 		if(length(numeric.column) == 0) {
-			stop("Cannot find numeric column.")
+			stop_wrap("Cannot find numeric column.")
 		}
 		numeric.column = numeric.column[1]
 	}
 	
 	if(length(numeric.column) > 1) {
-		stop("You can only have one numeric column.")
+		stop_wrap("You can only have one numeric column.")
 	}
 	
 	if(!is.null(posTransform)) {
@@ -1020,7 +1063,7 @@ circos.genomicText = function(region, value = NULL, y = NULL, labels = NULL, lab
 		# check settings when it is text-specific transformation
 		if(identical(posTransform, posTransform.text)) {
 			if(! facing %in% c("clockwise", "reverse.clockwise")) {
-				stop("Only support `facing` in c('clockwise', 'reverse.clockwise') if `posTransform` is `posTransform.text`.")
+				stop_wrap("Only support `facing` in c('clockwise', 'reverse.clockwise') if `posTransform` is `posTransform.text`.")
 			}
 			region = posTransform(region, value[[ numeric.column ]], value[[labels.column]], cex, font, padding = padding, extend = extend, align_to = align_to)
 		} else {
@@ -1064,19 +1107,22 @@ circos.genomicLink = function(region1, region2,
 	rou = get_most_inside_radius(), rou1 = rou, rou2 = rou,
     col = "black", lwd = par("lwd"), lty = par("lty"), border = col, ...) {
 	
+	region1 = validate_data_frame(region1)
+	region2 = validate_data_frame(region2)
+
 	region1 = normalizeToDataFrame(region1, sort = FALSE)
 	region2 = normalizeToDataFrame(region2, sort = FALSE)
 	
 	if(is.dataFrameList(region1)) {
-		stop("`region1` can not be a region list.")
+		stop_wrap("`region1` can not be a region list.")
 	}
 	
 	if(is.dataFrameList(region1)) {
-		stop("`region1` can not be a region list.")
+		stop_wrap("`region1` can not be a region list.")
 	}
 	
 	if(nrow(region1) != nrow(region2)) {
-		stop("nrow of `region1` and `region2` differ.")
+		stop_wrap("nrow of `region1` and `region2` differ.")
 	}
 	
 	nr = nrow(region1)
@@ -1137,10 +1183,11 @@ circos.genomicPosTransformLines = function(data, track.height = 0.1, posTransfor
 	
 	horizontalLine = match.arg(horizontalLine)[1]
 
+	data = validate_data_frame(data)
 	data = normalizeToDataFrame(data)
 	
 	if(is.dataFrameList(data)) {
-		stop("`data` can not be list of regions.")
+		stop_wrap("`data` can not be list of regions.")
 	}
 	
 	nr = nrow(data)
@@ -1276,7 +1323,7 @@ circos.genomicDensity = function(data, ylim.force = FALSE, window.size = NULL, o
 	
 	if(!is.null(area.baseline)) {
 		baseline = area.baseline
-		warning("`area.baseline` is deprecated, please use `baseline` instead.")
+		warning_wrap("`area.baseline` is deprecated, please use `baseline` instead.")
 	}
 	
 	data = normalizeToDataFrame(data)
@@ -1357,6 +1404,8 @@ circos.genomicDensity = function(data, ylim.force = FALSE, window.size = NULL, o
 # data frame, there will be an additionally chromosome name column.
 genomicDensity = function(region, window.size = 1e7, n.window = NULL, overlap = TRUE, chr.len = NULL) {
 	
+	region = validate_data_frame(region)
+
 	if(is.character(region[, 1]) || is.factor(region[, 1])) {
 		region[, 1] = as.vector(region[, 1])
 		all_chr = unique(region[, 1])
@@ -1509,7 +1558,7 @@ normalizeToDataFrame = function(data, sort = FALSE) {
 
 	if(is.data.frame(data)) {
 		if(ncol(data) < 3) {
-			stop("Your data frame is less than 3 column!.")
+			stop_wrap("Your data frame is less than 3 column!.")
 		}
 		data = data[data[[1]] %in% all.chr, , drop = FALSE]
 		if(sort) {
@@ -1519,7 +1568,7 @@ normalizeToDataFrame = function(data, sort = FALSE) {
 	} else if(is.list(data) && all(sapply(data, is.data.frame))) {
 		df = lapply(data, function(gr) {
 			if(ncol(gr) < 3) {
-				stop("Your data frame is less than 3 column!.")
+				stop_wrap("Your data frame is less than 3 column!.")
 			}
 			gr = gr[gr[[1]] %in% all.chr, , drop = FALSE]
 			if(sort) {
@@ -1532,7 +1581,7 @@ normalizeToDataFrame = function(data, sort = FALSE) {
 		df = as.data.frame(df)
 		return(df)
 	} else {
-		stop("The format of `data` should only be a data frame or a list of data frames.")
+		stop_wrap("The format of `data` should only be a data frame or a list of data frames.")
 	}
 }
 
@@ -1638,6 +1687,7 @@ rainfallTransform = function(region, mode = c("min", "max", "mean", "left", "rig
 	
 	mode = match.arg(mode)[1]
 
+	region = validate_data_frame(region)
 	if(is.character(region[, 1]) || is.factor(region[, 1])) {
 		region[, 1] = as.vector(region[, 1])
 		region = region[1:3]
@@ -1833,11 +1883,13 @@ circos.genomicHeatmap = function(bed, col, numeric.column = NULL,
 	heatmap_height = 0.15, side = c("inside", "outside"), 
 	track.margin = circos.par("track.margin")) {
 
+	bed = validate_data_frame(bed)
+
 	mat = bed[, -(1:3), drop = FALSE]
 	if(is.null(numeric.column)) {
 		numeric.column = which(apply(mat, 2, "is.numeric"))
 		if(length(numeric.column) == 0) {
-			stop("You don't have numeric columns in `bed`.")
+			stop_wrap("You don't have numeric columns in `bed`.")
 		}
 	} else {
 		if(is.numeric(numeric.column)) {
@@ -1945,12 +1997,15 @@ circos.genomicLabels = function(bed, labels = NULL, labels.column = NULL,
 		max(strwidth(labels, cex = cex, font = font)))),
 	side = c("inside", "outside"), track.margin = circos.par("track.margin")) {
 
+	bed = validate_data_frame(bed)
 	if(is.null(labels)){
 		labels = bed[[labels.column]]
 	}
 	bed[[4]] = as.vector(labels)
 	bed[[1]] = factor(as.vector(bed[[1]]), levels = get.all.sector.index())
-	bed = bed[order(bed[[1]], bed[[2]]), , drop = FALSE]
+
+	od = order(bed[[1]], bed[[2]])
+	bed = bed[od, , drop = FALSE]
 	bed[[1]] = as.vector(bed[[1]])
 
 	# order `bed`
@@ -1958,6 +2013,16 @@ circos.genomicLabels = function(bed, labels = NULL, labels.column = NULL,
 	if(length(col) == 1) col = rep(col, nrow(bed))
 	if(length(cex) == 1) cex = rep(cex, nrow(bed))
 	if(length(font) == 1) font = rep(font, nrow(bed))
+	if(length(line_col) == 1) line_col = rep(line_col, nrow(bed))
+	if(length(line_lwd) == 1) line_lwd = rep(line_lwd, nrow(bed))
+	if(length(line_lty) == 1) line_lty = rep(line_lty, nrow(bed))
+
+	col = col[od]
+	cex = cex[od]
+	font = font[od]
+	line_col = line_col[od]
+	line_lwd = line_lwd[od]
+	line_lty = line_lty[od]
 
 	# map all other chromosomes to the first chromosome
 	chr = get.all.sector.index()[1]
@@ -1980,7 +2045,7 @@ circos.genomicLabels = function(bed, labels = NULL, labels.column = NULL,
 	bed2[, 1] = chr
 
 	if(!facing %in% c("clockwise", "reverse.clockwise")) {
-		stop("facing can only be 'clockwise' or `reverse.clockwise`.")
+		stop_wrap("facing can only be 'clockwise' or `reverse.clockwise`.")
 	}
 
 	op = circos.par("points.overflow.warning")
