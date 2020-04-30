@@ -7,13 +7,25 @@ Add lines to a plotting region, specifically for genomic graphics
 Add lines to a plotting region, specifically for genomic graphics
 }
 \usage{
-circos.genomicLines(region, value, numeric.column = NULL,
+circos.genomicLines(
+    region,
+    value,
+    numeric.column = NULL,
     sector.index = get.cell.meta.data("sector.index"),
-    track.index = get.cell.meta.data("track.index"), posTransform = NULL,
-    col = ifelse(area, "grey", "black"), lwd = par("lwd"),
-    lty = par("lty"), type = "l",
-    area = FALSE, area.baseline = NULL, border = "black", baseline = "bottom",
-    pt.col = par("col"), cex = par("cex"), pch = par("pch"), ...)
+    track.index = get.cell.meta.data("track.index"),
+    posTransform = NULL,
+    col = ifelse(area, "grey", "black"),
+    lwd = par("lwd"),
+    lty = par("lty"),
+    type = "l",
+    area = FALSE,
+    area.baseline = NULL,
+    border = "black",
+    baseline = "bottom",
+    pt.col = par("col"),
+    cex = par("cex"),
+    pch = par("pch"),
+    ...)
 }
 \arguments{
 
@@ -40,13 +52,7 @@ circos.genomicLines(region, value, numeric.column = NULL,
 \details{
 The function is a low-level graphical function and usually is put in \code{panel.fun} when using \code{\link{circos.genomicTrackPlotRegion}}.
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
-}
 \examples{
-\dontrun{
-
 ### test bed
 circos.par("track.height" = 0.1)
 circos.initializeWithIdeogram(plotType = NULL)
@@ -87,7 +93,4 @@ circos.genomicTrackPlotRegion(bed, panel.fun = function(region, value, ...) {
 })
 
 circos.clear()
-
-}
-
 }

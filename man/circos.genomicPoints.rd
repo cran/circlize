@@ -7,10 +7,18 @@ Add points to a plotting region, specifically for genomic graphics
 Add points to a plotting region, specifically for genomic graphics
 }
 \usage{
-circos.genomicPoints(region, value, numeric.column = NULL,
+circos.genomicPoints(
+    region,
+    value,
+    numeric.column = NULL,
     sector.index = get.cell.meta.data("sector.index"),
-    track.index = get.cell.meta.data("track.index"), posTransform = NULL,
-    pch = par("pch"), col = par("col"), cex = par("cex"), bg = par("bg"), ...)
+    track.index = get.cell.meta.data("track.index"),
+    posTransform = NULL,
+    pch = par("pch"),
+    col = par("col"),
+    cex = par("cex"),
+    bg = par("bg"),
+    ...)
 }
 \arguments{
 
@@ -30,13 +38,7 @@ circos.genomicPoints(region, value, numeric.column = NULL,
 \details{
 The function is a low-level graphical function and usually is put in \code{panel.fun} when using \code{\link{circos.genomicTrackPlotRegion}}.
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
-}
 \examples{
-\dontrun{
-
 circos.par("track.height" = 0.1)
 circos.initializeWithIdeogram(plotType = NULL)
 
@@ -72,7 +74,6 @@ circos.genomicTrackPlotRegion(bed_list, stack = TRUE,
     circos.lines(cell.xlim, c(i, i), lty = 2, col = "#00000040")
 })
 
-
 bed = generateRandomBed(nr = 100, nc = 4)
 circos.genomicTrackPlotRegion(bed, panel.fun = function(region, value, ...) {
     cex = (value[[1]] - min(value[[1]]))/(max(value[[1]]) - min(value[[1]]))
@@ -88,7 +89,4 @@ circos.genomicTrackPlotRegion(bed, stack = TRUE, panel.fun = function(region, va
 })
 
 circos.clear()
-
-}
-
 }

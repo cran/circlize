@@ -7,8 +7,15 @@ Genomic rainfall plot
 Genomic rainfall plot
 }
 \usage{
-circos.genomicRainfall(data, mode = "min", ylim = NULL, col = "black",
-    pch = par("pch"), cex = par("cex"), normalize_to_width = FALSE, ...)
+circos.genomicRainfall(
+    data,
+    mode = "min",
+    ylim = NULL,
+    col = "black",
+    pch = par("pch"),
+    cex = par("cex"),
+    normalize_to_width = FALSE,
+    ...)
 }
 \arguments{
 
@@ -31,9 +38,8 @@ the plot, it means there is a cluster of regions at that area.
 
 On the plot, y-axis are log10-transformed.
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
+\seealso{
+\url{https://jokergoo.github.io/circlize_book/book/high-level-genomic-functions.html#genomic-density-and-rainfall-plot}
 }
 \examples{
 \dontrun{
@@ -49,7 +55,5 @@ circos.genomicDensity(bed_list[[1]], col = c("#FF000080"), track.height = 0.1)
 circos.genomicDensity(bed_list[[2]], col = c("#0000FF80"), track.height = 0.1)
 
 circos.clear()
-
 }
-
 }

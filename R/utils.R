@@ -13,8 +13,19 @@
 # == values
 # A matrix with two columns (``theta`` and ``rou``). ``rou`` is measured in degree.
 #
-circlize = function(x, y, sector.index = get.current.sector.index(),
-	track.index = get.current.track.index()) {
+# == example
+# pdf(NULL)
+# factors = c("a", "b")
+# circos.initialize(factors, xlim = c(0, 1))
+# circos.track(ylim = c(0, 1))
+# # x = 0.5, y = 0.5 in sector a and track 1
+# circlize(0.5, 0.5, sector.index = "a", track.index = 1)
+# circos.clear()
+# dev.off()
+circlize = function(
+    x, y, 
+    sector.index = get.current.sector.index(),
+    track.index = get.current.track.index()) {
 
     if(missing(y)) {
         if(ncol(x) >= 2) {
@@ -58,7 +69,20 @@ circlize = function(x, y, sector.index = get.current.sector.index(),
 #
 # == values
 # A matrix with two columns (``x`` and ``y``)
-reverse.circlize = function(x, y, sector.index = get.current.sector.index(),
+# 
+# == example
+# pdf(NULL)
+# factors = letters[1:4]
+# circos.initialize(factors, xlim = c(0, 1))
+# circos.trackPlotRegion(ylim = c(0, 1))
+# reverse.circlize(c(30, 60), c(0.9, 0.8))
+# reverse.circlize(c(30, 60), c(0.9, 0.8), sector.index = "d", track.index = 1)
+# reverse.circlize(c(30, 60), c(0.9, 0.8), sector.index = "a", track.index = 1)
+# circos.clear()
+# dev.off()
+reverse.circlize = function(
+    x, y, 
+    sector.index = get.current.sector.index(),
     track.index = get.current.track.index()) {
 
     if(missing(y)) {
@@ -554,6 +578,8 @@ col2value = function(r, g, b, col_fun) {
 # == seealso
 # `convert_x` and `convert_y` convert absolute units into a data coordinate in a specified cell.
 #
+# https://jokergoo.github.io/circlize_book/book/circular-layout.html#convert-functions
+#
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
@@ -707,6 +733,8 @@ convert_unit_in_data_coordinate = function(x, unit = c("mm", "cm", "inches", "ca
 # == seealso
 # `convert_y` converts on y direction.
 #
+# https://jokergoo.github.io/circlize_book/book/circular-layout.html#convert-functions
+#
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
@@ -732,7 +760,9 @@ convert_unit_in_data_coordinate = function(x, unit = c("mm", "cm", "inches", "ca
 #         circos.lines(c(0, line_length_on_x), c(0, line_length_on_y), col = "orange")
 #     })
 # circos.clear()
-convert_x = function(x, unit = c("mm", "cm", "inches"),
+convert_x = function(
+    x, 
+    unit = c("mm", "cm", "inches"),
     sector.index = get.cell.meta.data("sector.index"),
     track.index = get.cell.meta.data("track.index"),
     h = get.cell.meta.data("ycenter", sector.index = sector.index, 
@@ -775,13 +805,17 @@ ux = function(...) {
 # == seealso
 # `convert_x` converts on x direction.
 #
+# https://jokergoo.github.io/circlize_book/book/circular-layout.html#convert-functions
+#
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
 #
 # == example
 # # see example on `convert_x` page 
 # NULL
-convert_y = function(x, unit = c("mm", "cm", "inches"),
+convert_y = function(
+    x, 
+    unit = c("mm", "cm", "inches"),
     sector.index = get.current.sector.index(),
     track.index = get.current.track.index()) {
     convert_unit_in_data_coordinate(x, unit = unit, sector.index = sector.index, 

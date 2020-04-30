@@ -7,7 +7,9 @@ Calculate inter-distance of genomic regions
 Calculate inter-distance of genomic regions
 }
 \usage{
-rainfallTransform(region, mode = c("min", "max", "mean", "left", "right"),
+rainfallTransform(
+    region,
+    mode = c("min", "max", "mean", "left", "right"),
     normalize_to_width = FALSE)
 }
 \arguments{
@@ -23,13 +25,8 @@ And if the input is a bed-format data frame, there will be the chromosome column
 
 The row order of the returned data frame is as same as the input one.
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
-}
 \examples{
 bed = generateRandomBed()
 bed = subset(bed, chr == "chr1")
 head(rainfallTransform(bed))
-
 }

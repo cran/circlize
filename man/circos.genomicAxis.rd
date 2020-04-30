@@ -7,10 +7,16 @@ Add genomic axes
 Add genomic axes
 }
 \usage{
-circos.genomicAxis(h = "top", major.at = NULL, labels = NULL,
-    major.by = NULL, tickLabelsStartFromZero = TRUE,
-    labels.cex = 0.4*par("cex"), sector.index = get.cell.meta.data("sector.index"),
-    track.index = get.cell.meta.data("track.index"), ...)
+circos.genomicAxis(
+    h = "top",
+    major.at = NULL,
+    labels = NULL,
+    major.by = NULL,
+    tickLabelsStartFromZero = TRUE,
+    labels.cex = 0.4*par("cex"),
+    sector.index = get.cell.meta.data("sector.index"),
+    track.index = get.cell.meta.data("track.index"),
+    ...)
 }
 \arguments{
 
@@ -27,6 +33,9 @@ circos.genomicAxis(h = "top", major.at = NULL, labels = NULL,
 }
 \details{
 It assigns proper tick labels under genomic coordinate.
+}
+\seealso{
+\url{https://jokergoo.github.io/circlize_book/book/high-level-genomic-functions.html#genomic-axes}
 }
 \examples{
 circos.initializeWithIdeogram(plotType = NULL)

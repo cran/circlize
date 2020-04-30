@@ -7,11 +7,20 @@ Add heatmaps for selected regions
 Add heatmaps for selected regions
 }
 \usage{
-circos.genomicHeatmap(bed, col, na_col = "grey",
-    numeric.column = NULL, border = NA, border_lwd = par("lwd"),
-    border_lty = par("lty"), connection_height = convert_height(5, "mm"),
-    line_col = par("col"), line_lwd = par("lwd"), line_lty = par("lty"),
-    heatmap_height = 0.15, side = c("inside", "outside"),
+circos.genomicHeatmap(
+    bed,
+    col,
+    na_col = "grey",
+    numeric.column = NULL,
+    border = NA,
+    border_lwd = par("lwd"),
+    border_lty = par("lty"),
+    connection_height = convert_height(5, "mm"),
+    line_col = par("col"),
+    line_lwd = par("lwd"),
+    line_lty = par("lty"),
+    heatmap_height = 0.15,
+    side = c("inside", "outside"),
     track.margin = circos.par("track.margin"))
 }
 \arguments{
@@ -23,7 +32,7 @@ circos.genomicHeatmap(bed, col, na_col = "grey",
   \item{border}{border of the heatmap grids.}
   \item{border_lwd}{line width for borders of heatmap grids}
   \item{border_lty}{line style for borders of heatmap grids}
-  \item{connection_height}{height of the connection lines}
+  \item{connection_height}{height of the connection lines. If it is set to \code{NULL}, no connection will be drawn.}
   \item{line_col}{col of the connection line. The value can be a vector.}
   \item{line_lwd}{line width of the connection lines.}
   \item{line_lty}{line style of the connection lines.}
@@ -39,8 +48,8 @@ The correspondance between heatmaps and regions are identified by connection lin
 The function actually creates two tracks, one track for the connection lines and one track
 for the heamtaps. The heatmaps always fill the whole track.
 }
-\author{
-Zuguang Gu <z.gu@dkfz.de>
+\seealso{
+\url{https://jokergoo.github.io/circlize_book/book/high-level-genomic-functions.html#genomic-heatmap}
 }
 \examples{
 \dontrun{

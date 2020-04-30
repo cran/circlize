@@ -7,7 +7,11 @@ Initialize the circular layout
 Initialize the circular layout
 }
 \usage{
-circos.initialize(factors, x = NULL, xlim = NULL, sector.width = NULL)
+circos.initialize(
+    factors,
+    x = NULL,
+    xlim = NULL,
+    sector.width = NULL)
 }
 \arguments{
 
@@ -39,26 +43,13 @@ still set the width manually. However, it is not always a good idea to change th
 the width can reflect the range of data in sectors. However, in some cases, it is useful to manually set
 the width such as you want to zoom some part of the sectors.
 
-The function finally calls \code{\link[graphics]{plot}} with enforing aspect ratio to be 1 and be ready for adding graphics.
+The function finally calls \code{\link[graphics:plot.default]{plot}} with enforing aspect ratio to be 1 and be ready for adding graphics.
 }
 \seealso{
 \url{http://jokergoo.github.io/circlize_book/book/circular-layout.html}
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
-}
 \examples{
-circos.initialize(factors = sample(letters[1:4], 20, replace = TRUE), xlim = c(0, 1))
-circos.info()
-circos.clear()
-
-circos.initialize(factors = sample(letters[1:4], 20, replace = TRUE), xlim = cbind(1:4, 1:4*2))
-circos.info()
-circos.clear()
-
-circos.initialize(factors = sample(letters[1:4], 20, replace = TRUE), x = rnorm(20))
-circos.info()
-circos.clear()
+# There is no example
+NULL
 
 }

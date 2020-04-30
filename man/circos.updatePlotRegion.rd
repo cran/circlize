@@ -7,9 +7,13 @@ Update the plotting region in an existed cell
 Update the plotting region in an existed cell
 }
 \usage{
-circos.updatePlotRegion(sector.index = get.cell.meta.data("sector.index"),
+circos.updatePlotRegion(
+    sector.index = get.cell.meta.data("sector.index"),
     track.index = get.cell.meta.data("track.index"),
-    bg.col = NA, bg.border = "black", bg.lty = par("lty"), bg.lwd = par("lwd"))
+    bg.col = NA,
+    bg.border = "black",
+    bg.lty = par("lty"),
+    bg.lwd = par("lwd"))
 }
 \arguments{
 
@@ -28,10 +32,6 @@ But the \code{xlim} and \code{ylim} inside the cell still remain unchanged.
 Note if you use \code{\link{circos.track}} to update an already created track,
 you can re-define \code{ylim} in these cells.
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
-}
 \examples{
 circos.initialize(letters[1:8], xlim = c(0, 1))
 circos.track(ylim = c(0, 1), panel.fun = function(x, y) {
@@ -42,5 +42,4 @@ circos.rect(CELL_META$cell.xlim[1], CELL_META$cell.ylim[1],
             CELL_META$cell.xlim[2], CELL_META$cell.ylim[2],
             col = "#FF000080")
 circos.clear()
-
 }

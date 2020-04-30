@@ -7,12 +7,19 @@ Create plotting regions for a whole track
 Create plotting regions for a whole track
 }
 \usage{
-circos.trackPlotRegion(factors = NULL, x = NULL, y = NULL, ylim = NULL,
-    force.ylim = TRUE, track.index = NULL,
+circos.trackPlotRegion(
+    factors = NULL,
+    x = NULL, y = NULL,
+    ylim = NULL,
+    force.ylim = TRUE,
+    track.index = NULL,
     track.height = circos.par("track.height"),
     track.margin = circos.par("track.margin"),
     cell.padding = circos.par("cell.padding"),
-    bg.col = NA, bg.border = "black", bg.lty = par("lty"), bg.lwd = par("lwd"),
+    bg.col = NA,
+    bg.border = "black",
+    bg.lty = par("lty"),
+    bg.lwd = par("lwd"),
     panel.fun = function(x, y) {NULL})
 }
 \arguments{
@@ -73,10 +80,6 @@ See vignette for examples of how to use this feature.}
 \seealso{
 \url{http://jokergoo.github.io/circlize_book/book/circular-layout.html}
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
-}
 \examples{
 circos.initialize(letters[1:8], xlim = c(0, 1))
 set.seed(123)
@@ -87,5 +90,4 @@ circos.track(df$fa, x = df$x, y = df$y, panel.fun = function(x, y) {
     circos.points(x, y)
 }, track.height = 0.2, bg.border = rand_color(8))
 circos.clear()
-
 }

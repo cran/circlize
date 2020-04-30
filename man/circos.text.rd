@@ -7,11 +7,20 @@ Draw text in a cell
 Draw text in a cell
 }
 \usage{
-circos.text(x, y, labels, sector.index = get.cell.meta.data("sector.index"),
-    track.index = get.cell.meta.data("track.index"), direction = NULL,
+circos.text(
+    x, y,
+    labels,
+    sector.index = get.cell.meta.data("sector.index"),
+    track.index = get.cell.meta.data("track.index"),
+    direction = NULL,
     facing = c("inside", "outside", "reverse.clockwise", "clockwise",
-    "downward", "bending", "bending.inside", "bending.outside"), niceFacing = FALSE,
-    adj = par("adj"), cex = 1, col = par("col"), font = par("font"), ...)
+    "downward", "bending", "bending.inside", "bending.outside"),
+    niceFacing = FALSE,
+    adj = par("adj"),
+    cex = 1,
+    col = par("col"),
+    font = par("font"),
+    ...)
 }
 \arguments{
 
@@ -36,10 +45,6 @@ The function is similar to \code{\link[graphics]{text}}. All you need to note is
 \seealso{
 \url{http://jokergoo.github.io/circlize_book/book/graphics.html#text}
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
-}
 \examples{
 factors = letters[1:4]
 circos.par(points.overflow.warning = FALSE)
@@ -59,5 +64,4 @@ circos.trackPlotRegion(factors = factors, ylim = c(0, 10),
         cex = 0.8)
 })
 circos.clear()
-
 }

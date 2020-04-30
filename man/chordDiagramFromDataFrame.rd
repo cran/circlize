@@ -7,22 +7,40 @@ Plot Chord Diagram from a data frame
 Plot Chord Diagram from a data frame
 }
 \usage{
-chordDiagramFromDataFrame(df, grid.col = NULL, grid.border = NA, transparency = 0.5,
-    col = NULL, order = NULL, directional = 0, xmax = NULL,
-    direction.type = "diffHeight", diffHeight = convert_height(2, "mm"),
-    reduce = 1e-5, self.link = 2, preAllocateTracks = NULL,
+chordDiagramFromDataFrame(
+    df,
+    grid.col = NULL,
+    grid.border = NA,
+    transparency = 0.5,
+    col = NULL,
+    order = NULL,
+    directional = 0,
+    xmax = NULL,
+    direction.type = "diffHeight",
+    diffHeight = convert_height(2, "mm"),
+    reduce = 1e-5,
+    self.link = 2,
+    preAllocateTracks = NULL,
     annotationTrack = c("name", "grid", "axis"),
     annotationTrackHeight = convert_height(c(3, 2), "mm"),
-    link.border = NA, link.lwd = par("lwd"), link.lty = par("lty"),
-    link.sort = FALSE, link.decreasing = TRUE,
+    link.border = NA,
+    link.lwd = par("lwd"),
+    link.lty = par("lty"),
+    link.sort = FALSE,
+    link.decreasing = TRUE,
     link.arr.length = ifelse(link.arr.type == "big.arrow", 0.02, 0.4),
     link.arr.width = link.arr.length/2,
-    link.arr.type = "triangle", link.arr.lty = par("lty"),
-    link.arr.lwd = par("lwd"), link.arr.col = par("col"),
-    link.largest.ontop = FALSE, link.visible = TRUE,
+    link.arr.type = "triangle",
+    link.arr.lty = par("lty"),
+    link.arr.lwd = par("lwd"),
+    link.arr.col = par("col"),
+    link.largest.ontop = FALSE,
+    link.visible = TRUE,
     link.rank = seq_len(nrow(df)),
     link.overlap = FALSE,
-    scale = FALSE, big.gap = 10, small.gap = 1,
+    scale = FALSE,
+    big.gap = 10,
+    small.gap = 1,
     ...)
 }
 \arguments{
@@ -68,6 +86,9 @@ The data frame can have a column named "rank" which is used to control the order
 }
 \value{
 A data frame which contains positions of links, see explanation in \code{\link{chordDiagram}}.
+}
+\seealso{
+\url{http://jokergoo.github.io/circlize_book/book/the-chorddiagram-function.html}
 }
 \examples{
 # There is no example

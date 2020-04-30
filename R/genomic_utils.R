@@ -11,10 +11,10 @@
 #           If ``chromosome.index`` is set, this argument is enforced to ``FALSE``
 #
 # == details
-# The function read the cytoband data, sort the chromosome names and calculate the length of each chromosome. 
+# The function read the cytoband data, sort the chromosome names and calculate the length of each chromosome.
 # By default, it is human hg19 cytoband data.
 #
-# You can find the data structure of the cytoband data from http://hgdownload.cse.ucsc.edu/goldenpath/hg19/database/cytoBand.txt.gz
+# You can find the data structure of the cytoband data from https://hgdownload.cse.ucsc.edu/goldenpath/hg19/database/cytoBand.txt.gz
 #
 # == values
 # -``df``         Data frame for cytoband data (rows are sorted if ``sort.chr`` is set to ``TRUE``)
@@ -24,20 +24,21 @@
 # == example
 # data = read.cytoband(species = "hg19")
 # data = read.cytoband(cytoband = system.file(package = "circlize", "extdata", "cytoBand.txt"))
-# cytoband = read.table(system.file(package = "circlize", "extdata", "cytoBand.txt"), 
+# cytoband = read.table(system.file(package = "circlize", "extdata", "cytoBand.txt"),
 #     colClasses = c("character", "numeric", "numeric", "character", "character"), sep = "\t")
 # data = read.cytoband(cytoband = cytoband)
-read.cytoband = function(cytoband = system.file(package = "circlize",
-    "extdata", "cytoBand.txt"), species = NULL, 
-    chromosome.index = usable_chromosomes(species), 
+read.cytoband = function(
+	cytoband = system.file(package = "circlize", "extdata", "cytoBand.txt"),
+	species = NULL,
+    chromosome.index = usable_chromosomes(species),
     sort.chr = TRUE) {
 
 	# this function should also take charge of the order of chromosome
 	if(!is.null(chromosome.index)) sort.chr = FALSE
-	
+
 	# `species` is prior to `cytoband`
 	if(!is.null(species)) {
-		url = paste("http://hgdownload.cse.ucsc.edu/goldenPath/", species, "/database/cytoBand.txt.gz", sep = "")
+		url = paste("https://hgdownload.cse.ucsc.edu/goldenPath/", species, "/database/cytoBand.txt.gz", sep = "")
 		cytoband = paste0(circos.par("__tempdir__"), "/", species, "_cytoBand.txt.gz")
 		if(!file.exists(cytoband)) {
 			e = try(suppressWarnings(download.file(url, destfile = cytoband, quiet = TRUE)), silent = TRUE)
@@ -52,14 +53,14 @@ read.cytoband = function(cytoband = system.file(package = "circlize",
 			}
 		}
 	}
-	
+
 	if(is.data.frame(cytoband)) {
 		d = cytoband
 	} else {
 		if(grepl("\\.gz$", cytoband)) {
 			cytoband = gzfile(cytoband)
 		}
-		
+
 		d = read.table(cytoband, colClasses = c("character", "numeric", "numeric", "character", "character"), sep = "\t", stringsAsFactors = FALSE)
 	}
 
@@ -76,7 +77,7 @@ read.cytoband = function(cytoband = system.file(package = "circlize",
 	if(nrow(d) == 0) {
 		stop_wrap("Cannot find any chromosome. It is probably related to your chromosome names having or not having 'chr' prefix.")
 	}
-	
+
 	if(is.null(chromosome.index)) {
 		if(is.factor(d[[1]])) {
 			chromosome = levels(d[[1]])
@@ -99,7 +100,7 @@ read.cytoband = function(cytoband = system.file(package = "circlize",
 		dnew = rbind(dnew, d2)
 	}
 	names(chr.len) = chromosome
-	
+
 	return(list(df = dnew, chromosome = chromosome, chr.len = chr.len))
 }
 
@@ -116,10 +117,10 @@ read.cytoband = function(cytoband = system.file(package = "circlize",
 #           If ``chromosome.index`` is set, this argument is enforced to ``FALSE``
 #
 # == details
-# The function read the chromInfo data, sort the chromosome names and calculate the length of each chromosome. 
+# The function read the chromInfo data, sort the chromosome names and calculate the length of each chromosome.
 # By default, it is human hg19 chromInfo data.
 #
-# You can find the data structure for the chromInfo data from http://hgdownload.cse.ucsc.edu/goldenpath/hg19/database/chromInfo.txt.gz
+# You can find the data structure for the chromInfo data from https://hgdownload.cse.ucsc.edu/goldenpath/hg19/database/chromInfo.txt.gz
 #
 # == values
 # -``df``         Data frame for chromInfo data (rows are sorted if ``sort.chr`` is set to ``TRUE``)
@@ -129,19 +130,20 @@ read.cytoband = function(cytoband = system.file(package = "circlize",
 # == example
 # data = read.chromInfo(species = "hg19")
 # data = read.chromInfo(chromInfo = system.file(package = "circlize", "extdata", "chromInfo.txt"))
-# chromInfo = read.table(system.file(package = "circlize", "extdata", "chromInfo.txt"), 
+# chromInfo = read.table(system.file(package = "circlize", "extdata", "chromInfo.txt"),
 #     colClasses = c("character", "numeric"), sep = "\t")
 # data = read.chromInfo(chromInfo = chromInfo)
-read.chromInfo = function(chromInfo = system.file(package = "circlize",
-    "extdata", "chromInfo.txt"), species = NULL, 
-    chromosome.index = usable_chromosomes(species), 
+read.chromInfo = function(
+	chromInfo = system.file(package = "circlize", "extdata", "chromInfo.txt"),
+	species = NULL,
+    chromosome.index = usable_chromosomes(species),
     sort.chr = TRUE) {
-	
+
 	# this function should also take charge of the order of chromosome
 	if(!is.null(chromosome.index)) sort.chr = FALSE
-	
+
 	if(!is.null(species)) {
-		url = paste("http://hgdownload.cse.ucsc.edu/goldenPath/", species, "/database/chromInfo.txt.gz", sep = "")
+		url = paste("https://hgdownload.cse.ucsc.edu/goldenPath/", species, "/database/chromInfo.txt.gz", sep = "")
 		chromInfo = paste0(circos.par("__tempdir__"), "/", species, "_chromInfo.txt.gz")
 		if(!file.exists(chromInfo)) {
 			e = try(suppressWarnings(download.file(url, destfile = chromInfo, quiet = TRUE)), silent = TRUE)
@@ -156,14 +158,14 @@ read.chromInfo = function(chromInfo = system.file(package = "circlize",
 			}
 		}
 	}
-	
+
 	if(is.data.frame(chromInfo)) {
 		d = chromInfo
 	} else {
 		if(grepl("\\.gz$", chromInfo)) {
 			chromInfo = gzfile(chromInfo)
 		}
-		
+
 		d = read.table(chromInfo, colClasses = c("character", "numeric"), sep = "\t", stringsAsFactors = FALSE)[1:2]  # only first two columns
 	}
 	rownames(d) = d[[1]]
@@ -180,7 +182,7 @@ read.chromInfo = function(chromInfo = system.file(package = "circlize",
 	if(nrow(d) == 0) {
 		stop_wrap("Cannot find any chromosome. It is probably related to your chromosome names having or not having 'chr' prefix.")
 	}
-	
+
 	# now cytoband data is normalized to `d`
 	if(!is.null(chromosome.index)) {
 		chromosome.index = intersect(chromosome.index, unique(as.vector(d[[1]])))
@@ -210,7 +212,7 @@ read.chromInfo = function(chromInfo = system.file(package = "circlize",
 	names(chr.len) = chromosome
 
 	dnew = data.frame(chr = chromosome, start = rep(0, nrow(dnew)), end = dnew[[2]], stringsAsFactors = FALSE)
-	
+
 	return(list(df = dnew, chromosome = chromosome, chr.len = chr.len))
 }
 
@@ -236,10 +238,10 @@ usable_chromosomes = function(species) {
 # -x A vector containing the Giemsa stain results
 #
 # == details
-# The color theme is from http://circos.ca/tutorials/course/slides/session-2.pdf, page 42.
+# The color theme is from https://circos.ca/tutorials/course/slides/session-2.pdf, page 42.
 cytoband.col = function(x) {
 	x = as.vector(x)
-	col.panel = c("gpos100" = rgb(0, 0, 0, maxColorValue = 255), 
+	col.panel = c("gpos100" = rgb(0, 0, 0, maxColorValue = 255),
                   "gpos"    = rgb(0, 0, 0, maxColorValue = 255),
                   "gpos75"  = rgb(130, 130, 130, maxColorValue = 255),
                   "gpos66"  = rgb(160, 160, 160, maxColorValue = 255),
@@ -268,7 +270,10 @@ cytoband.col = function(x) {
 # == details
 # The function will uniformly sample positions from the genome. Chromosome names start with "chr"
 # and positions are sorted. The final number of rows may not be exactly as same as ``nr``.
-generateRandomBed = function(nr = 10000, nc = 1, fun = function(k) rnorm(k, 0, 0.5),
+generateRandomBed = function(
+	nr = 10000,
+	nc = 1,
+	fun = function(k) rnorm(k, 0, 0.5),
     species = NULL) {
 	cyto = read.cytoband(species = species)
 	chr.len = cyto$chr.len
@@ -291,7 +296,7 @@ generateRandomBed = function(nr = 10000, nc = 1, fun = function(k) rnorm(k, 0, 0
 	for(i in seq_along(dl)) {
 		df = rbind(df, dl[[i]])
 	}
-	
+
 	if(ncol(df) == 3) {
 		colnames(df) = c("chr", "start", "end")
 	} else {
@@ -303,7 +308,7 @@ generateRandomBed = function(nr = 10000, nc = 1, fun = function(k) rnorm(k, 0, 0
 
 sort_chr = function(chromosome) {
 	chromosome = sort(chromosome)
-	
+
 	chromosome.ind = gsub("chr", "", chromosome)
 	chromosome.ind = gsub("_.*$", "", chromosome.ind)
 	l_num = grepl("^\\d+$", chromosome.ind)

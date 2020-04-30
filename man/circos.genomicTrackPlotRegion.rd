@@ -7,9 +7,14 @@ Create a track for genomic graphics
 Create a track for genomic graphics
 }
 \usage{
-circos.genomicTrackPlotRegion(data = NULL, ylim = NULL, stack = FALSE,
-    numeric.column = NULL, jitter = 0,
-    panel.fun = function(region, value, ...)  {NULL}, ...)
+circos.genomicTrackPlotRegion(
+    data = NULL,
+    ylim = NULL,
+    stack = FALSE,
+    numeric.column = NULL,
+    jitter = 0,
+    panel.fun = function(region, value, ...) {NULL},
+    ...)
 }
 \arguments{
 
@@ -51,9 +56,8 @@ Being different from \code{panel.fun} in \code{\link{circos.trackPlotRegion}}, t
 argument is used to pass hidden values to low-level graphical functions. So if you are using functions like \code{circos.genomicPoints}, you should also
 add \code{...} as an additional argument into \code{circos.genomicPoints}.
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
+\seealso{
+\url{https://jokergoo.github.io/circlize_book/book/genomic-plotting-region.html} and \url{https://jokergoo.github.io/circlize_book/book/modes-of-input.html}
 }
 \examples{
 # There is no example

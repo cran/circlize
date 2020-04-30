@@ -7,22 +7,45 @@ Plot Chord Diagram from an adjacency matrix
 Plot Chord Diagram from an adjacency matrix
 }
 \usage{
-chordDiagramFromMatrix(mat, grid.col = NULL, grid.border = NA, transparency = 0.5,
-    col = NULL, row.col = NULL, column.col = NULL, order = NULL, directional = 0,
-    direction.type = "diffHeight", diffHeight = convert_height(2, "mm"),
-    reduce = 1e-5, xmax = NULL, self.link = 2,
-    symmetric = FALSE, keep.diagonal = FALSE, preAllocateTracks = NULL,
+chordDiagramFromMatrix(
+    mat,
+    grid.col = NULL,
+    grid.border = NA,
+    transparency = 0.5,
+    col = NULL,
+    row.col = NULL,
+    column.col = NULL,
+    order = NULL,
+    directional = 0,
+    direction.type = "diffHeight",
+    diffHeight = convert_height(2, "mm"),
+    reduce = 1e-5,
+    xmax = NULL,
+    self.link = 2,
+    symmetric = FALSE,
+    keep.diagonal = FALSE,
+    preAllocateTracks = NULL,
     annotationTrack = c("name", "grid", "axis"),
     annotationTrackHeight = convert_height(c(3, 2), "mm"),
-    link.border = NA, link.lwd = par("lwd"), link.lty = par("lty"),
-    link.sort = FALSE, link.decreasing = TRUE,
+    link.border = NA,
+    link.lwd = par("lwd"),
+    link.lty = par("lty"),
+    link.sort = FALSE,
+    link.decreasing = TRUE,
     link.arr.length = ifelse(link.arr.type == "big.arrow", 0.02, 0.4),
     link.arr.width = link.arr.length/2,
-    link.arr.type = "triangle", link.arr.lty = par("lty"),
-    link.arr.lwd = par("lwd"), link.arr.col = par("col"),
-    link.largest.ontop = FALSE, link.visible = TRUE,
-    link.rank = NULL, link.overlap = FALSE,
-    scale = FALSE, big.gap = 10, small.gap = 1, ...)
+    link.arr.type = "triangle",
+    link.arr.lty = par("lty"),
+    link.arr.lwd = par("lwd"),
+    link.arr.col = par("col"),
+    link.largest.ontop = FALSE,
+    link.visible = TRUE,
+    link.rank = NULL,
+    link.overlap = FALSE,
+    scale = FALSE,
+    big.gap = 10,
+    small.gap = 1,
+    ...)
 }
 \arguments{
 
@@ -71,6 +94,9 @@ Internally, the matrix is transformed to a data frame and sent to \code{\link{ch
 }
 \value{
 A data frame which contains positions of links, see explanation in \code{\link{chordDiagram}}.
+}
+\seealso{
+\url{http://jokergoo.github.io/circlize_book/book/the-chorddiagram-function.html}
 }
 \examples{
 # There is no example

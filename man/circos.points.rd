@@ -7,9 +7,14 @@ Add points to a plotting region
 Add points to a plotting region
 }
 \usage{
-circos.points(x, y, sector.index = get.cell.meta.data("sector.index"),
+circos.points(
+    x, y,
+    sector.index = get.cell.meta.data("sector.index"),
     track.index = get.cell.meta.data("track.index"),
-    pch = par("pch"), col = par("col"), cex = par("cex"), bg = par("bg"))
+    pch = par("pch"),
+    col = par("col"),
+    cex = par("cex"),
+    bg = par("bg"))
 }
 \arguments{
 
@@ -40,9 +45,8 @@ and \code{cex} which have same meaning as those in the \code{\link[graphics]{par
 It is recommended to use \code{\link{circos.points}} inside \code{panel.fun} in \code{\link{circos.trackPlotRegion}} so that
 it draws points directly on "curent" cell.
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
+\seealso{
+\url{https://jokergoo.github.io/circlize_book/book/graphics.html#points}
 }
 \examples{
 circos.initialize(letters[1:8], xlim = c(0, 1))
@@ -51,5 +55,4 @@ circos.track(ylim = c(0, 1), panel.fun = function(x, y) {
 })
 circos.points(runif(10), runif(10), sector.index = "c", pch = 16, col = "red")
 circos.clear()
-
 }

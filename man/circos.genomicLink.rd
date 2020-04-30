@@ -7,9 +7,17 @@ Add links from two sets of genomic positions
 Add links from two sets of genomic positions
 }
 \usage{
-circos.genomicLink(region1, region2,
-    rou = get_most_inside_radius(), rou1 = rou, rou2 = rou,
-    col = "black", lwd = par("lwd"), lty = par("lty"), border = col, ...)
+circos.genomicLink(
+    region1,
+    region2,
+    rou = get_most_inside_radius(),
+    rou1 = rou,
+    rou2 = rou,
+    col = "black",
+    lwd = par("lwd"),
+    lty = par("lty"),
+    border = col,
+    ...)
 }
 \arguments{
 
@@ -30,9 +38,8 @@ Of course, number of rows should be same in \code{region1} and \code{region2}.
 
 If you want to have more controls on links, please use \code{\link{circos.link}} directly.
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
+\seealso{
+\url{https://jokergoo.github.io/circlize_book/book/genomic-plotting-region.html#genomic-links}
 }
 \examples{
 \dontrun{
@@ -47,7 +54,5 @@ circos.initializeWithIdeogram()
 
 circos.genomicLink(bed1, bed2, col = sample(1:5, 20, replace = TRUE), border = NA)
 circos.clear()
-
 }
-
 }

@@ -7,8 +7,10 @@ Add an ideogram track
 Add an ideogram track
 }
 \usage{
-circos.genomicIdeogram(cytoband = system.file(package = "circlize",
-    "extdata", "cytoBand.txt"), species = NULL, track.height = convert_height(2, "mm"),
+circos.genomicIdeogram(
+    cytoband = system.file(package = "circlize", "extdata", "cytoBand.txt"),
+    species = NULL,
+    track.height = convert_height(2, "mm"),
     track.margin = circos.par("track.margin"))
 }
 \arguments{
@@ -19,11 +21,14 @@ circos.genomicIdeogram(cytoband = system.file(package = "circlize",
   \item{track.margin}{margins for the track}
 
 }
+\seealso{
+\url{https://jokergoo.github.io/circlize_book/book/high-level-genomic-functions.html#ideograms}
+}
 \author{
 Zuguang Gu <z.gu@dkfz.de>
 }
 \examples{
-# There is no example
-NULL
-
+circos.initializeWithIdeogram(plotType = c("labels", "axis"))
+circos.track(ylim = c(0, 1))
+circos.genomicIdeogram() # put ideogram as the third track
 }

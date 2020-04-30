@@ -7,10 +7,18 @@ Highlight sectors and tracks
 Highlight sectors and tracks
 }
 \usage{
-highlight.sector(sector.index, track.index = get.all.track.index(),
-    col = "#FF000040", border = NA, lwd = par("lwd"), lty = par("lty"),
-    padding = c(0, 0, 0, 0), text = NULL, text.col = par("col"),
-    text.vjust = 0.5, ...)
+highlight.sector(
+    sector.index,
+    track.index = get.all.track.index(),
+    col = "#FF000040",
+    border = NA,
+    lwd = par("lwd"),
+    lty = par("lty"),
+    padding = c(0, 0, 0, 0),
+    text = NULL,
+    text.col = par("col"),
+    text.vjust = 0.5,
+    ...)
 }
 \arguments{
 
@@ -32,6 +40,9 @@ You can use \code{\link{circos.info}} to find out index for all sectors and all 
 
 The function calls \code{\link{draw.sector}}.
 }
+\seealso{
+\url{https://jokergoo.github.io/circlize_book/book/graphics.html#highlight-sectors-and-tracks}
+}
 \examples{
 factors = letters[1:8]
 circos.initialize(factors, xlim = c(0, 1))
@@ -48,5 +59,4 @@ highlight.sector(c("f", "g"), col = NA, border = "green",
     lwd = 2, track.index = c(2, 3))
 highlight.sector(factors, col = "#FFFF0040", track.index = 4)
 circos.clear()
-
 }

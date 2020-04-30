@@ -7,15 +7,27 @@ Draw x-axis
 Draw x-axis
 }
 \usage{
-circos.axis(h = "top", major.at = NULL, labels = TRUE, major.tick = TRUE,
+circos.axis(
+    h = "top",
+    major.at = NULL,
+    labels = TRUE,
+    major.tick = TRUE,
     sector.index = get.cell.meta.data("sector.index"),
     track.index = get.cell.meta.data("track.index"),
-    labels.font = par("font"), labels.cex = par("cex"),
-    labels.facing = "inside", labels.direction = NULL, labels.niceFacing = TRUE,
-    direction = c("outside", "inside"), minor.ticks = 4,
-    major.tick.percentage = 0.1, labels.away.percentage = major.tick.percentage/2,
+    labels.font = par("font"),
+    labels.cex = par("cex"),
+    labels.facing = "inside",
+    labels.direction = NULL,
+    labels.niceFacing = TRUE,
+    direction = c("outside", "inside"),
+    minor.ticks = 4,
+    major.tick.percentage = 0.1,
+    labels.away.percentage = major.tick.percentage/2,
     major.tick.length = convert_y(1, "mm", sector.index, track.index),
-    lwd = par("lwd"), col = par("col"), labels.col = par("col"), labels.pos.adjust = TRUE)
+    lwd = par("lwd"),
+    col = par("col"),
+    labels.col = par("col"),
+    labels.pos.adjust = TRUE)
 }
 \arguments{
 
@@ -46,10 +58,8 @@ It can only draw axes on x-direction.
 }
 \seealso{
 \code{\link{circos.yaxis}} draws axes on y-direction.
-}
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
 
+\url{https://jokergoo.github.io/circlize_book/book/graphics.html#axes}
 }
 \examples{
 factors = letters[1:8]
@@ -77,7 +87,7 @@ circos.axis(sector.index = "h", h = 2, major.at = c(1, 3, 5, 7, 9),
     labels.away.percentage = 0.2, minor.ticks = 2, labels.facing = "clockwise")
 circos.clear()
 
-\dontrun{
+if(FALSE) {
 
 ############### real-time clock #################
 factors = letters[1]
@@ -94,24 +104,21 @@ while(1) {
     sec = ceiling(current.time$sec)
     min = current.time$min
     hour = current.time$hour
-    
-    # erase the clock hands
+
+# erase the clock hands
     draw.sector(rou1 = 0.8, border = "white", col = "white")
 
-    sec.degree = 90 - sec/60 * 360
+sec.degree = 90 - sec/60 * 360
     arrows(0, 0, cos(sec.degree/180*pi)*0.8, sin(sec.degree/180*pi)*0.8)
 
-    min.degree = 90 - min/60 * 360
-    arrows(0, 0, cos(min.degree/180*pi)*0.7, sin(min.degree/180*pi)*0.7, lwd = 2)   
+min.degree = 90 - min/60 * 360
+    arrows(0, 0, cos(min.degree/180*pi)*0.7, sin(min.degree/180*pi)*0.7, lwd = 2)
 
-    hour.degree = 90 - hour/12 * 360 - min/60 * 360/12
+hour.degree = 90 - hour/12 * 360 - min/60 * 360/12
     arrows(0, 0, cos(hour.degree/180*pi)*0.4, sin(hour.degree/180*pi)*0.4, lwd = 2)
 
-    
-    Sys.sleep(1)
+Sys.sleep(1)
 }
 circos.clear()
-
 }
-
 }

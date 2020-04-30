@@ -7,11 +7,21 @@ Add lines to the plotting region
 Add lines to the plotting region
 }
 \usage{
-circos.lines(x, y, sector.index = get.cell.meta.data("sector.index"),
+circos.lines(
+    x, y,
+    sector.index = get.cell.meta.data("sector.index"),
     track.index = get.cell.meta.data("track.index"),
-    col = ifelse(area, "grey", par("col")), lwd = par("lwd"), lty = par("lty"),
-    type = "l", straight = FALSE, area = FALSE, area.baseline = NULL,
-    border = "black", baseline = "bottom", pt.col = par("col"), cex = par("cex"),
+    col = ifelse(area, "grey", par("col")),
+    lwd = par("lwd"),
+    lty = par("lty"),
+    type = "l",
+    straight = FALSE,
+    area = FALSE,
+    area.baseline = NULL,
+    border = "black",
+    baseline = "bottom",
+    pt.col = par("col"),
+    cex = par("cex"),
     pch = par("pch"))
 }
 \arguments{
@@ -42,11 +52,7 @@ lines between points by setting \code{straight} to \code{TRUE}.
 Drawing areas below lines can help to identify the direction of y-axis in cells (since it is a circle). This can be done by specifying
 \code{area} to \code{TURE}.
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
-}
-\examples{
+\seealso{
 factors = letters[1:9]
 circos.par(points.overflow.warning = FALSE)
 circos.initialize(factors = factors, xlim = c(0, 10))
@@ -77,8 +83,12 @@ circos.lines(sort(runif(10)*10), runif(10)*8, sector.index = "h", type = "s", ar
 circos.text(5, 9, "type = 's', area = TRUE", sector.index = "h")
 
 circos.lines(sort(runif(10)*10), runif(10)*8, sector.index = "i", area = TRUE, baseline = "top")
-circos.text(5, 9, "type = 'l', area = TRUE\nbaseline = 'top'", sector.index = "i")
+circos.text(5, 9, "type = 'l', area = TRUE, baseline = 'top'", sector.index = "i")
 
 circos.clear()
+}
+\examples{
+# There is no example
+NULL
 
 }

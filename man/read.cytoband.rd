@@ -7,8 +7,9 @@ Read/parse cytoband data from a data frame/file/UCSC database
 Read/parse cytoband data from a data frame/file/UCSC database
 }
 \usage{
-read.cytoband(cytoband = system.file(package = "circlize",
-    "extdata", "cytoBand.txt"), species = NULL,
+read.cytoband(
+    cytoband = system.file(package = "circlize", "extdata", "cytoBand.txt"),
+    species = NULL,
     chromosome.index = usable_chromosomes(species),
     sort.chr = TRUE)
 }
@@ -32,10 +33,6 @@ You can find the data structure of the cytoband data from \url{http://hgdownload
   \item{\code{chromosome}}{Sorted chromosome names}
   \item{\code{chr.len}}{Length of chromosomes. Orders are same as \code{chromosome}}
 }
-}
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
 }
 \examples{
 data = read.cytoband(species = "hg19")

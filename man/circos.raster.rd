@@ -7,10 +7,13 @@ Add raster images
 Add raster images
 }
 \usage{
-circos.raster(image, x, y, width, height,
+circos.raster(
+    image, x, y,
+    width, height,
     facing = c("inside", "outside", "reverse.clockwise", "clockwise",
     "downward", "bending.inside", "bending.outside"),
-    niceFacing = FALSE, sector.index = get.cell.meta.data("sector.index"),
+    niceFacing = FALSE,
+    sector.index = get.cell.meta.data("sector.index"),
     track.index = get.cell.meta.data("track.index"),
     scaling = 1)
 }
@@ -42,7 +45,7 @@ circos.track(ylim = c(0, 1), panel.fun = function(x, y) {
 })
 circos.clear()
 
-\dontrun{
+if(FALSE) {
 # NOTE: following takes quite a long time to run
 load(system.file("extdata", "doodle.RData", package = "circlize"))
 circos.par("cell.padding" = c(0, 0, 0, 0))

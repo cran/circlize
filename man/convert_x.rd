@@ -7,7 +7,9 @@ Convert unit on x direction in data coordinate
 Convert unit on x direction in data coordinate
 }
 \usage{
-convert_x(x, unit = c("mm", "cm", "inches"),
+convert_x(
+    x,
+    unit = c("mm", "cm", "inches"),
     sector.index = get.cell.meta.data("sector.index"),
     track.index = get.cell.meta.data("track.index"),
     h = get.cell.meta.data("ycenter", sector.index = sector.index,
@@ -27,6 +29,8 @@ A vector of numeric values which are measured in the specified data coordinate
 }
 \seealso{
 \code{\link{convert_y}} converts on y direction.
+
+\url{https://jokergoo.github.io/circlize_book/book/circular-layout.html#convert-functions}
 }
 \author{
 Zuguang Gu <z.gu@dkfz.de>

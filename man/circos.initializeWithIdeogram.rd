@@ -7,11 +7,15 @@ Initialize the circular layout with an ideogram
 Initialize the circular layout with an ideogram
 }
 \usage{
-circos.initializeWithIdeogram(cytoband = system.file(package = "circlize",
-    "extdata", "cytoBand.txt"), species = NULL, sort.chr = TRUE,
-    chromosome.index = usable_chromosomes(species), major.by = NULL,
+circos.initializeWithIdeogram(
+    cytoband = system.file(package = "circlize", "extdata", "cytoBand.txt"),
+    species = NULL,
+    sort.chr = TRUE,
+    chromosome.index = usable_chromosomes(species),
+    major.by = NULL,
     plotType = c("ideogram", "axis", "labels"),
-    track.height = NULL, ideogram.height = convert_height(2, "mm"),
+    track.height = NULL,
+    ideogram.height = convert_height(2, "mm"),
     ...)
 }
 \arguments{
@@ -36,15 +40,14 @@ The function finally pass data to \code{\link{circos.genomicInitialize}} to init
 
 The style of ideogram is almost fixed, but you can customize it with your self-sefined code. Refer to vignette for demonstration.
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
+\seealso{
+\url{https://jokergoo.github.io/circlize_book/book/initialize-genomic-plot.html#initialize-cytoband}
 }
 \examples{
 \dontrun{
 circos.initializeWithIdeogram()
 
-cytoband.file = system.file(package = "circlize"),
+cytoband.file = system.file(package = "circlize",
     "extdata", "cytoBand.txt")
 circos.initializeWithIdeogram(cytoband.file)
 
@@ -81,5 +84,4 @@ circos.par("gap.degree" = rep(c(2, 4), 12))
 circos.initializeWithIdeogram()
 circos.clear()
 }
-
 }

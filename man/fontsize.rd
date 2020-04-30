@@ -14,14 +14,6 @@ fontsize(x)
   \item{x}{value for fontsize}
 
 }
-\details{
-It just mark the value as a fontsize setting for \code{\link{circos.text}}
-
-}
-\author{
-Zuguang Gu <z.gu@dkfz.de>
-
-}
 \examples{
 # There is no example
 NULL

@@ -7,8 +7,11 @@ Draw polygon
 Draw polygon
 }
 \usage{
-circos.polygon(x, y, sector.index = get.cell.meta.data("sector.index"),
-    track.index = get.cell.meta.data("track.index"), ...)
+circos.polygon(
+    x, y,
+    sector.index = get.cell.meta.data("sector.index"),
+    track.index = get.cell.meta.data("track.index"),
+    ...)
 }
 \arguments{
 
@@ -23,10 +26,6 @@ circos.polygon(x, y, sector.index = get.cell.meta.data("sector.index"),
 similar as \code{\link[graphics]{polygon}}.
 
 Note: start point should overlap with the end point,
-}
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
 }
 \examples{
 set.seed(123)
@@ -48,5 +47,4 @@ circos.trackPlotRegion(ylim = c(-3, 3), track.height = 0.4, panel.fun = function
     circos.lines(x1, loess.predict$fit)
 })
 circos.clear()
-
 }

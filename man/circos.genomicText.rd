@@ -7,12 +7,27 @@ Draw text in a cell, specifically for genomic graphics
 Draw text in a cell, specifically for genomic graphics
 }
 \usage{
-circos.genomicText(region, value = NULL, y = NULL, labels = NULL, labels.column = NULL,
-    numeric.column = NULL, sector.index = get.cell.meta.data("sector.index"),
-    track.index = get.cell.meta.data("track.index"), posTransform = NULL,
-    direction = NULL, facing = "inside", niceFacing = FALSE,
-    adj = par("adj"), cex = 1, col = "black", font = par("font"), padding = 0,
-    extend = 0, align_to = "region", ...)
+circos.genomicText(
+    region,
+    value = NULL,
+    y = NULL,
+    labels = NULL,
+    labels.column = NULL,
+    numeric.column = NULL,
+    sector.index = get.cell.meta.data("sector.index"),
+    track.index = get.cell.meta.data("track.index"),
+    posTransform = NULL,
+    direction = NULL,
+    facing = "inside",
+    niceFacing = FALSE,
+    adj = par("adj"),
+    cex = 1,
+    col = "black",
+    font = par("font"),
+    padding = 0,
+    extend = 0,
+    align_to = "region",
+    ...)
 }
 \arguments{
 
@@ -41,12 +56,7 @@ circos.genomicText(region, value = NULL, y = NULL, labels = NULL, labels.column 
 \details{
 The function is a low-level graphical function and usually is put in \code{panel.fun} when using \code{\link{circos.genomicTrackPlotRegion}}.
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
-}
 \examples{
-\dontrun{
 circos.par("track.height" = 0.1, cell.padding = c(0, 0, 0, 0))
 circos.initializeWithIdeogram(plotType = NULL)
 
@@ -62,7 +72,4 @@ circos.genomicTrackPlotRegion(bed, panel.fun = function(region, value, ...) {
 })
 
 circos.clear()
-
-}
-
 }

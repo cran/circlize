@@ -7,10 +7,22 @@ Add lines to the plotting regions in a same track
 Add lines to the plotting regions in a same track
 }
 \usage{
-circos.trackLines(factors, x, y, track.index = get.cell.meta.data("track.index"),
-    col = par("col"), lwd = par("lwd"), lty = par("lty"), type = "l", straight = FALSE,
-    area = FALSE, area.baseline = NULL, border = "black", baseline = "bottom",
-    pt.col = par("col"), cex = par("cex"), pch = par("pch"))
+circos.trackLines(
+    factors,
+    x, y,
+    track.index = get.cell.meta.data("track.index"),
+    col = par("col"),
+    lwd = par("lwd"),
+    lty = par("lty"),
+    type = "l",
+    straight = FALSE,
+    area = FALSE,
+    area.baseline = NULL,
+    border = "black",
+    baseline = "bottom",
+    pt.col = par("col"),
+    cex = par("cex"),
+    pch = par("pch"))
 }
 \arguments{
 
@@ -37,10 +49,6 @@ The function adds lines in multiple cells by first splitting data into several p
 each part corresponds to one factor (sector index) and then add lines in cells by calling \code{\link{circos.lines}}.
 
 This function can be replaced by a \code{for} loop containing \code{\link{circos.lines}}.
-}
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
 }
 \examples{
 # There is no example

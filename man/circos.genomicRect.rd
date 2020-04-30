@@ -7,11 +7,20 @@ Draw rectangle-like grid, specifically for genomic graphics
 Draw rectangle-like grid, specifically for genomic graphics
 }
 \usage{
-circos.genomicRect(region, value = NULL,
-    ytop = NULL, ybottom = NULL, ytop.column = NULL, ybottom.column = NULL,
+circos.genomicRect(
+    region,
+    value = NULL,
+    ytop = NULL,
+    ybottom = NULL,
+    ytop.column = NULL,
+    ybottom.column = NULL,
     sector.index = get.cell.meta.data("sector.index"),
-    track.index = get.cell.meta.data("track.index"), posTransform = NULL,
-    col = NA, border = "black", lty = par("lty"), ...)
+    track.index = get.cell.meta.data("track.index"),
+    posTransform = NULL,
+    col = NA,
+    border = "black",
+    lty = par("lty"),
+    ...)
 }
 \arguments{
 
@@ -33,13 +42,8 @@ circos.genomicRect(region, value = NULL,
 \details{
 The function is a low-level graphical function and usually is put in \code{panel.fun} when using \code{\link{circos.genomicTrackPlotRegion}}.
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
-}
 \examples{
 \dontrun{
-
 ############################
 ### rect matrix
 circos.par("track.height" = 0.1, cell.padding = c(0, 0, 0, 0))
@@ -89,8 +93,8 @@ bed_list = list(bed1, bed2)
 f = colorRamp2(breaks = c(-1, 0, 1), colors = c("green", "black", "red"))
 circos.genomicTrackPlotRegion(bed_list, stack = TRUE,
     panel.fun = function(region, value, ...) {
-    
-    circos.genomicRect(region, value, col = f(value[[1]]), 
+
+circos.genomicRect(region, value, col = f(value[[1]]), 
         border = NA, ...)
     i = getI(...)
     cell.xlim = get.cell.meta.data("cell.xlim")
@@ -102,8 +106,8 @@ circos.genomicTrackPlotRegion(bed_list, ylim = c(0, 3),
     i = getI(...)
     circos.genomicRect(region, value, ytop = i+0.4, ybottom = i-0.4, col = f(value[[1]]), 
         border = NA, ...)
-    
-    cell.xlim = get.cell.meta.data("cell.xlim")
+
+cell.xlim = get.cell.meta.data("cell.xlim")
     circos.lines(cell.xlim, c(i, i), lty = 2, col = "#000000")
 })
 
@@ -119,7 +123,5 @@ circos.genomicTrackPlotRegion(bed_list, panel.fun = function(region, value, ...)
 })
 
 circos.clear()
-
 }
-
 }

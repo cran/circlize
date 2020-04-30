@@ -7,8 +7,11 @@ Add circular dendrograms
 Add circular dendrograms
 }
 \usage{
-circos.dendrogram(dend, facing = c("outside", "inside"),
-    max_height = NULL, use_x_attr = FALSE)
+circos.dendrogram(
+    dend,
+    facing = c("outside", "inside"),
+    max_height = NULL,
+    use_x_attr = FALSE)
 }
 \arguments{
 
@@ -23,6 +26,9 @@ Assuming there are \code{n} nodes in the dendrogram, the positions for leaves on
 So you must be careful with \code{xlim} when you initialize the cirular layout.
 
 You can use the \code{dendextend} package to render the dendrograms.
+}
+\seealso{
+\url{https://jokergoo.github.io/circlize_book/book/high-level-plots.html#phylogenetic-trees}
 }
 \examples{
 load(system.file(package = "circlize", "extdata", "bird.orders.RData"))
@@ -52,5 +58,4 @@ circos.trackPlotRegion(ylim = c(0, max_height), bg.border = NA,
         circos.dendrogram(dend, max_height = max_height)
 })
 circos.clear()
-
 }

@@ -7,10 +7,16 @@ Initialize circular plot with any genomic data
 Initialize circular plot with any genomic data
 }
 \usage{
-circos.genomicInitialize(data, sector.names = NULL, major.by = NULL,
-    plotType = c("axis", "labels"), tickLabelsStartFromZero = TRUE,
-    axis.labels.cex = 0.4*par("cex"), labels.cex = 0.8*par("cex"),
-    track.height = NULL, ...)
+circos.genomicInitialize(
+    data,
+    sector.names = NULL,
+    major.by = NULL,
+    plotType = c("axis", "labels"),
+    tickLabelsStartFromZero = TRUE,
+    axis.labels.cex = 0.4*par("cex"),
+    labels.cex = 0.8*par("cex"),
+    track.height = NULL,
+    ...)
 }
 \arguments{
 
@@ -34,20 +40,17 @@ is \code{levels(data[[1]])}; If the first column is just a simple vector, the or
 
 For more details on initializing genomic plot, please refer to the vignettes.
 }
-\references{
-Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.
-
+\seealso{
+\url{https://jokergoo.github.io/circlize_book/book/initialize-genomic-plot.html#initialize-with-general-genomic-category}
 }
 \examples{
-\dontrun{
-
 df = read.cytoband()$df
 circos.genomicInitialize(df)
 
 df = data.frame(name = c("TP53", "TP63", "TP73"),
-                 start = c(7565097, 189349205, 3569084),
-                 end = c(7590856, 189615068, 3652765),
-                 stringsAsFactors = FALSE)
+                start = c(7565097, 189349205, 3569084),
+                end = c(7590856, 189615068, 3652765),
+                stringsAsFactors = FALSE)
 circos.genomicInitialize(df)
 circos.clear()
 
@@ -66,7 +69,4 @@ circos.clear()
 df[[1]] = factor(df[[1]], levels = c("TP73", "TP63", "TP53"))
 circos.genomicInitialize(df)
 circos.clear()
-
-}
-
 }

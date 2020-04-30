@@ -7,7 +7,9 @@ Convert to data coordinate system
 Convert to data coordinate system
 }
 \usage{
-reverse.circlize(x, y, sector.index = get.current.sector.index(),
+reverse.circlize(
+    x, y,
+    sector.index = get.current.sector.index(),
     track.index = get.current.track.index())
 }
 \arguments{
@@ -34,5 +36,4 @@ reverse.circlize(c(30, 60), c(0.9, 0.8), sector.index = "d", track.index = 1)
 reverse.circlize(c(30, 60), c(0.9, 0.8), sector.index = "a", track.index = 1)
 circos.clear()
 dev.off()
-
 }
