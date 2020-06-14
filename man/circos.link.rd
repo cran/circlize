@@ -30,7 +30,8 @@ circos.link(
     arr.type = "triangle",
     arr.lty = lty,
     arr.lwd = lwd,
-    arr.col = col)
+    arr.col = col,
+    reduce_to_mid_line = FALSE)
 }
 \arguments{
 
@@ -39,7 +40,7 @@ circos.link(
   \item{sector.index2}{Index for the other sector where the other link end locates}
   \item{point2}{A single value or a numeric vector of length 2. If it is a 2-elements vector, then the link would be a belt/ribbon.}
   \item{rou}{The position of the the link ends (if \code{rou1} and \code{rou2} are not set). It is the percentage of the radius of the unit circle. By default its value is the position of bottom margin of the most inner track.}
-  \item{rou1}{The position of end 1 of the link. }
+  \item{rou1}{The position of end 1 of the link.}
   \item{rou2}{The position of end 2 of the link.}
   \item{h}{Height of the link, measured as percent to the radius to the unit circle. By default it is automatically infered.}
   \item{h.ratio}{systematically change the link height. The value is between 0 and 1.}
@@ -57,6 +58,7 @@ circos.link(
   \item{arr.col}{Color of the arrows, pass to \code{\link[shape]{Arrowhead}}.}
   \item{arr.lwd}{Line width of arrows, pass to \code{\link[shape]{Arrowhead}}.}
   \item{arr.lty}{Line type of arrows, pass to \code{\link[shape]{Arrowhead}}.}
+  \item{reduce_to_mid_line}{Only use the middle points of \code{point1} and \code{point2} to draw the link.}
 
 }
 \details{
@@ -70,7 +72,7 @@ links would look nice.
 Please refer to the vignette for detailed explanation.
 }
 \seealso{
-\url{http://jokergoo.github.io/circlize_book/book/graphics.html#links}
+\url{https://jokergoo.github.io/circlize_book/book/graphics.html#links}
 }
 \examples{
 # There is no example

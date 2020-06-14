@@ -40,6 +40,7 @@
 # -link.rank order to add links to the circle, a large value means to add it later.
 # -link.overlap pass to `chordDiagramFromMatrix` or `chordDiagramFromDataFrame`
 # -scale scale each sector to same width
+# -group It contains the group labels and the sector names are used as the names in the vector.
 # -big.gap Gap between the two sets of sectors. If the input is a matrix, the two sets
 #      are row sectors and column sectors. If the input is a data frame, the two sets
 #      correspond to the first column and the second column. It only works when there
@@ -120,6 +121,7 @@ chordDiagram = function(
 	link.rank = NULL,
 	link.overlap = FALSE,
 	scale = FALSE,
+	group = NULL,
 	big.gap = 10,
 	small.gap = 1,
 	...) {
@@ -144,7 +146,7 @@ chordDiagram = function(
 			link.border = link.border, link.lwd = link.lwd, link.lty = link.lty, link.sort = link.sort, link.decreasing = link.decreasing,
 			link.arr.length = link.arr.length, link.arr.width = link.arr.width, link.arr.type = link.arr.type, link.arr.lty = link.arr.lty,
 			link.arr.lwd = link.arr.lwd, link.arr.col = link.arr.col, link.largest.ontop = link.largest.ontop,
-			link.visible = link.visible, link.rank = link.rank, link.overlap = link.overlap, scale = scale, big.gap = big.gap, small.gap = small.gap, ...)
+			link.visible = link.visible, link.rank = link.rank, link.overlap = link.overlap, scale = scale, group = group, big.gap = big.gap, small.gap = small.gap, ...)
 	} else {
 		x = validate_data_frame(x)
 		if(ncol(x) > 3) {
@@ -158,7 +160,7 @@ chordDiagram = function(
 					link.border = link.border, link.lwd = link.lwd, link.lty = link.lty, link.sort = link.sort, link.decreasing = link.decreasing,
 					link.arr.length = link.arr.length, link.arr.width = link.arr.width, link.arr.type = link.arr.type, link.arr.lty = link.arr.lty,
 					link.arr.lwd = link.arr.lwd, link.arr.col = link.arr.col, link.largest.ontop = link.largest.ontop,
-					link.visible = link.visible, link.rank = link.rank, link.overlap = link.overlap, scale = scale, big.gap = big.gap, small.gap = small.gap, ...)))
+					link.visible = link.visible, link.rank = link.rank, link.overlap = link.overlap, scale = scale, group = group, big.gap = big.gap, small.gap = small.gap, ...)))
 			} else {
 				chordDiagramFromDataFrame(x, grid.col = grid.col, grid.border = grid.border, transparency = transparency,
 					col = col, order = order, directional = directional, direction.type = direction.type,
@@ -167,7 +169,7 @@ chordDiagram = function(
 					link.border = link.border, link.lwd = link.lwd, link.lty = link.lty, link.sort = link.sort, link.decreasing = link.decreasing,
 					link.arr.length = link.arr.length, link.arr.width = link.arr.width, link.arr.type = link.arr.type, link.arr.lty = link.arr.lty,
 					link.arr.lwd = link.arr.lwd, link.arr.col = link.arr.col, link.largest.ontop = link.largest.ontop,
-					link.visible = link.visible, link.rank = link.rank, link.overlap = link.overlap, scale = scale, big.gap = big.gap, small.gap = small.gap, ...)
+					link.visible = link.visible, link.rank = link.rank, link.overlap = link.overlap, scale = scale, group = group, big.gap = big.gap, small.gap = small.gap, ...)
 			}
 		} else {
 			chordDiagramFromDataFrame(x, grid.col = grid.col, grid.border = grid.border, transparency = transparency,
@@ -177,7 +179,7 @@ chordDiagram = function(
 				link.border = link.border, link.lwd = link.lwd, link.lty = link.lty, link.sort = link.sort, link.decreasing = link.decreasing,
 				link.arr.length = link.arr.length, link.arr.width = link.arr.width, link.arr.type = link.arr.type, link.arr.lty = link.arr.lty,
 				link.arr.lwd = link.arr.lwd, link.arr.col = link.arr.col, link.largest.ontop = link.largest.ontop,
-				link.visible = link.visible, link.rank = link.rank, link.overlap = link.overlap, scale = scale, big.gap = big.gap, small.gap = small.gap, ...)
+				link.visible = link.visible, link.rank = link.rank, link.overlap = link.overlap, scale = scale, group = group, big.gap = big.gap, small.gap = small.gap, ...)
 		}
 	}
 }
@@ -341,6 +343,7 @@ mat2df = function(mat) {
 # -link.rank order to add links to the circle, a large value means to add it later.
 # -link.overlap if it is a directional Chord Diagram, whether the links that come or end in a same sector overlap?
 # -scale scale each sector to same width
+# -group It contains the group labels and the sector names are used as the names in the vector.
 # -big.gap Gap between row sectors and column sectors.
 # -small.gap Small gap between sectors.
 # -... pass to `circos.link`
@@ -390,6 +393,7 @@ chordDiagramFromMatrix = function(
 	link.rank = NULL,
 	link.overlap = FALSE,
 	scale = FALSE,
+	group = NULL,
 	big.gap = 10,
 	small.gap = 1,
 	...) {
@@ -474,6 +478,25 @@ chordDiagramFromMatrix = function(
 	}
 
 	keep_index = names(xlim)[xlim / sum(xlim) >= reduce]
+
+	if(length(keep_index) < length(xlim)) {
+		gap.degree = circos.par$gap.degree
+		if(length(gap.degree) > 1) {
+			if(is.null(names(gap.degree))) {
+				if(length(keep_index) != length(gap.degree)) {
+					stop_wrap("`reduce` argument causes reduction of sectors. You can either set `reduce = 0`, or adjust the `gap.degree`/`gap.after` in `circos.par()` to remove tiny sectors, or set `gap.degree`/`gap.after` as a named vector where sector names are the vector names (tiny sectors can be included).")
+				}
+			} else {
+				if(length(setdiff(nn[keep_index], names(gap.degree))) == 0) {
+
+				} else {
+					if(length(keep_index) != length(gap.degree)) {
+						stop_wrap("`reduce` argument causes reduction of sectors. You can either set `reduce = 0`, or adjust the `gap.degree`/`gap.after` in `circos.par()` to remove tiny sectors, or set `gap.degree`/`gap.after` as a named vector where sector names are the vector names (tiny sectors can be included).")
+					}
+				}
+			}
+		}
+	}
 	ri = which(rownames(mat) %in% keep_index)
 	ci = which(colnames(mat) %in% keep_index)
 
@@ -640,6 +663,7 @@ chordDiagramFromMatrix = function(
 		link.rank = link.rank,
 		link.overlap = link.overlap,
 		scale = scale,
+		group = group,
 		big.gap = big.gap,
 		small.gap = small.gap,
 		...)
@@ -704,6 +728,7 @@ chordDiagramFromMatrix = function(
 # -link.rank order to add links to the circle, a large value means to add it later.
 # -link.overlap if it is a directional Chord Diagram, whether the links that come or end in a same sector overlap?
 # -scale scale each sector to same width
+# -group It contains the group labels and the sector names are used as the names in the vector.
 # -big.gap Gaps between the sectors in the first column of ``df`` and sectors in the second column in ``df``.
 # -small.gap Small gap between sectors.
 # -... pass to `circos.link`
@@ -749,6 +774,7 @@ chordDiagramFromDataFrame = function(
 	link.rank = seq_len(nrow(df)),
 	link.overlap = FALSE,
 	scale = FALSE,
+	group = NULL,
 	big.gap = 10,
 	small.gap = 1,
 	...) {
@@ -807,6 +833,17 @@ chordDiagramFromDataFrame = function(
 
 	cate = union(df[[1]], df[[2]])
 	if(!is.null(order)) {
+
+		if(length(grid.col) > 1) {
+			if(is.null(names(grid.col))) {
+				warning_wrap("Since you have set `order`, you should better set `grid.col` as a named vector where sector names are the vector names, or else the color will be wrongly assigned.")
+			} else {
+				if(length(setdiff(cate, names(grid.col))) > 0) {
+					warning_wrap("Since you have set `order`, you should better set `grid.col` as a named vector where sector names are the vector names (should contain all sectors).")
+				}
+			}
+		}
+
 		order = intersect(order, cate)
 		if(length(order) != length(cate)) {
 			stop_wrap("`order` should contain names of all sectors.")
@@ -829,6 +866,17 @@ chordDiagramFromDataFrame = function(
 		grid.col = rand_color(n)
 		names(grid.col) = cate
 	} else {
+		if(length(grid.col) > 1) {
+			if(!is.null(group)) {
+				if(is.null(names(grid.col))) {
+					warning_wrap("Since you have set `group`, you should better set `grid.col` as a named vector where sector names are the vector names, or else the color will be wrongly assigned.")
+				} else {
+					if(length(setdiff(cate, names(grid.col))) > 0) {
+						warning_wrap("Since you have set `group`, you should better set `grid.col` as a named vector where sector names are the vector names (should contain all sectors).")
+					}
+				}
+			}
+		}
 		if(!is.null(names(grid.col))) {
 			unnamed_grid = setdiff(cate, names(grid.col))
 			if(length(unnamed_grid) > 0) {
@@ -908,6 +956,7 @@ chordDiagramFromDataFrame = function(
 
 	#### reduce the data frame
 	onr = nrow(df)
+	onn = union(df[, 1], df[, 2])
 	while(1) {
 		xsum = structure(rep(0, length(cate)), names = cate)
 		for(i in seq_len(nr)) {
@@ -947,6 +996,26 @@ chordDiagramFromDataFrame = function(
 		reduce = 1e-10
 		if(nr == onr) break
 		onr = nr
+	}
+
+	nn = union(df[, 1], df[, 2])
+	if(length(nn) < length(onn)) {
+		gap.degree = circos.par$gap.degree
+		if(length(gap.degree) > 1) {
+			if(is.null(names(gap.degree))) {
+				if(length(nn) != length(gap.degree)) {
+					stop_wrap("`reduce` argument causes reduction of sectors. You can either set `reduce = 0`, or adjust the `gap.degree`/`gap.after` in `circos.par()` to remove tiny sectors, or set `gap.degree`/`gap.after` as a named vector where sector names are the vector names (tiny sectors can be included).")
+				}
+			} else {
+				if(length(setdiff(nn, names(gap.degree))) == 0) {
+
+				} else {
+					if(length(nn) != length(gap.degree)) {
+						stop_wrap("`reduce` argument causes reduction of sectors. You can either set `reduce = 0`, or adjust the `gap.degree`/`gap.after` in `circos.par()` to remove tiny sectors, or set `gap.degree`/`gap.after` as a named vector where sector names are the vector names (tiny sectors can be included).")
+					}
+				}
+			}
+		}
 	}
 
 	# re-calcualte xsum
@@ -1089,22 +1158,61 @@ chordDiagramFromDataFrame = function(
     o.start.degree = circos.par("start.degree")
     o.gap.after = circos.par("gap.after")
 
+    ### group_by ###
+	if(!is.null(group)) {
+		# validate `group`
+		if(is.null(names(group))) {
+			stop_wrap("`group` should be named vector where names are the sector names and values are the group labels.")
+		}
+		if(length(setdiff(cate, names(group))) > 0) {
+			stop_wrap("Names in `group` should cover all sector names.")
+		}
+
+		group = group[intersect(names(group), cate)]
+		
+		tg = table(group)
+		group_lt = split(names(group), group)
+
+		sn_by_group = unlist(group_lt)
+
+		cate = intersect(sn_by_group, cate)
+		xsum = xsum[cate]
+
+		gap.after = c(unlist(lapply(tg, function(x) c(rep(small.gap, x-1), big.gap))))
+		names(gap.after) = sn_by_group
+		circos.par(gap.after = gap.after)
+	}
+
 	if((identical(circos.par("gap.after"), 1))) {  # gap.after is not set in circos.par()
 		if(length(intersect(df[, 1], df[, 2])) == 0) {
-			n_df1 = length(unique(df[, 1]))
-			n_df2 = length(unique(df[, 2]))
-			n_sector = n_df1 + n_df2
-			s1 = sum(abs(df[, 3]))
-			s2 = sum(abs(df[, 4]))
-			d1 =  (360 - small.gap*(n_sector - 2) - big.gap*2) * (s1/(s1 + s2)) + small.gap*(n_df1-1)
-			if(circos.par$start.degree == 1) circos.par$start.degree = 0
-			if(circos.par$clock.wise) {
-				start_degree = circos.par$start.degree - (180 - d1)/2
-			} else {
-				start_degree = circos.par$start.degree + (180 - d1)/2
+			ind1 = which(cate %in% df[, 1])
+			ind2 = which(cate %in% df[, 2])
+
+			if(max(ind1) < min(ind2) || max(ind2) < min(ind1)) {
+				n_df1 = length(unique(df[, 1]))
+				n_df2 = length(unique(df[, 2]))
+				s1 = sum(abs(df[, 3]))
+				s2 = sum(abs(df[, 4]))
+				if(cate[1] %in% df[ ,2]) {
+					foo = n_df1
+					n_df1 = n_df2
+					n_df2 = foo
+
+					foo = s1
+					s1 = s2
+					s2 = foo
+				}
+				n_sector = n_df1 + n_df2
+				d1 =  (360 - small.gap*(n_sector - 2) - big.gap*2) * (s1/(s1 + s2)) + small.gap*(n_df1-1)
+				if(circos.par$start.degree == 1) circos.par$start.degree = 0
+				if(circos.par$clock.wise) {
+					start_degree = circos.par$start.degree - (180 - d1)/2
+				} else {
+					start_degree = circos.par$start.degree + (180 - d1)/2
+				}
+				gap.after = c(rep(small.gap, n_df1 - 1), big.gap, rep(small.gap, n_df2 - 1), big.gap)
+				suppressWarnings(circos.par(start.degree = start_degree, gap.after = gap.after))
 			}
-			suppressWarnings(circos.par(start.degree = start_degree,
-				gap.after = c(rep(small.gap, n_df1 - 1), big.gap, rep(small.gap, n_df2 - 1), big.gap)))
 		} else {
 			# warning("The two sets of sectors overlap, ignore `gap.degree`.")
 		}

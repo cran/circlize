@@ -168,6 +168,10 @@ circos.par = setGlobalOptions(
 	'__omar__' = list(   # is par("mar") the default value?
 		.value = FALSE,
 		.private = TRUE,
+		.visible = FALSE),
+	'__tempenv__' = list(
+		.value = new.env(parent = emptyenv()),
+		.private = TRUE,
 		.visible = FALSE)
 )
 
@@ -309,6 +313,12 @@ circos.initialize = function(
 	sector[["max.data"]] = max.value
 
     gap.degree = circos.par("gap.degree")
+    if(!is.null(names(gap.degree))) {
+    	if(length(setdiff(le, names(gap.degree))) == 0) {
+    		gap.degree = gap.degree[le]
+    	}
+    }
+
 	if(length(gap.degree) == 1) {
 		gap.degree = rep(gap.degree, n.sector)
 	} else if(length(gap.degree) != n.sector) {
@@ -329,7 +339,7 @@ circos.initialize = function(
 		for(i in seq_len(n.sector)) {
 
 			if(sector.range[i] == 0) {
-				stop_wrap("Range of the sector ('", le[i] ,"') cannot be 0.")
+				stop_wrap("Range of the sector ('", le[i] ,"') cannot be 0. You might need to set the second and the fourth values in `circos.par$cell.padding` to 0.")
 			}
 
 			# only to ensure value are always increasing or decreasing with the absolute degree value
@@ -438,7 +448,14 @@ circos.clear = function() {
 	circos.par(RESET = TRUE)
 	circos.par("__tempdir__" = tmpdir)
 
+	empty_env(circos.par("__tempenv__"))
+
     return(invisible(NULL))
+}
+
+empty_env = function(env) {
+	obj = ls(envir = env, all.names = TRUE)
+	if(length(obj)) rm(list = obj, envir = env)
 }
 
 # == title
@@ -472,6 +489,7 @@ get.all.track.index = function() {
 }
 
 get.sector.data = function(sector.index = get.current.sector.index()) {
+	sector.index = as.character(sector.index)
 	.SECTOR.DATA = get(".SECTOR.DATA", envir = .CIRCOS.ENV)
     sector.data = as.vector(as.matrix(.SECTOR.DATA[.SECTOR.DATA[[1]] == sector.index, -1]))
     names(sector.data) = colnames(.SECTOR.DATA)[-1]
@@ -535,16 +553,20 @@ set.current.sector.index = function(x) {
 # circos.clear()
 # dev.off()
 set.current.cell = function(sector.index, track.index) {
+	sector.index = as.character(sector.index)
 	set.current.sector.index(sector.index)
 	set.current.track.index(track.index)
 }
 
 get.cell.data = function(sector.index = get.current.sector.index(), track.index = get.current.track.index()) {
+	sector.index = as.character(sector.index)
 	.CELL.DATA = get(".CELL.DATA", envir = .CIRCOS.ENV)
     .CELL.DATA[[sector.index]][[track.index]]
 }
 
 set.cell.data = function(sector.index = get.current.sector.index(), track.index = get.current.track.index(), ...) {
+	sector.index = as.character(sector.index)
+	
 	.CELL.DATA = get(".CELL.DATA", envir = .CIRCOS.ENV)
     .CELL.DATA[[sector.index]][[track.index]] = list(...)
 	assign(".CELL.DATA", .CELL.DATA, envir = .CIRCOS.ENV)
@@ -553,7 +575,8 @@ set.cell.data = function(sector.index = get.current.sector.index(), track.index 
 
 # whether cell in sector.index, track.index exists?
 has.cell = function(sector.index, track.index) {
-
+	sector.index = as.character(sector.index)
+	
 	.CELL.DATA = get(".CELL.DATA", envir = .CIRCOS.ENV)
     if(sector.index %in% names(.CELL.DATA) &&
        track.index <= length(.CELL.DATA[[sector.index]]) &&
@@ -577,7 +600,7 @@ has.cell = function(sector.index, track.index) {
 # and ``track.index`` are set to ``NULL``, the function would print index for
 # all sectors and all tracks. If ``sector.index`` and/or ``track.index`` are set,
 # the function would print ``xlim``, ``ylim``, ``cell.xlim``, ``cell.ylim``,
-# ``xplot``, ``yplot``, ``track.margin`` and ``cell.padding`` for every cell in specified sectors and tracks.
+# ``xplot``, ``yplot``, ``cell.width``, ``cell.height``, ``track.margin`` and ``cell.padding`` for every cell in specified sectors and tracks.
 # Also, the function will print index of your current sector and current track.
 #
 # If ``plot`` is set to ``TRUE``, the function will plot the index of the sector and the track
@@ -632,6 +655,8 @@ circos.info = function(sector.index = NULL, track.index = NULL, plot = FALSE) {
 					cell.ylim = get.cell.meta.data("cell.ylim", sector.index[i], track.index[j])
 					xplot = get.cell.meta.data("xplot", sector.index[i], track.index[j])
 					yplot = get.cell.meta.data("yplot", sector.index[i], track.index[j])
+				    cell.width = get.cell.meta.data("cell.width", sector.index[i], track.index[j])
+				    cell.height = get.cell.meta.data("cell.height", sector.index[i], track.index[j])
 				    track.margin = get.cell.meta.data("track.margin", sector.index[i], track.index[j])
 				    cell.padding = get.cell.meta.data("cell.padding", sector.index[i], track.index[j])
 					cat("xlim: [", xlim[1], ", ", xlim[2], "]\n", sep = "")
@@ -640,6 +665,8 @@ circos.info = function(sector.index = NULL, track.index = NULL, plot = FALSE) {
 					cat("cell.ylim: [", cell.ylim[1], ", ", cell.ylim[2], "]\n", sep = "")
 					cat("xplot (degree): [", xplot[1], ", ", xplot[2], "]\n", sep = "")
 					cat("yplot (radius): [", yplot[1], ", ", yplot[2], "]\n", sep = "")
+					cat("cell.width (degree): ", cell.width, "\n", sep = "")
+					cat("cell.height (radius): ", cell.height, "\n", sep = "")
 					cat("track.margin: c(", track.margin[1], ", ", track.margin[2], ")\n", sep = "")
 					cat("cell.padding: c(", cell.padding[1], ", ", cell.padding[2], ", ", cell.padding[3], ", ", cell.padding[4], ")\n", sep = "")
 					cat("\n")
@@ -687,8 +714,10 @@ show.index = function() {
 # -``ycenter``              Center of y-axis
 # -``cell.xlim``            Minimal and maximal values on the x-axis extended by cell paddings
 # -``cell.ylim``            Minimal and maximal values on the y-axis extended by cell paddings
-# -``xplot``                Degrees for right and left borders of the cell.
+# -``xplot``                Degrees for right and left borders of the cell. The values ignore the direction of the circular layout (i.e. whether it is clock wise or not).
 # -``yplot``                Radius for top and bottom borders of the cell.
+# -``cell.width``           Width of the cell, in degrees.
+# -``cell.height``          Height of the cell, simply ``yplot[2] - yplot[1]``
 # -``cell.start.degree``    Same as ``xplot[1]``
 # -``cell.end.degree``      Same as ``xplot[2]``
 # -``cell.bottom.radius``   Same as ``yplot[1]``
@@ -712,6 +741,9 @@ show.index = function() {
 # circos.clear()
 get.cell.meta.data = function(name, sector.index = get.current.sector.index(),
                               track.index = get.current.track.index()) {
+	
+	sector.index = as.character(sector.index)
+
 	if(length(sector.index) == 0) {
 		stop_wrap("It seems the circular plot has not been initialized.")
 	}
@@ -775,6 +807,12 @@ get.cell.meta.data = function(name, sector.index = get.current.sector.index(),
 		return(x)
 	} else if(name == "yplot") {
 		return(c(current.cell.data$track.start - current.cell.data$track.height, current.cell.data$track.start))
+	} else if(name == "cell.width") {
+		x = current.sector.data[c("start.degree", "end.degree")]
+		return((x[1] - x[2]) %% 360)
+	} else if(name == "cell.height") {
+		y = c(current.cell.data$track.start - current.cell.data$track.height, current.cell.data$track.start)
+		return(y[2] - y[1])
 	} else if(name == "track.margin") {
 		return(current.cell.data$track.margin)
 	} else if(name == "cell.padding") {
@@ -804,9 +842,41 @@ get.cell.meta.data = function(name, sector.index = get.current.sector.index(),
 	} else if(name == "track.height") {
 		return(current.cell.data$track.height)
 	} else {
-		stop_wrap("Wrong cell meta name.")
+		env = circos.par("__tempenv__")
+		if(!is.null(env$track.meta.data)) {
+			track.index = as.character(track.index)
+			if(!is.null(env$track.meta.data[[track.index]])) {
+				if(name %in% names(env$track.meta.data[[track.index]])) {
+					return(env$track.meta.data[[track.index]][[name]])
+				}
+			}
+		}
+		if(!is.null(env$sector.meta.data)) {
+			if(!is.null(env$sector.meta.data[[sector.index]])) {
+				if(name %in% names(env$sector.meta.data[[sector.index]])) {
+					return(env$sector.meta.data[[sector.index]][[name]])
+				}
+			}
+		}
 	}
+
 	return(NULL)
+}
+
+add.track.meta.data = function(name, value, track.index = get.current.track.index()) {
+	env = circos.par("__tempenv__")
+	if(is.null(env$track.meta.data)) env$track.meta.data = list()
+	track.index = as.character(track.index)
+	if(is.null(env$track.meta.data[[track.index]])) env$track.meta.data[[track.index]] = list()
+	env$track.meta.data[[track.index]][[name]] = value
+}
+
+add.sector.meta.data = function(name, value, sector.index = get.current.sector.index()) {
+	sector.index = as.character(sector.index)
+	env = circos.par("__tempenv__")
+	if(is.null(env$sector.meta.data)) env$sector.meta.data = list()
+	if(is.null(env$sector.meta.data[[sector.index]])) env$sector.meta.data[[sector.index]] = list()
+	env$sector.meta.data[[sector.index]][[name]] = value
 }
 
 # == title (variable:CELL_META)
@@ -840,10 +910,32 @@ class(CELL_META) = "CELL_META"
 # == example
 # names(CELL_META)
 names.CELL_META = function(x) {
-	c("xlim", "ylim", "xrange", "yrange", "xcenter", "ycenter", "cell.xlim", "cell.ylim",
-     "sector.numeric.index", "sector.index", "track.index", "xplot", "yplot", "track.margin", "cell.padding",
+	sector.index = get.current.sector.index()
+    track.index = get.current.track.index()
+
+	nm = c("xlim", "ylim", "xrange", "yrange", "xcenter", "ycenter", "cell.xlim", "cell.ylim",
+     "sector.numeric.index", "sector.index", "track.index", "xplot", "yplot", "cell.width", "cell.height", "track.margin", "cell.padding",
      "cell.start.degree", "cell.end.degree", "cell.bottom.radius", "cell.top.radius", "bg.col", "bg.border",
      "bg.lty", "bg.lwd", "track.height")
+
+	env = circos.par("__tempenv__")
+	if(track.index > 0) {
+		if(!is.null(env$track.meta.data)) {
+			track.index = as.character(track.index)
+			if(!is.null(env$track.meta.data[[track.index]])) {
+				nm = c(nm, names(env$track.meta.data[[track.index]]))
+			}
+		}
+	}
+	if(!is.null(sector.index)) {
+		if(!is.null(env$sector.meta.data)) {
+			if(!is.null(env$sector.meta.data[[sector.index]])) {
+				nm = c(nm, names(env$sector.meta.data[[sector.index]]))
+			}
+		}
+	}
+
+	return(nm)
 }
 
 # == title

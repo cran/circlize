@@ -575,6 +575,8 @@ col2value = function(r, g, b, col_fun) {
 # Since in the circular plot, the aspect ratio is always 1, it does not matter this conversion
 # is applied on x direction or y direction.
 #
+# This function is mainly used in the radical direction.
+#
 # == seealso
 # `convert_x` and `convert_y` convert absolute units into a data coordinate in a specified cell.
 #
@@ -629,6 +631,9 @@ convert_length = function(x, unit = c("mm", "cm", "inches")) {
 # == details
 # This function is same as `convert_length`. The reason for naming this function
 # is `convert_length` is mostely used for defining the height of tracks and track margins.
+#
+# == seealso
+# For pre-defined units, users can use `cm_h`, `mm_h` and `inches_h`.
 #
 # == author
 # Zuguang Gu <z.gu@dkfz.de>
@@ -731,6 +736,8 @@ convert_unit_in_data_coordinate = function(x, unit = c("mm", "cm", "inches", "ca
 # A vector of numeric values which are measured in the specified data coordinate
 #
 # == seealso
+# For pre-defined units, users can use `cm_x`, `mm_x` and `inches_x`.
+#
 # `convert_y` converts on y direction.
 #
 # https://jokergoo.github.io/circlize_book/book/circular-layout.html#convert-functions
@@ -742,21 +749,21 @@ convert_unit_in_data_coordinate = function(x, unit = c("mm", "cm", "inches", "ca
 # fa = letters[1:10]
 # circos.par(cell.padding = c(0, 0, 0, 0), track.margin = c(0, 0))
 # circos.initialize(fa, xlim = cbind(rep(0, 10), runif(10, 0.5, 1.5)))
-# circos.track(ylim = c(0, 1), track.height = convert_height(5, "mm"),
+# circos.track(ylim = c(0, 1), track.height = mm_h(5),
 #     panel.fun = function(x, y) {
-#         circos.lines(c(0, 0 + convert_x(5, "mm")), c(0.5, 0.5), col = "blue")
+#         circos.lines(c(0, 0 + mm_x(5)), c(0.5, 0.5), col = "blue")
 #     })
-# circos.par(track.margin = c(0, convert_height(2, "mm")))
+# circos.par(track.margin = c(0, mm_h(2)))
 # circos.track(ylim = c(0, 1), track.height = convert_height(1, "cm"),
 #     panel.fun = function(x, y) {
 #         xcenter = get.cell.meta.data("xcenter")
-#         circos.lines(c(xcenter, xcenter), c(0, convert_y(1, "cm")), col = "red")
+#         circos.lines(c(xcenter, xcenter), c(0, cm_y(1)), col = "red")
 #     })
-# circos.par(track.margin = c(0, convert_height(5, "mm")))
-# circos.track(ylim = c(0, 1), track.height = convert_height(1, "inches"),
+# circos.par(track.margin = c(0, mm_h(5)))
+# circos.track(ylim = c(0, 1), track.height = inch_h(1),
 #     panel.fun = function(x, y) {
-#         line_length_on_x = convert_x(1*sqrt(2)/2, "cm")
-#         line_length_on_y = convert_y(1*sqrt(2)/2, "cm")
+#         line_length_on_x = cm_x(1*sqrt(2)/2)
+#         line_length_on_y = cm_y(1*sqrt(2)/2)
 #         circos.lines(c(0, line_length_on_x), c(0, line_length_on_y), col = "orange")
 #     })
 # circos.clear()
@@ -803,6 +810,8 @@ ux = function(...) {
 # A vector of numeric values which are measured in the specified data coordinate
 #
 # == seealso
+# For pre-defined units, users can use `cm_y`, `mm_y` and `inches_y`.
+#
 # `convert_x` converts on x direction.
 #
 # https://jokergoo.github.io/circlize_book/book/circular-layout.html#convert-functions
@@ -867,6 +876,223 @@ convert_unit_in_canvas_coordinate = function(x, unit = c("mm", "cm", "inches")) 
     return(len)
 }
 
+# == title
+# Convert unit on x direction in data coordinate
+#
+# == param
+# -... pass to `convert_x`
+#
+# == details
+# This function is same as `convert_x` in cm unit.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# # see example in `convert_x` page
+# NULL
+cm_x = function(...) {
+    convert_x(..., unit = "cm")
+}
+# == title
+# Convert unit on y direction in data coordinate
+#
+# == param
+# -... pass to `convert_y`
+#
+# == details
+# This function is same as `convert_y` in cm unit.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# # see example in `convert_y` page
+# NULL
+cm_y = function(...) {
+    convert_y(..., unit = "cm")
+}
+# == title
+# Convert units
+#
+# == param
+# -... pass to `convert_length`
+#
+# == details
+# This function is same as `convert_length` in cm unit.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# # see example in `convert_length` page
+# NULL
+cm_h = function(...) {
+    convert_length(..., unit = "cm")
+}
+# == title
+# Convert unit on x direction in data coordinate
+#
+# == param
+# -... pass to `convert_x`
+#
+# == details
+# This function is same as `convert_x` in mm unit.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# # see example in `convert_x` page
+# NULL
+mm_x = function(...) {
+    convert_x(..., unit = "mm")
+}
+# == title
+# Convert unit on y direction in data coordinate
+#
+# == param
+# -... pass to `convert_y`
+#
+# == details
+# This function is same as `convert_y` in mm unit.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# # see example in `convert_y` page
+# NULL
+mm_y = function(...) {
+    convert_y(..., unit = "mm")
+}
+# == title
+# Convert units
+#
+# == param
+# -... pass to `convert_length`
+#
+# == details
+# This function is same as `convert_length` in mm unit.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# # see example in `convert_length` page
+# NULL
+mm_h = function(...) {
+    convert_length(..., unit = "mm")
+}
+# == title
+# Convert unit on x direction in data coordinate
+#
+# == param
+# -... pass to `convert_x`
+#
+# == details
+# This function is same as `convert_x` in inch unit.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# # see example in `convert_x` page
+# NULL
+inches_x = function(...) {
+    convert_x(..., unit = "inches")
+}
+# == title
+# Convert unit on y direction in data coordinate
+#
+# == param
+# -... pass to `convert_y`
+#
+# == details
+# This function is same as `convert_y` in inch unit.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# # see example in `convert_y` page
+# NULL
+inches_y = function(...) {
+    convert_y(..., unit = "inches")
+}
+# == title
+# Convert units
+#
+# == param
+# -... pass to `convert_length`
+#
+# == details
+# This function is same as `convert_length` in inch unit.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# # see example in `convert_length` page
+# NULL
+inches_h = function(...) {
+    convert_length(..., unit = "inches")
+}
+# == title
+# Convert unit on x direction in data coordinate
+#
+# == param
+# -... pass to `convert_x`
+#
+# == details
+# This function is same as `convert_x` in inch unit.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# # see example in `convert_x` page
+# NULL
+inch_x = function(...) {
+    convert_x(..., unit = "inches")
+}
+# == title
+# Convert unit on y direction in data coordinate
+#
+# == param
+# -... pass to `convert_y`
+#
+# == details
+# This function is same as `convert_y` in inch unit.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# # see example in `convert_y` page
+# NULL
+inch_y = function(...) {
+    convert_y(..., unit = "inches")
+}
+# == title
+# Convert units
+#
+# == param
+# -... pass to `convert_length`
+#
+# == details
+# This function is same as `convert_length` in inch unit.
+#
+# == author
+# Zuguang Gu <z.gu@dkfz.de>
+#
+# == example
+# # see example in `convert_length` page
+# NULL
+inch_h = function(...) {
+    convert_length(..., unit = "inches")
+}
+
 stop_wrap = function(...) {
     x = paste0(...)
     x = paste(strwrap(x), collapse = "\n")
@@ -899,3 +1125,89 @@ validate_data_frame = function(x) {
         return(x)
     }
 }
+
+
+roundrect_pos = function(xleft, ybottom, xright, ytop, radius = 0.1, 
+  asp = NULL) {
+
+  if(is.null(asp)) {
+    pin = par("pin")
+    usr = par("usr")
+    asp = pin[1]/pin[2] * (usr[4] - usr[3])/(usr[2] - usr[1])
+  }
+
+  convert_y_1 = function(y, asp) {
+    y/asp
+  }
+
+  covnert_y_2 = function(y, asp) {
+    y*asp
+  }
+
+  if(xleft > xright) {
+    foo = xleft
+    xleft = xright
+    xright = foo
+  }
+  if(ybottom > ytop) {
+    foo = ybottom
+    ybottom = ytop
+    ytop = foo
+  }
+
+  ytop = convert_y_1(ytop, asp)
+  ybottom = convert_y_1(ybottom, asp)
+
+  w = abs(xright - xleft)
+  h = abs(ytop - ybottom)
+  r = radius*min(w, h)
+
+  x = NULL
+  y = NULL
+
+  # left top 180 -> 90
+  df = polar2Cartesian(cbind(seq(180, 90, length = 20), rep(r,20)))
+  x = c(x, df[, 1] + xleft + r)
+  y = c(y, df[, 2] + ytop - r)
+
+  x = c(x, xleft + r, xright - r)
+  y = c(y, ytop, ytop)
+
+  # right top 90 -> 0
+  df = polar2Cartesian(cbind(seq(90, 0, length = 20), rep(r,20)))
+  x = c(x, df[, 1] + xright - r)
+  y = c(y, df[, 2] + ytop - r)
+
+  x = c(x, xright, xright)
+  y = c(y, ytop - r, ybottom + r)
+
+  # bottom right 0 - (-90)
+  df = polar2Cartesian(cbind(seq(0, -90, length = 20), rep(r,20)))
+  x = c(x, df[, 1] + xright - r)
+  y = c(y, df[, 2] + ybottom + r)
+
+  x = c(x, xright - r, xleft + r)
+  y = c(y, ybottom, ybottom)
+
+  # bottom left 270 - 180
+  df = polar2Cartesian(cbind(seq(270, 180, length = 20), rep(r,20)))
+  x = c(x, df[, 1] + xleft + r)
+  y = c(y, df[, 2] + ybottom + r)
+
+  x = c(x, xleft, xleft)
+  y = c(y, ybottom + r, ytop - r)
+
+  y = covnert_y_2(y, asp)
+
+  return(list(x = x, y = y))
+}
+
+# plot(c(-2, -1), c(-2, -1))
+# foo = roundrect_pos(-2, -2, -1, -1)
+# lines(foo$x, foo$y)
+
+
+# plot(c(-4, -1), c(-2, -1))
+# foo = roundrect_pos(-4, -2, -1, -1)
+# lines(foo$x, foo$y)
+

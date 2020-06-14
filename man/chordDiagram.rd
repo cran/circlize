@@ -43,6 +43,7 @@ chordDiagram(
     link.rank = NULL,
     link.overlap = FALSE,
     scale = FALSE,
+    group = NULL,
     big.gap = 10,
     small.gap = 1,
     ...)
@@ -84,6 +85,7 @@ chordDiagram(
   \item{link.rank}{order to add links to the circle, a large value means to add it later.}
   \item{link.overlap}{pass to \code{\link{chordDiagramFromMatrix}} or \code{\link{chordDiagramFromDataFrame}}}
   \item{scale}{scale each sector to same width}
+  \item{group}{It contains the group labels and the sector names are used as the names in the vector.}
   \item{big.gap}{Gap between the two sets of sectors. If the input is a matrix, the two sets are row sectors and column sectors. If the input is a data frame, the two sets correspond to the first column and the second column. It only works when there is no intersection between the two sets.}
   \item{small.gap}{Small gap between sectors.}
   \item{...}{pass to \code{\link{circos.link}}.}
@@ -94,11 +96,11 @@ Chord diagram is a way to visualize numeric tables ( \url{http://circos.ca/intro
 when the table represents information of directional relations. This function
 visualize tables in a circular way.
 
-This function is flexible and contains some settings that may be a little difficult to understand. 
+This function is flexible and contains some settings that may be a little difficult to understand.
 Please refer to vignette for better explanation.
 }
 \seealso{
-\url{http://jokergoo.github.io/circlize_book/book/the-chorddiagram-function.html}
+\url{https://jokergoo.github.io/circlize_book/book/the-chorddiagram-function.html}
 }
 \value{
 A data frame which contains positions of links, columns are:
@@ -115,7 +117,7 @@ A data frame which contains positions of links, columns are:
 }
 \examples{
 set.seed(999)
-mat = matrix(sample(18, 18), 3, 6) 
+mat = matrix(sample(18, 18), 3, 6)
 rownames(mat) = paste0("S", 1:3)
 colnames(mat) = paste0("E", 1:6)
 

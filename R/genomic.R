@@ -33,7 +33,7 @@
 # https://jokergoo.github.io/circlize_book/book/initialize-genomic-plot.html#initialize-cytoband
 #
 # == example
-# \dontrun{
+# \donttest{
 # circos.initializeWithIdeogram()
 #
 # cytoband.file = system.file(package = "circlize",
@@ -156,10 +156,11 @@ circos.initializeWithIdeogram = function(
 # Zuguang Gu <z.gu@dkfz.de>
 #
 # == example
+# \donttest{
 # circos.initializeWithIdeogram(plotType = c("labels", "axis"))
 # circos.track(ylim = c(0, 1))
 # circos.genomicIdeogram() # put ideogram as the third track
-#
+# }
 circos.genomicIdeogram = function(
 	cytoband = system.file(package = "circlize", "extdata", "cytoBand.txt"), 
 	species = NULL, 
@@ -380,9 +381,9 @@ circos.genomicAxis = function(
 		
 		if(is.null(labels)) {
 			if(major.by > 1e6) {
-				major.tick.labels = paste((major.at-offset)/1000000, "MB", sep = "")
+				major.tick.labels = paste((major.at-offset)/1000000, "Mb", sep = "")
 			} else if(major.by > 1e3) {
-				major.tick.labels = paste((major.at-offset)/1000, "KB", sep = "")
+				major.tick.labels = paste((major.at-offset)/1000, "kb", sep = "")
 			} else {
 				major.tick.labels = paste((major.at-offset), "bp", sep = "")
 			}
@@ -511,7 +512,7 @@ circos.genomicTrackPlotRegion = function(
 		if(is.numeric(numeric.column)) {
 			numeric.column = numeric.column - 3
 		}
-		if(any(numeric.column < 0)) {
+		if(any(numeric.column <= 0)) {
 			stop_wrap("Wrong value in `numeric.column`, they should be larger than 3 or character index.")
 		}
 	}
@@ -527,7 +528,7 @@ circos.genomicTrackPlotRegion = function(
 				stop_wrap("Length of `numeric.column` should only be one or length of ``data`` if it is a list of data frames.")
 			}
 			for(i in seq_along(data)) {
-				if(!is.numeric(data[[i]][-(1:3)][numeric.column[i]])) {
+				if(!is.numeric(data[[i]][-(1:3)][, numeric.column[i]])) {
 					stop_wrap("Some of your `numeric.column` are not numeric.")
 				}
 			}
@@ -547,7 +548,7 @@ circos.genomicTrackPlotRegion = function(
 		if(is.null(numeric.column)) {
 			numeric.column = which(as.logical(sapply(data[-(1:3)], is.numeric)))
 		} else {
-			if(!all(sapply(data[-(1:3)][numeric.column], is.numeric))) {
+			if(!all(sapply(data[-(1:3)][, numeric.column, drop = FALSE], is.numeric))) {
 				stop_wrap("Some of your `numeric.column` are not numeric.")
 			}
 		}
@@ -903,6 +904,7 @@ circos.genomicPoints = function(
 # The function is a low-level graphical function and usually is put in ``panel.fun`` when using `circos.genomicTrackPlotRegion`.
 #
 # == examples
+# \donttest{
 # ### test bed
 # circos.par("track.height" = 0.1)
 # circos.initializeWithIdeogram(plotType = NULL)
@@ -943,7 +945,7 @@ circos.genomicPoints = function(
 # })
 #
 # circos.clear()
-#
+# }
 circos.genomicLines = function(
 	region, 
 	value, 
@@ -1104,7 +1106,7 @@ circos.genomicLines = function(
 # The function is a low-level graphical function and usually is put in ``panel.fun`` when using `circos.genomicTrackPlotRegion`.
 #
 # == example
-# \dontrun{
+# \donttest{
 # ############################
 # ### rect matrix
 # circos.par("track.height" = 0.1, cell.padding = c(0, 0, 0, 0))
@@ -1470,7 +1472,7 @@ circos.genomicText = function(
 # https://jokergoo.github.io/circlize_book/book/genomic-plotting-region.html#genomic-links
 #
 # == example
-# \dontrun{
+# \donttest{
 # set.seed(123)
 #
 # bed1 = generateRandomBed(nr = 100)
@@ -1511,6 +1513,13 @@ circos.genomicLink = function(
 	
 	if(nrow(region1) != nrow(region2)) {
 		stop_wrap("nrow of `region1` and `region2` differ.")
+	}
+
+	if(ncol(region1) == 2) {
+		region1[, 3] = region1[, 2]
+	}
+	if(ncol(region2) == 2) {
+		region2[, 3] = region2[, 2]
 	}
 	
 	nr = nrow(region1)
@@ -1721,7 +1730,7 @@ circos.genomicPosTransformLines = function(
 # load(system.file(package = "circlize", "extdata", "DMR.RData"))
 #
 # # rainfall
-# \dontrun{
+# \donttest{
 # circos.initializeWithIdeogram(plotType = c("axis", "labels"))
 #
 # bed_list = list(DMR_hyper, DMR_hypo)
@@ -2073,7 +2082,7 @@ normalizeToDataFrame = function(data, sort = FALSE) {
 # https://jokergoo.github.io/circlize_book/book/high-level-genomic-functions.html#genomic-density-and-rainfall-plot
 #
 # == example
-# \dontrun{
+# \donttest{
 # load(system.file(package = "circlize", "extdata", "DMR.RData"))
 #
 # # rainfall
@@ -2356,7 +2365,7 @@ posTransform.text = function(
 # https://jokergoo.github.io/circlize_book/book/high-level-genomic-functions.html#genomic-heatmap
 #
 # == example
-# \dontrun{
+# \donttest{
 # circos.initializeWithIdeogram(plotType = c("labels", "axis"))
 # bed = generateRandomBed(nr = 100, nc = 4)
 # col_fun = colorRamp2(c(-1, 0, 1), c("green", "black", "red"))
@@ -2482,6 +2491,7 @@ circos.genomicHeatmap = function(
 # https://jokergoo.github.io/circlize_book/book/high-level-genomic-functions.html#labels
 # 
 # == example
+# \donttest{
 # circos.initializeWithIdeogram(plotType = c("labels", "axis"))
 # bed = generateRandomBed(nr = 100, fun = function(k) sample(letters, k, replace = TRUE))
 # bed[1, 4] = "aaaaaaaa"
@@ -2489,6 +2499,7 @@ circos.genomicHeatmap = function(
 #     col = as.numeric(factor(bed[[1]])))
 # circos.genomicLabels(bed, labels.column = 4, side = "outside",
 #     line_col = as.numeric(factor(bed[[1]])))
+# }
 circos.genomicLabels = function(
 	bed, 
 	labels = NULL, 
