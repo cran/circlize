@@ -11,18 +11,22 @@ circos.dendrogram(
     dend,
     facing = c("outside", "inside"),
     max_height = NULL,
-    use_x_attr = FALSE)
+    use_x_attr = FALSE,
+    sector.index = get.current.sector.index(),
+    track.index = get.current.track.index())
 }
 \arguments{
 
   \item{dend}{A \code{\link[stats]{dendrogram}} object.}
-  \item{facing}{Is the dendromgrams facing inside to the circle or outside.}
-  \item{max_height}{Maximum height of the dendrogram. This is important if more than one dendrograms are drawn in one track and making them comparable.}
+  \item{facing}{Is the dendromgrams facing inside to the circle or outside?}
+  \item{max_height}{Maximum height of the dendrogram. This is important if more than one dendrograms are drawn in one track and making them comparable. The height of a dendrogram can be obtained by \code{attr(dend, "height")}.}
   \item{use_x_attr}{Whether use the \code{x} attribute to determine node positions in the dendrogram, used internally.}
+  \item{sector.index}{Index of sector.}
+  \item{track.index}{Index of track.}
 
 }
 \details{
-Assuming there are \code{n} nodes in the dendrogram, the positions for leaves on x-axis is \code{0.5, 1.5, ..., n - 0.5}.
+Assuming there are \code{n} nodes in the dendrogram, the positions for leaves on x-axis are always \code{0.5, 1.5, ..., n - 0.5}.
 So you must be careful with \code{xlim} when you initialize the cirular layout.
 
 You can use the \code{dendextend} package to render the dendrograms.
@@ -39,7 +43,7 @@ n = length(labels)  # number of bird species
 dend = as.dendrogram(hc)
 
 circos.par(cell.padding = c(0, 0, 0, 0))
-circos.initialize(factors = "a", xlim = c(0, n)) # only one sector
+circos.initialize(sectors = "a", xlim = c(0, n)) # only one sector
 max_height = attr(dend, "height")  # maximum height of the trees
 circos.trackPlotRegion(ylim = c(0, 1), bg.border = NA, track.height = 0.3,
     panel.fun = function(x, y) {

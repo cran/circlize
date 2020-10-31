@@ -9,8 +9,8 @@ Draw polygon
 \usage{
 circos.polygon(
     x, y,
-    sector.index = get.cell.meta.data("sector.index"),
-    track.index = get.cell.meta.data("track.index"),
+    sector.index = get.current.sector.index(),
+    track.index = get.current.track.index(),
     ...)
 }
 \arguments{
@@ -25,12 +25,12 @@ circos.polygon(
 \details{
 similar as \code{\link[graphics]{polygon}}.
 
-Note: start point should overlap with the end point,
+Note: start point should overlap with the end point.
 }
 \examples{
 set.seed(123)
-factors = letters[1:4]
-circos.initialize(factors, xlim = c(0, 1))
+sectors = letters[1:4]
+circos.initialize(sectors, xlim = c(0, 1))
 circos.trackPlotRegion(ylim = c(-3, 3), track.height = 0.4, panel.fun = function(x, y) {
     x1 = runif(20)
     y1 = x1 + rnorm(20)

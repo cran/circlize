@@ -8,17 +8,19 @@ Add points to the plotting regions in a same track
 }
 \usage{
 circos.trackPoints(
-    factors = NULL,
+    sectors,
     x, y,
-    track.index = get.cell.meta.data("track.index"),
+    track.index = get.current.track.index(),
     pch = par("pch"),
     col = par("col"),
     cex = par("cex"),
-    bg = par("bg"))
+    bg = par("bg"),
+    factors = sectors)
 }
 \arguments{
 
-  \item{factors}{A \code{\link{factor}} or a character vector which represents the categories of data}
+  \item{sectors}{A \code{\link{factor}} or a character vector which represents the categories of data}
+  \item{factors}{The same as \code{sectors}. It will be removed in future versions. }
   \item{x}{Data points on x-axis}
   \item{y}{Data points on y-axis}
   \item{track.index}{Index for the track}
@@ -39,9 +41,9 @@ This function can be replaced by a \code{for} loop containing \code{\link{circos
 }
 \examples{
 circos.initialize(letters[1:8], xlim = c(0, 1))
-df = data.frame(fa = sample(letters[1:8], 100, replace = TRUE),
+df = data.frame(sectors = sample(letters[1:8], 100, replace = TRUE),
                 x = runif(100), y = runif(100))
 circos.track(ylim = c(0, 1))
-circos.trackPoints(df$fa, x = df$x, y = df$y, pch = 16, col = as.numeric(factor(df$fa)))
+circos.trackPoints(df$sectors, x = df$x, y = df$y, pch = 16, col = as.numeric(factor(df$fa)))
 circos.clear()
 }

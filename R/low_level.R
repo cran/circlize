@@ -41,8 +41,8 @@
 # circos.clear()
 circos.points = function(
 	x, y,
-	sector.index = get.cell.meta.data("sector.index"),
-    track.index = get.cell.meta.data("track.index"),
+	sector.index = get.current.sector.index(),
+    track.index = get.current.track.index(),
     pch = par("pch"),
     col = par("col"),
     cex = par("cex"),
@@ -74,7 +74,8 @@ circos.points = function(
 # Add points to the plotting regions in a same track
 #
 # == param
-# -factors      A `factor` or a character vector which represents the categories of data
+# -sectors      A `factor` or a character vector which represents the categories of data
+# -factors      The same as ``sectors``. It will be removed in future versions. 
 # -x            Data points on x-axis
 # -y            Data points on y-axis
 # -track.index  Index for the track
@@ -94,19 +95,21 @@ circos.points = function(
 #
 # == example
 # circos.initialize(letters[1:8], xlim = c(0, 1))
-# df = data.frame(fa = sample(letters[1:8], 100, replace = TRUE),
+# df = data.frame(sectors = sample(letters[1:8], 100, replace = TRUE),
 #                 x = runif(100), y = runif(100))
 # circos.track(ylim = c(0, 1))
-# circos.trackPoints(df$fa, x = df$x, y = df$y, pch = 16, col = as.numeric(factor(df$fa)))
+# circos.trackPoints(df$sectors, x = df$x, y = df$y, pch = 16, col = as.numeric(factor(df$fa)))
 # circos.clear()
 circos.trackPoints = function(
-	factors = NULL,
+    sectors,
 	x, y,
-	track.index = get.cell.meta.data("track.index"),
+	track.index = get.current.track.index(),
     pch = par("pch"),
     col = par("col"),
     cex = par("cex"),
-    bg = par("bg")) {
+    bg = par("bg"),
+    factors = sectors
+    ) {
 
     # basic check here
     if(length(x) != length(factors) || length(y) != length(factors)) {
@@ -152,24 +155,24 @@ circos.trackPoints = function(
 # Add lines to the plotting region
 #
 # == param
-# -x            Data points on x-axis, measured in "current" data coordinate
-# -y            Data points on y-axis, measured in "current" data coordinate
-# -sector.index Index for the sector
-# -track.index  Index for the track
-# -col          Line color
-# -lwd          line width
-# -lty          line style
-# -type         line type, similar as ``type`` argument in `graphics::lines`, but only in ``c("l", "o", "h", "s")``
-# -straight     whether draw straight lines between points.
-# -area         whether to fill the area below the lines. If it is set to ``TRUE``, ``col`` controls the filled color
+# -x            Data points on x-axis, measured in "current" data coordinate.
+# -y            Data points on y-axis, measured in "current" data coordinate.
+# -sector.index Index for the sector.
+# -track.index  Index for the track.
+# -col          Line color.
+# -lwd          Line width.
+# -lty          Line style.
+# -type         Line type, similar as ``type`` argument in `graphics::lines`, but only in ``c("l", "o", "h", "s")``
+# -straight     Whether draw straight lines between points.
+# -area         Whether to fill the area below the lines. If it is set to ``TRUE``, ``col`` controls the filled color
 #               in the area and ``border`` controls color of the line.
 # -area.baseline deprecated, use ``baseline`` instead.
-# -baseline     the base line to draw areas. By default it is the minimal of y-range (bottom). It can be a string or a number.
+# -baseline     The base line to draw areas. By default it is the minimal of y-range (bottom). It can be a string or a number.
 #               If a string, it should be one of ``bottom`` and ``top``. This argument also works if ``type`` is set to ``h``.
-# -border       color for border of the area
-# -pt.col       if ``type`` is "o", point color
-# -cex          if ``type`` is "o", point size
-# -pch          if ``type`` is "o", point type
+# -border       color for border of the area.
+# -pt.col       If ``type`` is "o", point color.
+# -cex          If ``type`` is "o", point size.
+# -pch          If ``type`` is "o", point type.
 #
 # == details
 # Normally, straight lines in the Cartesian coordinate have to be transformed into curves in the circular layout.
@@ -179,11 +182,11 @@ circos.trackPoints = function(
 # Drawing areas below lines can help to identify the direction of y-axis in cells (since it is a circle). This can be done by specifying
 # ``area`` to ``TURE``.
 #
-# == seealso
-# factors = letters[1:9]
+# == example
+# sectors = letters[1:9]
 # circos.par(points.overflow.warning = FALSE)
-# circos.initialize(factors = factors, xlim = c(0, 10))
-# circos.trackPlotRegion(factors = factors, ylim = c(0, 10), track.height = 0.5)
+# circos.initialize(sectors, xlim = c(0, 10))
+# circos.trackPlotRegion(sectors, ylim = c(0, 10), track.height = 0.5)
 #
 # circos.lines(sort(runif(10)*10), runif(10)*8, sector.index = "a")
 # circos.text(5, 9, "type = 'l'", sector.index = "a", facing = "outside")
@@ -215,8 +218,8 @@ circos.trackPoints = function(
 # circos.clear()
 circos.lines = function(
 	x, y,
-	sector.index = get.cell.meta.data("sector.index"),
-    track.index = get.cell.meta.data("track.index"),
+	sector.index = get.current.sector.index(),
+    track.index = get.current.track.index(),
     col = ifelse(area, "grey", par("col")),
     lwd = par("lwd"),
     lty = par("lty"),
@@ -318,23 +321,24 @@ circos.lines = function(
 # Add lines to the plotting regions in a same track
 #
 # == param
-# -factors      A `factor` or a character vector which represents the categories of data
-# -x            Data points on x-axis
-# -y            Data points on y-axis
-# -track.index  Index for the track
-# -col          Line color
-# -lwd          line width
-# -lty          line style
-# -type         line type, similar as ``type`` argument in `graphics::lines`, but only in ``c("l", "o", "h", "s")``
-# -straight     whether draw straight lines between points
-# -area         whether to fill the area below the lines. If it is set to ``TRUE``, ``col`` controls the filled color
+# -sectors      A `factor` or a character vector which represents the categories of data.
+# -factors      The same as ``sectors``. It will be removed in future versions. 
+# -x            Data points on x-axis.
+# -y            Data points on y-axis.
+# -track.index  Index for the track.
+# -col          Line color.
+# -lwd          Line width.
+# -lty          Line style.
+# -type         Line type, similar as ``type`` argument in `graphics::lines`, but only in ``c("l", "o", "h", "s")``.
+# -straight     Whether draw straight lines between points.
+# -area         Whether to fill the area below the lines. If it is set to ``TRUE``, ``col`` controls the filled color
 #               in the area and ``border`` controls the color of the line.
-# -area.baseline deprecated, use ``baseline`` instead.
-# -baseline the base line to draw area, pass to `circos.lines`.
-# -border       color for border of the area
-# -pt.col       if ``type`` is "o", points color
-# -cex          if ``type`` is "o", points size
-# -pch          if ``type`` is "o", points type
+# -area.baseline Deprecated, use ``baseline`` instead.
+# -baseline The base line to draw area, pass to `circos.lines`.
+# -border       Color for border of the area.
+# -pt.col       If ``type`` is "o", points color.
+# -cex          If ``type`` is "o", points size.
+# -pch          If ``type`` is "o", points type.
 #
 # == details
 # The function adds lines in multiple cells by first splitting data into several parts in which
@@ -342,9 +346,9 @@ circos.lines = function(
 #
 # This function can be replaced by a ``for`` loop containing `circos.lines`.
 circos.trackLines = function(
-	factors,
+    sectors,
 	x, y,
-	track.index = get.cell.meta.data("track.index"),
+	track.index = get.current.track.index(),
     col = par("col"),
     lwd = par("lwd"),
     lty = par("lty"),
@@ -356,7 +360,8 @@ circos.trackLines = function(
 	baseline = "bottom",
     pt.col = par("col"),
     cex = par("cex"),
-    pch = par("pch")) {
+    pch = par("pch"),
+    factors = sectors) {
 
 	if(!is.null(area.baseline)) {
 		baseline = area.baseline
@@ -435,7 +440,7 @@ circos.trackLines = function(
 # This function can be vectorized.
 #
 # == examples
-# circos.initialize(fa = c("a", "b", "c", "d"), xlim = c(0, 10))
+# circos.initialize(c("a", "b", "c", "d"), xlim = c(0, 10))
 # circos.track(ylim = c(0, 10), panel.fun = function(x, y) {
 #     for(rot in seq(0, 360, by = 30)) {
 #         circos.rect(2, 2, 6, 6, rot = rot)
@@ -444,8 +449,8 @@ circos.trackLines = function(
 #
 circos.rect = function(
 	xleft, ybottom, xright, ytop,
-	sector.index = get.cell.meta.data("sector.index"),
-	track.index = get.cell.meta.data("track.index"),
+	sector.index = get.current.sector.index(),
+	track.index = get.current.track.index(),
 	rot = 0,
 	...) {
 
@@ -458,6 +463,15 @@ circos.rect = function(
 
     if(!has.cell(sector.index, track.index)) {
         stop_wrap("'circos.rect' can only be used after the plotting region been created.")
+    }
+
+    if(missing(xleft) && missing(ybottom) && missing(xright) && missing(ytop)) {
+        cell.xlim = get.cell.meta.data("cell.xlim", sector.index = sector.index, track.index = track.index)
+        cell.ylim = get.cell.meta.data("cell.ylim", sector.index = sector.index, track.index = track.index)
+        xleft = cell.xlim[1]
+        ybottom = cell.ylim[1]
+        xright = cell.xlim[2]
+        ytop = cell.ylim[2]
     }
 
     n1 = length(xleft)
@@ -539,16 +553,16 @@ circos.rect = function(
 # Draw triangles
 #
 # == param
-# -x1 x-coordinates for the first point
-# -y1 y-coordinates for the first point
-# -x2 x-coordinates for the second point
-# -y2 y-coordinates for the second point
-# -x3 x-coordinates for the third point
-# -y3 y-coordinates for the third point
-# -... pass to `circos.polygon`
+# -x1 x-coordinates for the first point.
+# -y1 y-coordinates for the first point.
+# -x2 x-coordinates for the second point.
+# -y2 y-coordinates for the second point.
+# -x3 x-coordinates for the third point.
+# -y3 y-coordinates for the third point.
+# -... Pass to `circos.polygon`.
 #
 # == example
-# circos.initialize(fa = c("a", "b", "c", "d"), xlim = c(0, 10))
+# circos.initialize(c("a", "b", "c", "d"), xlim = c(0, 10))
 # circos.track(ylim = c(0, 10), panel.fun = function(x, y) {
 #     circos.triangle(c(2, 2), c(2, 8),
 #                     c(8, 8), c(2, 8),
@@ -614,12 +628,12 @@ circos.triangle = function(x1, y1, x2, y2, x3, y3, ...) {
 # == details
 # similar as `graphics::polygon`.
 #
-# Note: start point should overlap with the end point,
+# Note: start point should overlap with the end point.
 #
 # == example
 # set.seed(123)
-# factors = letters[1:4]
-# circos.initialize(factors, xlim = c(0, 1))
+# sectors = letters[1:4]
+# circos.initialize(sectors, xlim = c(0, 1))
 # circos.trackPlotRegion(ylim = c(-3, 3), track.height = 0.4, panel.fun = function(x, y) {
 #     x1 = runif(20)
 #     y1 = x1 + rnorm(20)
@@ -638,8 +652,8 @@ circos.triangle = function(x1, y1, x2, y2, x3, y3, ...) {
 # circos.clear()
 circos.polygon = function(
 	x, y,
-	sector.index = get.cell.meta.data("sector.index"),
-	track.index = get.cell.meta.data("track.index"),
+	sector.index = get.current.sector.index(),
+	track.index = get.current.track.index(),
 	...) {
 
     if(!has.cell(sector.index, track.index)) {
@@ -659,22 +673,32 @@ circos.polygon = function(
 # Draw segments through pairwise of points
 #
 # == param
-# -x0 x coordinates for starting points
-# -y0 y coordinates for ending points
-# -x1 x coordinates for starting points
-# -y1 y coordinates for ending points
-# -sector.index Index for the sector
-# -track.index  Index for the track
-# -straight whether the segment is a straight line
-# -col color of the segments
-# -lwd line width of the segments
-# -lty line type of the segments
-# -... pass to `graphics::lines`
+# -x0 x coordinates for starting points.
+# -y0 y coordinates for ending points.
+# -x1 x coordinates for starting points.
+# -y1 y coordinates for ending points.
+# -sector.index Index for the sector.
+# -track.index  Index for the track.
+# -straight Whether the segment is a straight line.
+# -col Color of the segments.
+# -lwd Line width of the segments.
+# -lty Line type of the segments.
+# -... Pass to `graphics::lines`.
 #
+# == example
+# circos.initialize(letters[1:8], xlim = c(0, 1))
+# circos.track(ylim = c(0, 1), track.height = 0.3, panel.fun = function(x, y) {
+#     x = seq(0.2, 0.8, by = 0.2)
+#     y = seq(0.2, 0.8, by = 0.2)
+#
+#     circos.segments(x, 0.1, x, 0.9)
+#     circos.segments(0.1, y, 0.9, y)
+# })
+# circos.clear()
 circos.segments = function(
 	x0, y0, x1, y1,
-	sector.index = get.cell.meta.data("sector.index"),
-	track.index = get.cell.meta.data("track.index"),
+	sector.index = get.current.sector.index(),
+	track.index = get.current.track.index(),
 	straight = FALSE,
 	col = par("col"),
 	lwd = par("lwd"),
@@ -784,10 +808,10 @@ circos.segments = function(
 # https://jokergoo.github.io/circlize_book/book/graphics.html#text
 #
 # == example
-# factors = letters[1:4]
+# sectors = letters[1:4]
 # circos.par(points.overflow.warning = FALSE)
-# circos.initialize(factors = factors, xlim = c(0, 10))
-# circos.trackPlotRegion(factors = factors, ylim = c(0, 10),
+# circos.initialize(sectors, xlim = c(0, 10))
+# circos.trackPlotRegion(sectors, ylim = c(0, 10),
 #   track.height = 0.5, panel.fun = function(x, y) {
 #     circos.text(3, 1, "inside", facing = "inside", cex = 0.8)
 #     circos.text(7, 1, "outside", facing = "outside", cex = 0.8)
@@ -805,8 +829,8 @@ circos.segments = function(
 circos.text = function(
 	x, y,
 	labels,
-	sector.index = get.cell.meta.data("sector.index"),
-    track.index = get.cell.meta.data("track.index"),
+	sector.index = get.current.sector.index(),
+    track.index = get.current.track.index(),
     direction = NULL,
     facing = c("inside", "outside", "reverse.clockwise", "clockwise",
 	    "downward", "bending", "bending.inside", "bending.outside"),
@@ -1058,7 +1082,8 @@ degree = function(x) {
 # Draw text in cells among the whole track
 #
 # == param
-# -factors      A `factor` or a character vector which represents the categories of data
+# -sectors      A `factor` or a character vector which represents the categories of data
+# -factors      The same as ``sectors``. It will be removed in future versions. 
 # -x            Data points on x-axis
 # -y            Data points on y-axis
 # -labels       Labels
@@ -1077,10 +1102,10 @@ degree = function(x) {
 #
 # This function can be replaced by a ``for`` loop containing `circos.text`.
 circos.trackText = function(
-	factors,
+	sectors, 
 	x, y,
 	labels,
-	track.index = get.cell.meta.data("track.index"),
+	track.index = get.current.track.index(),
     direction = NULL,
     facing = c("inside", "outside", "reverse.clockwise", "clockwise",
 	    "downward", "bending", "bending.inside", "bending.outside"),
@@ -1088,7 +1113,8 @@ circos.trackText = function(
     adj = par("adj"),
     cex = 1,
     col = par("col"),
-    font = par("font")) {
+    font = par("font"),
+    factors = sectors) {
 
     # basic check here
     if(length(x) != length(factors) || length(y) != length(factors)) {
@@ -1141,29 +1167,29 @@ circos.trackText = function(
 # -labels           labels of the major ticks. Also, the exceeding part would be trimmed automatically.
 #                   The value can also be logical (either an atomic value or a vector) which represents
 #                   which labels to show.
-# -major.tick       Whether to draw major tick. If it is set to ``FALSE``, there would be
-#                   no minor ticks.
-# -sector.index     Index for the sector
-# -track.index      Index for the track
-# -labels.font      font style for the axis labels
-# -labels.cex       font size for the axis labels
-# -labels.direction deprecated, use ``facing`` instead.
-# -labels.facing    facing of labels on axis, passing to `circos.text`
-# -labels.niceFacing Should facing of axis labels be human-easy
-# -direction        whether the axis ticks point to the outside or inside of the circle.
+# -major.tick       Whether to draw major tick. If it is set to ``FALSE``, there will be
+#                   no minor ticks neither.
+# -sector.index     Index for the sector.
+# -track.index      Index for the track.
+# -labels.font      Font style for the axis labels.
+# -labels.cex       Font size for the axis labels.
+# -labels.direction Deprecated, use ``facing`` instead.
+# -labels.facing    Facing of labels on axis, passing to `circos.text`
+# -labels.niceFacing Should facing of axis labels be human-easy.
+# -direction        Whether the axis ticks point to the outside or inside of the circle.
 # -minor.ticks      Number of minor ticks between two close major ticks.
-# -major.tick.percentage not used. Length of the major ticks. It is the percentage to the height of the cell.
-# -labels.away.percentage not used. The distance for the axis labels to the major ticks. It is the percentage to the height of the cell.
-# -major.tick.length length of the major ticks, measured in "current" data coordinate. `convert_y` can be
+# -major.tick.length Length of the major ticks, measured in "current" data coordinate. `convert_y` can be
 #                   used to convert an absolute unit to the data coordinate.
-# -lwd              line width for ticks
-# -col              color for the axes
-# -labels.col       color for the labels
-# -labels.pos.adjust  whether to adjust the positions of the first label and the last label. The value can be a vector
+# -major.tick.percentage Not used any more, please directly use ``major.tick.length``.
+# -lwd              Line width for ticks.
+# -col              Color for the axes.
+# -labels.col       Color for the labels.
+# -labels.pos.adjust  Whether to adjust the positions of the first label and the last label so that the first label 
+#                     align to its left and the last label align to its right if they exceed the range on axes. The value can be a vector
 #                    of length two which correspond to the first label and the last label.
 #
 # == details
-# It can only draw axes on x-direction.
+# It only draws axes on x-direction.
 #
 # == seealso
 # `circos.yaxis` draws axes on y-direction.
@@ -1171,15 +1197,15 @@ circos.trackText = function(
 # https://jokergoo.github.io/circlize_book/book/graphics.html#axes
 #
 # == example
-# factors = letters[1:8]
+# sectors = letters[1:8]
 # circos.par(points.overflow.warning = FALSE)
-# circos.initialize(factors = factors, xlim = c(0, 10))
-# circos.trackPlotRegion(factors = factors, ylim = c(0, 10), track.height = 0.1,
+# circos.initialize(sectors, xlim = c(0, 10))
+# circos.trackPlotRegion(sectors, ylim = c(0, 10), track.height = 0.1,
 #     bg.border = NA, panel.fun = function(x, y) {
 #         circos.text(5, 10, get.cell.meta.data("sector.index"))
 # })
 #
-# circos.trackPlotRegion(factors = factors, ylim = c(0, 10))
+# circos.trackPlotRegion(sectors, ylim = c(0, 10))
 # circos.axis(sector.index = "a")
 # circos.axis(sector.index = "b", direction = "inside", labels.facing = "outside")
 # circos.axis(sector.index = "c", h = "bottom")
@@ -1192,8 +1218,8 @@ circos.trackText = function(
 #     labels = c("a1", "c1", "e1", "g1", "f1"), major.tick = FALSE,
 #     labels.facing = "reverse.clockwise")
 # circos.axis(sector.index = "h", h = 2, major.at = c(1, 3, 5, 7, 9),
-#     labels = c("a1", "c1", "e1", "g1", "f1"), major.tick.percentage = 0.3,
-#     labels.away.percentage = 0.2, minor.ticks = 2, labels.facing = "clockwise")
+#     labels = c("a1", "c1", "e1", "g1", "f1"), minor.ticks = 2, 
+#     major.tick.length = mm_y(5), labels.facing = "clockwise")
 # circos.clear()
 #
 # if(FALSE) {
@@ -1202,10 +1228,10 @@ circos.trackText = function(
 # factors = letters[1]
 #
 # circos.par("gap.degree" = 0, "cell.padding" = c(0, 0, 0, 0), "start.degree" = 90)
-# circos.initialize(factors = factors, xlim = c(0, 12))
-# circos.trackPlotRegion(factors = factors, ylim = c(0, 1), bg.border = NA)
+# circos.initialize(sectors, xlim = c(0, 12))
+# circos.trackPlotRegion(sectors, ylim = c(0, 1), bg.border = NA)
 # circos.axis(sector.index = "a", major.at = 0:12, labels = "",
-#     direction = "inside", major.tick.percentage = 0.3)
+#     direction = "inside", major.tick.length = mm_y(3))
 # circos.text(1:12, rep(0.5, 12), 1:12, facing = "downward")
 #
 # while(1) {
@@ -1235,8 +1261,8 @@ circos.axis = function(
 	major.at = NULL,
 	labels = TRUE,
 	major.tick = TRUE,
-	sector.index = get.cell.meta.data("sector.index"),
-	track.index = get.cell.meta.data("track.index"),
+	sector.index = get.current.sector.index(),
+	track.index = get.current.track.index(),
 	labels.font = par("font"),
 	labels.cex = par("cex"),
 	labels.facing = "inside",
@@ -1244,13 +1270,14 @@ circos.axis = function(
 	labels.niceFacing = TRUE,
 	direction = c("outside", "inside"),
 	minor.ticks = 4,
-	major.tick.percentage = 0.1,
-	labels.away.percentage = major.tick.percentage/2,
-	major.tick.length = convert_y(1, "mm", sector.index, track.index),
+	major.tick.length = mm_y(1),
+    major.tick.percentage = 0.5,
 	lwd = par("lwd"),
 	col = par("col"),
 	labels.col = par("col"),
 	labels.pos.adjust = TRUE) {
+
+    set.current.cell(sector.index, track.index)
 
     if(!is.null(labels.direction)) {
         labels.facing = switch(labels.direction[1],
@@ -1300,6 +1327,9 @@ circos.axis = function(
 
 	# ticks
 	yrange = get.cell.meta.data("yrange", sector.index, track.index)
+    if(!missing(major.tick.percentage)) {
+        message("`major.tick.percentage` is not used any more, please directly use argument `major.tick.length`.")
+    }
 	# major.tick.length = yrange * major.tick.percentage
 	# major.tick.length = convert_y(2, "mm", sector.index, track.index)
 
@@ -1409,16 +1439,23 @@ circos.axis = function(
 		# circos.text(x, y, labels, ...)
 	}
 
-	if(is.logical(labels) && labels) {
-		add_axis_labels(major.at[l], rep(h, sum(l)) + (major.tick.length + convert_y(0.5, "mm", sector.index, track.index))*ifelse(direction == "outside", 1, -1),
-		           labels = major.at[l], adj = labels.adj,
-		           font = labels.font, cex = labels.cex, sector.index = sector.index, track.index = track.index,
-		           facing = labels.facing, niceFacing = labels.niceFacing, h = h, col = labels.col,
-		           labels.pos.adjust = labels.pos.adjust)
-	} else if(is.logical(labels) && !labels) {
+	if(is.logical(labels)) {
+        if(labels[1]) {
+    		add_axis_labels(major.at[l], rep(h, sum(l)) + (major.tick.length + mm_y(0.5, sector.index, track.index))*ifelse(direction == "outside", 1, -1),
+    		           labels = major.at[l], adj = labels.adj,
+    		           font = labels.font, cex = labels.cex, sector.index = sector.index, track.index = track.index,
+    		           facing = labels.facing, niceFacing = labels.niceFacing, h = h, col = labels.col,
+    		           labels.pos.adjust = labels.pos.adjust)
+    	}
+    } else if(is.function(labels)) {
+        add_axis_labels(major.at[l], rep(h, sum(l)) + (major.tick.length + mm_y(0.5, sector.index, track.index))*ifelse(direction == "outside", 1, -1),
+                       labels = labels(major.at[l]), adj = labels.adj,
+                       font = labels.font, cex = labels.cex, sector.index = sector.index, track.index = track.index,
+                       facing = labels.facing, niceFacing = labels.niceFacing, h = h, col = labels.col,
+                       labels.pos.adjust = labels.pos.adjust)
 
     } else if(length(labels)) {
-		add_axis_labels(major.at[l], rep(h, sum(l)) + (major.tick.length + convert_y(0.5, "mm", sector.index, track.index))*ifelse(direction == "outside", 1, -1),
+		add_axis_labels(major.at[l], rep(h, sum(l)) + (major.tick.length + mm_y(0.5, sector.index, track.index))*ifelse(direction == "outside", 1, -1),
 		            labels = labels[l], adj = labels.adj,
 		            font = labels.font, cex = labels.cex, sector.index = sector.index, track.index = track.index,
 			        facing = labels.facing, niceFacing = labels.niceFacing, h = h, col = labels.col,
@@ -1449,15 +1486,18 @@ circos.axis = function(
 # Draw x-axis
 #
 # == param
-# -... all pass to `circos.axis`
+# -... All pass to `circos.axis`.
+#
+# == details
+# This function is identical to `circos.axis`.
 #
 circos.xaxis = function(...) {
 	circos.axis(...)
 }
 
 .default.major.by = function(
-	sector.index = get.cell.meta.data("sector.index"),
-	track.index = get.cell.meta.data("track.index")) {
+	sector.index = get.current.sector.index(),
+	track.index = get.current.track.index()) {
 	# start.degree - end.degree is always a positive value.
 	d = circos.par("major.by.degree")
 	cell.start.degre = get.cell.meta.data("cell.start.degree", sector.index, track.index)
@@ -1497,11 +1537,11 @@ circos.xaxis = function(...) {
 # == example
 # op = par(no.readonly = TRUE)
 #
-# factors = letters[1:8]
+# sectors = letters[1:8]
 # circos.par(points.overflow.warning = FALSE)
 # circos.par(gap.degree = 8)
-# circos.initialize(factors = factors, xlim = c(0, 10))
-# circos.trackPlotRegion(factors = factors, ylim = c(0, 10), track.height = 0.5)
+# circos.initialize(sectors, xlim = c(0, 10))
+# circos.trackPlotRegion(sectors, ylim = c(0, 10), track.height = 0.5)
 # par(cex = 0.8)
 # for(a in letters[2:4]) {
 #   circos.yaxis(side = "left", sector.index = a)
@@ -1517,8 +1557,8 @@ circos.yaxis = function(
 	at = NULL,
 	labels = TRUE,
 	tick = TRUE,
-	sector.index = get.cell.meta.data("sector.index"),
-	track.index = get.cell.meta.data("track.index"),
+	sector.index = get.current.sector.index(),
+	track.index = get.current.track.index(),
 	labels.font = par("font"),
 	labels.cex = par("cex"),
 	labels.niceFacing = TRUE,
@@ -1538,7 +1578,11 @@ circos.yaxis = function(
 
 	if(is.null(at)) {
 		at = grid.pretty(ylim)
-		labels = at
+        if(is.function(labels)) {
+            labels = labels(at)
+        } else {
+		  labels = at
+        }
 	}
 
 	ylim2 = ylim
@@ -1597,7 +1641,8 @@ circos.yaxis = function(
 # Draw histogram in cells among a whole track
 #
 # == param
-# -factors      Factors which represent the categories of data
+# -sectors      A `factor` or a character vector which represents the categories of data
+# -factors      The same as ``sectors``. It will be removed in future versions. 
 # -x            Data on the x-axis
 # -track.index  Index for the track which is going to be updated. Setting it to ``NULL`` means
 #               creating the plotting regions in the next newest track.
@@ -1630,18 +1675,18 @@ circos.yaxis = function(
 # == example
 # \donttest{
 # x = rnorm(1600)
-# factors = sample(letters[1:16], 1600, replace = TRUE)
-# circos.initialize(factors = factors, x = x)
-# circos.trackHist(factors = factors, x = x, col = "#999999",
+# sectors = sample(letters[1:16], 1600, replace = TRUE)
+# circos.initialize(sectors, x = x)
+# circos.trackHist(sectors, x = x, col = "#999999",
 #   border = "#999999")
-# circos.trackHist(factors = factors, x = x, bin.size = 0.1,
+# circos.trackHist(sectors, x = x, bin.size = 0.1,
 #   col = "#999999", border = "#999999")
-# circos.trackHist(factors = factors, x = x, draw.density = TRUE,
+# circos.trackHist(sectors, x = x, draw.density = TRUE,
 #   col = "#999999", border = "#999999")
 # circos.clear()
 # }
 circos.trackHist = function(
-	factors,
+	sectors,
 	x,
 	track.height = circos.par("track.height"),
     track.index = NULL,
@@ -1660,7 +1705,8 @@ circos.trackHist = function(
     right = TRUE,
     draw.density = FALSE,
     bin.size = NULL,
-    area = FALSE) {
+    area = FALSE,
+    factors = sectors) {
 
     # basic check here
     if(length(x) != length(factors)) {
@@ -1708,7 +1754,7 @@ circos.trackHist = function(
     }
 
     # create the plotting region
-    circos.trackPlotRegion(factors = fa, y=yy, track.height = track.height,
+    circos.trackPlotRegion(sectors = fa, y=yy, track.height = track.height,
                       track.index = track.index, ylim = ylim, force.ylim = force.ylim,
                       bg.col = bg.col, bg.border = bg.border, bg.lty = bg.lty, bg.lwd = bg.lwd)
 
@@ -1727,7 +1773,7 @@ circos.trackHist = function(
 	fa = fa[l3]
 
     if(draw.density) {
-        circos.trackLines(factors = fa, xx, yy, track.index = track.index,
+        circos.trackLines(sectors = fa, xx, yy, track.index = track.index,
                           col = col, lty = lty, lwd = lwd, area = area, border = border)
     } else {
         # in each cell, draw rectangles
@@ -1765,13 +1811,16 @@ circos.trackHist = function(
 #
 # == param
 # -dend A `stats::dendrogram` object.
-# -facing Is the dendromgrams facing inside to the circle or outside.
+# -facing Is the dendromgrams facing inside to the circle or outside?
 # -max_height Maximum height of the dendrogram. This is important if more than one dendrograms
-#             are drawn in one track and making them comparable.
+#             are drawn in one track and making them comparable. The height of a dendrogram
+#             can be obtained by ``attr(dend, "height")``.
 # -use_x_attr Whether use the ``x`` attribute to determine node positions in the dendrogram, used internally.
+# -sector.index Index of sector.
+# -track.index Index of track.
 #
 # == details
-# Assuming there are ``n`` nodes in the dendrogram, the positions for leaves on x-axis is ``0.5, 1.5, ..., n - 0.5``.
+# Assuming there are ``n`` nodes in the dendrogram, the positions for leaves on x-axis are always ``0.5, 1.5, ..., n - 0.5``.
 # So you must be careful with ``xlim`` when you initialize the cirular layout.
 #
 # You can use the ``dendextend`` package to render the dendrograms.
@@ -1788,7 +1837,7 @@ circos.trackHist = function(
 # dend = as.dendrogram(hc)
 #
 # circos.par(cell.padding = c(0, 0, 0, 0))
-# circos.initialize(factors = "a", xlim = c(0, n)) # only one sector
+# circos.initialize(sectors = "a", xlim = c(0, n)) # only one sector
 # max_height = attr(dend, "height")  # maximum height of the trees
 # circos.trackPlotRegion(ylim = c(0, 1), bg.border = NA, track.height = 0.3,
 #     panel.fun = function(x, y) {
@@ -1811,8 +1860,11 @@ circos.dendrogram = function(
     dend,
     facing = c("outside", "inside"),
     max_height = NULL,
-    use_x_attr = FALSE) {
+    use_x_attr = FALSE,
+    sector.index = get.current.sector.index(),
+    track.index = get.current.track.index()) {
 
+    set.current.cell(sector.index, track.index)
     facing = match.arg(facing)[1]
 
     if(is.null(max_height)) {
@@ -1840,90 +1892,104 @@ circos.dendrogram = function(
 
     draw.d = function(dend, max_height, facing = "outside", max_width = 0) {
         leaf = attr(dend, "leaf")
-        d1 = dend[[1]]  # child tree 1
-        d2 = dend[[2]]  # child tree 2
         height = attr(dend, "height")
         midpoint = attr(dend, "midpoint")
+        n = length(dend)
 
-        if(use_x_attr) {
-            x1 = attr(d1, "x")
-        } else {
-            if(is.leaf(d1)) {
-                x1 = x[as.character(attr(d1, "label"))]
+        xl = numeric(n)
+        yl = numeric(n)
+        for(i in seq_len(n)) {
+            if(use_x_attr) {
+                xl[i] = attr(dend[[i]], "x")
             } else {
-                x1 = attr(d1, "midpoint") + x[as.character(labels(d1))[1]]
+                if(is.leaf(dend[[i]])) {
+                    xl[i] = x[as.character(attr(dend[[i]], "label"))]
+                } else {
+                    xl[i] = attr(dend[[i]], "midpoint") + x[as.character(labels(dend[[i]]))[1]]
+                }
             }
+            yl[i] = attr(dend[[i]], "height")
         }
-        y1 = attr(d1, "height")
-
-        if(use_x_attr) {
-            x2 = attr(d2, "x")
-        } else {
-            if(is.leaf(d2)) {
-                x2 = x[as.character(attr(d2, "label"))]
-            } else {
-                x2 = attr(d2, "midpoint") + x[as.character(labels(d2))[1]]
-            }
-        }
-        y2 = attr(d2, "height")
 
         # graphic parameter for current branch
         # only for lines, there are lwd, col, lty
-        edge_par1 = do.call("lines_par", as.list(attr(d1, "edgePar")))  # as.list to convert NULL to list()
-        edge_par2 = do.call("lines_par", as.list(attr(d2, "edgePar")))
+        edge_par_lt = vector("list", n)
+        for(i in seq_len(n)) {
+            edge_par_lt[[i]] = do.call("lines_par", as.list(attr(dend[[i]], "edgePar")))  # as.list to convert NULL to list()
+        }
         node_par = attr(dend, "nodePar")
         if(!is.null(node_par)) node_par = do.call("points_par", as.list(attr(dend, "nodePar")))
 
         # plot the connection line
         if(facing == "outside") {
-            circos.lines(c(x1, x1), max_height - c(y1, height), col = edge_par1$col, lty = edge_par1$lty, lwd = edge_par1$lwd, straight = TRUE)
-            circos.lines(c(x1, (x1+x2)/2), max_height - c(height, height), col = edge_par1$col, lty = edge_par1$lty, lwd = edge_par1$lwd)
-            circos.lines(c(x2, x2), max_height - c(y2, height), col = edge_par2$col, lty = edge_par2$lty, lwd = edge_par2$lwd, straight = TRUE)
-            circos.lines(c(x2, (x1+x2)/2), max_height - c(height, height), col = edge_par2$col, lty = edge_par2$lty, lwd = edge_par2$lwd)
+            if(n == 1) {
+                circos.lines(c(xl[1], xl[1]), max_height - c(yl[1], height), 
+                    col = edge_par_lt[[1]]$col, lty = edge_par_lt[[1]]$lty, lwd = edge_par_lt[[1]]$lwd, straight = TRUE)
+            } else {
+                circos.lines(c(xl[1], xl[1]), max_height - c(yl[1], height), 
+                    col = edge_par_lt[[1]]$col, lty = edge_par_lt[[1]]$lty, lwd = edge_par_lt[[1]]$lwd, straight = TRUE)
+                circos.lines(c(xl[1], (xl[1]+xl[2])/2), max_height - c(height, height), 
+                    col = edge_par_lt[[1]]$col, lty = edge_par_lt[[1]]$lty, lwd = edge_par_lt[[1]]$lwd)
+                if(n > 2) {
+                    for(i in seq(2, n-1)) {
+                        circos.lines(c(xl[i], xl[i]), max_height - c(yl[i], height), 
+                            col = edge_par_lt[[i]]$col, lty = edge_par_lt[[i]]$lty, lwd = edge_par_lt[[i]]$lwd, straight = TRUE)
+                        circos.lines(c((xl[i-1]+xl[i])/2, (xl[i]+xl[i+1])/2), max_height - c(height, height), 
+                            col = edge_par_lt[[i]]$col, lty = edge_par_lt[[i]]$lty, lwd = edge_par_lt[[i]]$lwd)
+                    }
+                }
+                circos.lines(c(xl[n], xl[n]), max_height - c(yl[n], height), 
+                    col = edge_par_lt[[n]]$col, lty = edge_par_lt[[n]]$lty, lwd = edge_par_lt[[n]]$lwd, straight = TRUE)
+                circos.lines(c(xl[n], (xl[n]+xl[n-1])/2), max_height - c(height, height), 
+                    col = edge_par_lt[[n]]$col, lty = edge_par_lt[[n]]$lty, lwd = edge_par_lt[[n]]$lwd)
+            }
             if(!is.null(node_par)) {
-                circos.points((x1+x2)/2, max_height - height, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
+                circos.points(mean(xl)/2, max_height - height, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
             }
         } else if(facing == "inside") {
-            circos.lines(c(x1, x1), c(y1, height), col = edge_par1$col, lty = edge_par1$lty, lwd = edge_par1$lwd, straight = TRUE)
-            circos.lines(c(x1, (x1+x2)/2), c(height, height), col = edge_par1$col, lty = edge_par1$lty, lwd = edge_par1$lwd)
-            circos.lines(c(x2, x2), c(y2, height), col = edge_par2$col, lty = edge_par2$lty, lwd = edge_par2$lwd, straight = TRUE)
-            circos.lines(c(x2, (x1+x2)/2), c(height, height), col = edge_par2$col, lty = edge_par2$lty, lwd = edge_par2$lwd)
+            if(n == 1) {
+                circos.lines(c(xl[1], xl[1]), c(yl[1], height), 
+                    col = edge_par_lt[[1]]$col, lty = edge_par_lt[[1]]$lty, lwd = edge_par_lt[[1]]$lwd, straight = TRUE)
+            } else {
+                circos.lines(c(xl[1], xl[1]), c(yl[1], height), 
+                    col = edge_par_lt[[1]]$col, lty = edge_par_lt[[1]]$lty, lwd = edge_par_lt[[1]]$lwd, straight = TRUE)
+                circos.lines(c(xl[1], (xl[1]+xl[2])/2), c(height, height), 
+                    col = edge_par_lt[[1]]$col, lty = edge_par_lt[[1]]$lty, lwd = edge_par_lt[[1]]$lwd)
+                if(n > 2) {
+                    for(i in seq(2, n-1)) {
+                        circos.lines(c(xl[i], xl[i]), c(yl[i], height), 
+                            col = edge_par_lt[[i]]$col, lty = edge_par_lt[[i]]$lty, lwd = edge_par_lt[[i]]$lwd, straight = TRUE)
+                        circos.lines(c((xl[i-1]+xl[i])/2, (xl[i]+xl[i+1])/2), c(height, height), 
+                            col = edge_par_lt[[i]]$col, lty = edge_par_lt[[i]]$lty, lwd = edge_par_lt[[i]]$lwd)
+                    }
+                }
+                circos.lines(c(xl[n], xl[n]), c(yl[n], height), 
+                    col = edge_par_lt[[n]]$col, lty = edge_par_lt[[n]]$lty, lwd = edge_par_lt[[n]]$lwd, straight = TRUE)
+                circos.lines(c(xl[n], (xl[n]+xl[n-1])/2), c(height, height), 
+                    col = edge_par_lt[[n]]$col, lty = edge_par_lt[[n]]$lty, lwd = edge_par_lt[[n]]$lwd)
+            }
             if(!is.null(node_par)) {
-                circos.points((x1+x2)/2, height, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
+                circos.points(mean(xl)/2, height, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
             }
         }
 
         # do it recursively
-        if(is.leaf(d1)) {
-            node_par = attr(d1, "nodePar")
-            if(!is.null(node_par)) node_par = do.call("points_par", as.list(attr(d1, "nodePar")))
-            if(facing == "outside") {
-                if(!is.null(node_par)) {
-                    circos.points(x1, max_height, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
+        for(i in seq_len(n)) {
+            if(is.leaf(dend[[i]])) {
+                node_par = attr(dend[[i]], "nodePar")
+                if(!is.null(node_par)) node_par = do.call("points_par", as.list(attr(dend[[i]], "nodePar")))
+                if(facing == "outside") {
+                    if(!is.null(node_par)) {
+                        circos.points(xl[i], max_height, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
+                    }
+                } else if(facing == "inside") {
+                    if(!is.null(node_par)) {
+                        circos.points(xl[i], 0, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
+                    }
                 }
-            } else if(facing == "inside") {
-                if(!is.null(node_par)) {
-                    circos.points(x1, 0, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
-                }
+            } else {
+                draw.d(dend[[i]], max_height, facing, max_width)
             }
-        } else {
-            draw.d(d1, max_height, facing, max_width)
-        }
-
-        if(is.leaf(d2)) {
-            node_par = attr(d2, "nodePar")
-            if(!is.null(node_par)) node_par = do.call("points_par", as.list(attr(d2, "nodePar")))
-            if(facing == "outside") {
-                if(!is.null(node_par)) {
-                    circos.points(x2, max_height, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
-                }
-            } else if(facing == "inside") {
-                if(!is.null(node_par)) {
-                    circos.points(x2, 0, col = node_par$col, pch = node_par$pch, cex = node_par$cex)
-                }
-            }
-        } else {
-            draw.d(d2, max_height, facing, max_width)
         }
     }
 
@@ -1933,7 +1999,7 @@ circos.dendrogram = function(
     names(x) = labels
     n = length(labels)
 
-    draw.d(dend, max_height, facing, max_width = n)
+    if(!is.leaf(dend)) draw.d(dend, max_height, facing, max_width = n)
 }
 
 # == title
@@ -1941,15 +2007,23 @@ circos.dendrogram = function(
 #
 # == param
 # -value A numeric vector or a matrix. If it is a matrix, columns correspond to the height of bars.
-# -pos Positions of the boxes.
-# -bar_width Width of bars.
+# -pos Positions of the bars.
+# -bar_width Width of bars. It assumes the bars locating at ``x = 1, 2, ...``.
 # -col Filled color of bars.
 # -border Color for the border.
 # -lwd Line width.
 # -lty Line style.
+# -sector.index Index of sector.
+# -track.index Index of track.
+#
+# == details
+# If the input variable is a matrix, it draws a stacked barplot.
+#
+# Please note, the x-values of barplots are normally integer indices. Just be careful
+# when initializing the circular layout.
 #
 # == example
-# circos.initialize(fa = letters[1:4], xlim = c(0, 10))
+# circos.initialize(letters[1:4], xlim = c(0, 10))
 # circos.track(ylim = c(0, 1), panel.fun = function(x, y) {
 #     value = runif(10)
 #     circos.barplot(value, 1:10 - 0.5, col = 1:10)
@@ -1960,14 +2034,18 @@ circos.dendrogram = function(
 # })
 # circos.clear()
 #
-# circos.initialize(fa = letters[1:4], xlim = c(0, 10))
+# circos.initialize(letters[1:4], xlim = c(0, 10))
 # circos.track(ylim = c(0, 4), panel.fun = function(x, y) {
 #     value = matrix(runif(10*4), ncol = 4)
 #     circos.barplot(value, 1:10 - 0.5, col = 2:5)
 # })
 # circos.clear()
 circos.barplot = function(value, pos, bar_width = 0.6,
-    col = NA, border = "black", lwd = par("lwd"), lty = par("lty")) {
+    col = NA, border = "black", lwd = par("lwd"), lty = par("lty"),
+    sector.index = get.current.sector.index(),
+    track.index = get.current.track.index()) {
+
+    set.current.cell(sector.index, track.index)
 
     if(is.matrix(value)) {
         if(nrow(value) != length(pos)) {
@@ -2008,20 +2086,26 @@ circos.barplot = function(value, pos, bar_width = 0.6,
 # Draw boxplots
 #
 # == param
-# -value A numeric vector, a matrix or a list. If it is a matrix, boxplots are made by columns.
+# -value A numeric vector, a matrix or a list. If it is a matrix, boxplots are made by columns (each column is a box).
 # -pos Positions of the boxes.
 # -outline Whether to draw outliers.
-# -box_width Width of boxes.
+# -box_width Width of boxes. It assumes the bars locating at ``x = 1, 2, ...``.
 # -col Filled color of boxes.
 # -border Color for the border as well as the quantile lines.
 # -lwd Line width.
 # -lty Line style
 # -cex Point size.
 # -pch Point type.
-# -pt.col Point color
+# -pt.col Point color.
+# -sector.index Index of sector.
+# -track.index Index of track.
 #
+# == detail
+# Please note, the x-values of boxplots are normally integer indices. Just be careful
+# when initializing the circular layout.
+# 
 # == example
-# circos.initialize(fa = letters[1:4], xlim = c(0, 10))
+# circos.initialize(letters[1:4], xlim = c(0, 10))
 # circos.track(ylim = c(0, 1), panel.fun = function(x, y) {
 #     for(pos in seq(0.5, 9.5, by = 1)) {
 #         value = runif(10)
@@ -2030,7 +2114,7 @@ circos.barplot = function(value, pos, bar_width = 0.6,
 # })
 # circos.clear()
 #
-# circos.initialize(fa = letters[1:4], xlim = c(0, 10))
+# circos.initialize(letters[1:4], xlim = c(0, 10))
 # circos.track(ylim = c(0, 1), panel.fun = function(x, y) {
 #     value = replicate(runif(10), n = 10, simplify = FALSE)
 #     circos.boxplot(value, 1:10 - 0.5, col = 1:10)
@@ -2038,7 +2122,11 @@ circos.barplot = function(value, pos, bar_width = 0.6,
 # circos.clear()
 circos.boxplot = function(value, pos, outline = TRUE, box_width = 0.6,
     col = NA, border = "black", lwd = par("lwd"), lty = par("lty"),
-    cex = par("cex"), pch = 1, pt.col = par("col")) {
+    cex = par("cex"), pch = 1, pt.col = par("col"),
+    sector.index = get.current.sector.index(),
+    track.index = get.current.track.index()) {
+
+    set.current.cell(sector.index, track.index)
 
     single_boxplot = function(value, pos, outline = TRUE, box_width = 0.6,
         col = NA, border = "black", lwd = par("lwd"), lty = par("lty"),
@@ -2112,10 +2200,12 @@ circos.boxplot = function(value, pos, outline = TRUE, box_width = 0.6,
 # -pch Point type.
 # -pt.col Point color
 # -max_density The maximal density value across several violins. It is used to compare between violins.
+# -sector.index Index of sector.
+# -track.index Index of track.
 #
 # == example
 # \donttest{
-# circos.initialize(fa = letters[1:4], xlim = c(0, 10))
+# circos.initialize(letters[1:4], xlim = c(0, 10))
 # circos.track(ylim = c(0, 1), panel.fun = function(x, y) {
 #     for(pos in seq(0.5, 9.5, by = 1)) {
 #         value = runif(10)
@@ -2124,7 +2214,7 @@ circos.boxplot = function(value, pos, outline = TRUE, box_width = 0.6,
 # })
 # circos.clear()
 #
-# circos.initialize(fa = letters[1:4], xlim = c(0, 10))
+# circos.initialize(letters[1:4], xlim = c(0, 10))
 # circos.track(ylim = c(0, 1), panel.fun = function(x, y) {
 #     value = replicate(runif(10), n = 10, simplify = FALSE)
 #     circos.violin(value, 1:10 - 0.5, col = 1:10)
@@ -2134,7 +2224,10 @@ circos.boxplot = function(value, pos, outline = TRUE, box_width = 0.6,
 circos.violin = function(value, pos, violin_width = 0.8, 
     col = NA, border = "black", lwd = par("lwd"), lty = par("lty"),
     show_quantile = TRUE, pt.col = par("col"), cex = par("cex"), pch = 16,
-    max_density = NULL) {
+    max_density = NULL, sector.index = get.current.sector.index(),
+    track.index = get.current.track.index()) {
+
+    set.current.cell(sector.index, track.index)
 
     single_violin = function(density, pos, violin_width = 0.8, 
         col = NA, border = "black", lwd = par("lwd"), lty = par("lty"),

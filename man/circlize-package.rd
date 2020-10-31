@@ -23,6 +23,9 @@ Current there are following low-level graphic functions:
   \item \code{\link{circos.segments}}
   \item \code{\link{circos.text}}
   \item \code{\link{circos.axis}}, \code{\link{circos.xaxis}}, \code{\link{circos.yaxis}}
+  \item \code{\link{circos.barplot}}
+  \item \code{\link{circos.boxplot}}
+  \item \code{\link{circos.violin}}
   \item \code{\link{circos.link}}
 }
 
@@ -35,11 +38,18 @@ functions are available:
   \item \code{\link{circos.trackText}}
 }
 
+Draw circular heatmaps
+
+\itemize{
+  \item \code{\link{circos.heatmap}}
+}
+
 Functions to arrange circular layout:
 
 \itemize{
   \item \code{\link{circos.initialize}}
   \item \code{\link{circos.track}}
+  \item \code{\link{circos.nested}}
   \item \code{\link{circos.update}}
   \item \code{\link{circos.par}}
   \item \code{\link{circos.info}}

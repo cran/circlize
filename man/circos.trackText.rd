@@ -8,10 +8,10 @@ Draw text in cells among the whole track
 }
 \usage{
 circos.trackText(
-    factors,
+    sectors,
     x, y,
     labels,
-    track.index = get.cell.meta.data("track.index"),
+    track.index = get.current.track.index(),
     direction = NULL,
     facing = c("inside", "outside", "reverse.clockwise", "clockwise",
     "downward", "bending", "bending.inside", "bending.outside"),
@@ -19,11 +19,13 @@ circos.trackText(
     adj = par("adj"),
     cex = 1,
     col = par("col"),
-    font = par("font"))
+    font = par("font"),
+    factors = sectors)
 }
 \arguments{
 
-  \item{factors}{A \code{\link{factor}} or a character vector which represents the categories of data}
+  \item{sectors}{A \code{\link{factor}} or a character vector which represents the categories of data}
+  \item{factors}{The same as \code{sectors}. It will be removed in future versions. }
   \item{x}{Data points on x-axis}
   \item{y}{Data points on y-axis}
   \item{labels}{Labels}

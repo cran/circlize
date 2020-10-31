@@ -8,7 +8,7 @@ Draw histogram in cells among a whole track
 }
 \usage{
 circos.trackHist(
-    factors,
+    sectors,
     x,
     track.height = circos.par("track.height"),
     track.index = NULL,
@@ -27,11 +27,13 @@ circos.trackHist(
     right = TRUE,
     draw.density = FALSE,
     bin.size = NULL,
-    area = FALSE)
+    area = FALSE,
+    factors = sectors)
 }
 \arguments{
 
-  \item{factors}{Factors which represent the categories of data}
+  \item{sectors}{A \code{\link{factor}} or a character vector which represents the categories of data}
+  \item{factors}{The same as \code{sectors}. It will be removed in future versions. }
   \item{x}{Data on the x-axis}
   \item{track.index}{Index for the track which is going to be updated. Setting it to \code{NULL} means creating the plotting regions in the next newest track.}
   \item{track.height}{Height of the track. It is the percentage to the radius of the unit circle. If to update a track, this argument is disabled.}
@@ -63,13 +65,13 @@ high-level graphics by this package.
 \examples{
 \donttest{
 x = rnorm(1600)
-factors = sample(letters[1:16], 1600, replace = TRUE)
-circos.initialize(factors = factors, x = x)
-circos.trackHist(factors = factors, x = x, col = "#999999",
+sectors = sample(letters[1:16], 1600, replace = TRUE)
+circos.initialize(sectors, x = x)
+circos.trackHist(sectors, x = x, col = "#999999",
   border = "#999999")
-circos.trackHist(factors = factors, x = x, bin.size = 0.1,
+circos.trackHist(sectors, x = x, bin.size = 0.1,
   col = "#999999", border = "#999999")
-circos.trackHist(factors = factors, x = x, draw.density = TRUE,
+circos.trackHist(sectors, x = x, draw.density = TRUE,
   col = "#999999", border = "#999999")
 circos.clear()
 }

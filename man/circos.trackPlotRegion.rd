@@ -8,7 +8,7 @@ Create plotting regions for a whole track
 }
 \usage{
 circos.trackPlotRegion(
-    factors = NULL,
+    sectors = NULL,
     x = NULL, y = NULL,
     ylim = NULL,
     force.ylim = TRUE,
@@ -20,11 +20,13 @@ circos.trackPlotRegion(
     bg.border = "black",
     bg.lty = par("lty"),
     bg.lwd = par("lwd"),
-    panel.fun = function(x, y) {NULL})
+    panel.fun = function(x, y) {NULL},
+    factors = sectors)
 }
 \arguments{
 
-  \item{factors}{A \code{\link{factor}} or a character vector which represents categories of data, if it is \code{NULL}, then it uses all sector index.}
+  \item{sectors}{A \code{\link{factor}} or a character vector which represents categories of data, if it is \code{NULL}, then it uses all sector index.}
+  \item{factors}{The same as \code{sectors}. It will be removed in future versions. }
   \item{x}{Data on x-axis. It is only used if \code{panel.fun} is set.}
   \item{y}{Data on y-axis}
   \item{ylim}{Range of data on y-axis}
