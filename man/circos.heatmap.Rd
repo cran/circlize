@@ -14,7 +14,7 @@ circos.heatmap(mat, split = NULL, col, na.col = "grey",
     dend.side = c("none", "outside", "inside"), dend.track.height = 0.1,
     rownames.side = c("none", "outside", "inside"), rownames.cex = 0.5,
     rownames.font = par("font"), rownames.col = "black",
-    show.sector.labels = FALSE, ...)
+    show.sector.labels = FALSE, cell_width = rep(1, nrow(mat)), ...)
 }
 \arguments{
 
@@ -26,7 +26,7 @@ circos.heatmap(mat, split = NULL, col, na.col = "grey",
   \item{bg.lty}{Line type of the background border.}
   \item{bg.lwd}{Line width of the background border.}
   \item{ignore.white}{Whether to draw the white color?}
-  \item{cluster}{whether to apply clustering on rows.}
+  \item{cluster}{whether to apply clustering on rows. The value can also be a \code{dendrogram}/\code{hclust} object or other objects that can be converted to with \code{\link[stats:dendrogram]{as.dendrogram}}.}
   \item{clustering.method}{Clustering method, pass to \code{\link[stats]{hclust}}.}
   \item{distance.method}{Distance method, pass to \code{\link[stats]{dist}}.}
   \item{dend.callback}{A callback function that is applied to the dendrogram in every sector.}
@@ -37,6 +37,7 @@ circos.heatmap(mat, split = NULL, col, na.col = "grey",
   \item{rownames.font}{Font of row names.}
   \item{rownames.col}{Color of row names.}
   \item{show.sector.labels}{Whether to show sector labels.}
+  \item{cell_width}{Relative widths of heatmap cells.}
   \item{...}{Pass to \code{\link{circos.track}} which draws the heatmap track.}
 
 }

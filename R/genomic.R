@@ -263,7 +263,7 @@ circos.genomicInitialize = function(
 	...) {
 
 	data = validate_data_frame(data)
-	validate_region(data)
+	validate_region(data, check_chr = FALSE)
 	
 	if(is.factor(data[[1]])) {
 		fa = levels(data[[1]])
@@ -514,11 +514,11 @@ circos.genomicTrackPlotRegion = function(
 	if(is.dataFrameList(data)) {
 		for(i in seq_along(data)) {
 			data[[i]][[1]] = as.character(data[[i]][[1]])
-			validate_region(data[[i]])
+			validate_region(data[[i]], check_chr = FALSE)
 		}
 	} else {
 		data[[1]] = as.character(data[[1]])
-		validate_region(data)
+		validate_region(data, check_chr = FALSE)
 	}
 
 	# excluding the first three columns
@@ -1505,7 +1505,7 @@ circos.genomicLink = function(
 	}
 	
 	if(nrow(region1) != nrow(region2)) {
-		stop_wrap("nrow of `region1` and `region2` differ.")
+		stop_wrap("nrow of `region1` and `region2` differ. Please check the chromosome column and make sure all the chromosomes are in the circular layout.")
 	}
 	
 	nr = nrow(region1)
@@ -1855,7 +1855,7 @@ genomicDensity = function(
 	region = validate_data_frame(region)
 
 	if(is.character(region[, 1]) || is.factor(region[, 1])) {
-		validate_region(region)
+		validate_region(region, check_chr = TRUE)
 		region[, 1] = as.vector(region[, 1])
 		all_chr = unique(region[, 1])
 		if(!is.null(chr.len)) {
@@ -1884,7 +1884,7 @@ genomicDensity = function(
 		})))
 	}
 	
-	validate_region(region, 1, 2)
+	validate_region(region, 1, 2, check_chr = FALSE)
 	if(ncol(region) >= 3) {
 		if(is.numeric(region[, 1])) {
 			if(max(region[, 1]) < 100) {
@@ -2007,6 +2007,7 @@ normalizeToDataFrame = function(data, sort = FALSE) {
 	all.chr = get.all.sector.index()
 
 	if(is.data.frame(data)) {
+		data = as.data.frame(data)
 		if(ncol(data) < 3) {
 			stop_wrap("Your data frame is less than 3 column!.")
 		}
@@ -2112,7 +2113,7 @@ circos.genomicRainfall = function(
 	}
 	
 	for(i in seq_along(data)) {
-		validate_region(data[[i]])
+		validate_region(data[[i]], check_chr = TRUE)
 	}
 
 	if(length(col) == 1) {
@@ -2391,7 +2392,7 @@ circos.genomicHeatmap = function(
 	track.margin = circos.par("track.margin")) {
 
 	bed = validate_data_frame(bed)
-	validate_region(bed)
+	validate_region(bed, check_chr = TRUE)
 
 	mat = bed[, -(1:3), drop = FALSE]
 	if(is.null(numeric.column)) {
@@ -2473,7 +2474,7 @@ circos.genomicHeatmap = function(
 # -facing fFacing of the labels. The value can only be ``"clockwise"`` or ``"reverse.clockwise"``.
 # -niceFacing Whether automatically adjust the facing of the labels.
 # -col Color for the labels.
-# -cex Aize of the labels.
+# -cex Size of the labels.
 # -font Font of the labels.
 # -padding Padding of the labels, the value is the ratio to the height of the label.
 # -connection_height Height of the connection track.
@@ -2482,6 +2483,7 @@ circos.genomicHeatmap = function(
 # -line_lty Line type for the connectioin lines.
 # -labels_height Height of the labels track.
 # -side Side of the labels track, is it in the inside of the track where the regions are marked?
+# -labels.side Same as ``side``. It will replace ``side`` in the future versions.
 # -track.margin Bottom and top margins.
 #
 # == details
@@ -2523,10 +2525,11 @@ circos.genomicLabels = function(
 	line_lty = par("lty"),
 	labels_height = min(c(cm_h(1.5), max(strwidth(labels, cex = cex, font = font)))),
 	side = c("inside", "outside"), 
+	labels.side = side,
 	track.margin = circos.par("track.margin")) {
 
 	bed = validate_data_frame(bed)
-	validate_region(bed)
+	validate_region(bed, check_chr = TRUE)
 	
 	if(is.null(labels)){
 		labels = bed[[labels.column]]
@@ -2580,7 +2583,8 @@ circos.genomicLabels = function(
 
 	op = circos.par("points.overflow.warning")
 	circos.par("points.overflow.warning" = FALSE)
-	if(side == "inside") {
+	labels.side = side = match.arg(side)[1]
+	if(labels.side == "inside") {
 		# an empty track
 		circos.genomicTrackPlotRegion(bed2, ylim = c(0, 1), 
 			track.margin = c(convert_height(0.5, "mm"), track.margin[2]), 
@@ -2669,16 +2673,17 @@ smartAlign = function(x1, x2, xlim) {
 		new_x2 = numeric(length(x2))
 		for(i_cluster in unique(cluster)) {
 			index = which(cluster == i_cluster)
-			total_len = sum(x2[index] - x1[index])
+			len = x2[index] - x1[index]
+			total_len = sum(len)
 			mid = (min(x1[index]) + max(x2[index]))/2
 			if(total_len > xlim[2] - xlim[1]) {
-				tp = seq(xlim[1], xlim[2], length = length(index) + 1)
+				tp = c(0, cumsum(len)) + (xlim[1] + xlim[2])/2 - total_len/2
 			} else if(mid - total_len/2 < xlim[1]) {
-				tp = seq(xlim[1], xlim[1] + total_len, length = length(index) + 1)
+				tp = c(0, cumsum(len)) + xlim[1]
 			} else if(mid + total_len/2 > xlim[2]) {
-				tp = seq(xlim[2] - total_len, xlim[2], length = length(index) + 1)
+				tp = xlim[2] - total_len + c(0, cumsum(len))
 			} else {
-				tp = seq(mid - total_len/2, mid + total_len/2, length = length(index)+1)
+				tp = c(0, cumsum(len)) + mid - total_len/2
 			}
 			new_x1[index] = tp[-length(tp)]
 			new_x2[index] = tp[-1]

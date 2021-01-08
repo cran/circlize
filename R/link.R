@@ -18,6 +18,7 @@
 # -w             Since the link is a Bezier curve, it controls the shape of Bezier curve.
 # -h2            Height of the bottom edge of the link if it is a ribbon.
 # -w2            Shape of the bottom edge of the link if it is a ribbon.
+# -inverse       Whether the link is inversed.
 # -col           Color of the link. If the link is a ribbon, then it is the filled color for the ribbon.
 # -lwd           Line (or border) width
 # -lty           Line (or border) style
@@ -60,6 +61,7 @@ circos.link = function(
     w = 1,
     h2 = h,
     w2 = w,
+    inverse = FALSE,
     col = "black",
     lwd = par("lwd"),
     lty = par("lty"),
@@ -79,6 +81,13 @@ circos.link = function(
 	point1 = sort(point1)
 	point2 = sort(point2)
 
+	if(min(point1) < sector.data1["min.data"] || max(point1) > sector.data1["max.data"]) {
+		message_wrap(paste0("Note: The first link end is drawn out of sector '", sector.index1, "'."))
+	}
+	if(min(point2) < sector.data2["min.data"] || max(point2) > sector.data2["max.data"]) {
+		message_wrap(paste0("Note: The second link end is drawn out of sector '", sector.index2, "'."))
+	}
+
 	if(reduce_to_mid_line) {
 		point1 = mean(point1)
 		point2 = mean(point2)
@@ -90,15 +99,15 @@ circos.link = function(
 
 		d = getQuadraticPoints(theta1, theta2, rou1, rou2, h = h, h.ratio = h.ratio, w = w)
         nr = nrow(d)
-        if(directional == 0) {
+        # if(directional == 0) {
         	lines(d, col = col, lwd = lwd, lty = lty, lend = "butt")
-        } else if(directional == 1) {
-			lines(d[-nr, , drop = FALSE], col = col, lwd = lwd, lty = lty, lend = "butt")
-		} else if(directional == -1) {
-			lines(d[-1, , drop = FALSE], col = col, lwd = lwd, lty = lty, lend = "butt")
-		} else if(directional == 2) {
-			lines(d[-c(1, nr), , drop = FALSE], col = col, lwd = lwd, lty = lty, lend = "butt")
-		}
+  #       } else if(directional == 1) {
+		# 	lines(d[-nr, , drop = FALSE], col = col, lwd = lwd, lty = lty, lend = "butt")
+		# } else if(directional == -1) {
+		# 	lines(d[-1, , drop = FALSE], col = col, lwd = lwd, lty = lty, lend = "butt")
+		# } else if(directional == 2) {
+		# 	lines(d[-c(1, nr), , drop = FALSE], col = col, lwd = lwd, lty = lty, lend = "butt")
+		# }
 
         if(nrow(d) > 1) {
 	        if(directional %in% c(1,2)) {  # point1 to point2
@@ -275,32 +284,65 @@ circos.link = function(
 			d = rbind(d, revMat(r))
 			polygon(d, col = col, lty = lty, lwd = lwd, border = border)
 		} else {
-
 			if(degreeDiff(theta11, theta22) > degreeDiff(theta12, theta21)) {
-				d1 = getQuadraticPoints(theta11, theta22, rou1, rou2, h = h, h.ratio = h.ratio, w = w)
-		        d2 = getQuadraticPoints(theta12, theta21, rou1, rou2, h = h2, h.ratio = h.ratio, w = w2)
+		        if(inverse) {
+			        d1 = getQuadraticPoints(theta11, theta21, rou1, rou2, h = h, h.ratio = h.ratio, w = w)
+			        d2 = getQuadraticPoints(theta12, theta22, rou1, rou2, h = h, h.ratio = h.ratio, w = w)
+			    } else {
+			    	d1 = getQuadraticPoints(theta11, theta22, rou1, rou2, h = h, h.ratio = h.ratio, w = w)
+		       		d2 = getQuadraticPoints(theta12, theta21, rou1, rou2, h = h2, h.ratio = h.ratio, w = w2)
+			    }
 		        if(directional == 1) {
-		        	d1x = getQuadraticPoints(theta11, theta22, rou1, rou2 - arr.length, h = h, h.ratio = h.ratio, w = w)
-			        d2x = getQuadraticPoints(theta12, theta21, rou1, rou2 - arr.length, h = h2, h.ratio = h.ratio, w = w2)
+		        	if(inverse) {
+		        		d1x = getQuadraticPoints(theta11, theta21, rou1, rou2 - arr.length, h = h, h.ratio = h.ratio, w = w)
+				        d2x = getQuadraticPoints(theta12, theta22, rou1, rou2 - arr.length, h = h, h.ratio = h.ratio, w = w)
+		        	} else {
+			        	d1x = getQuadraticPoints(theta11, theta22, rou1, rou2 - arr.length, h = h, h.ratio = h.ratio, w = w)
+				        d2x = getQuadraticPoints(theta12, theta21, rou1, rou2 - arr.length, h = h2, h.ratio = h.ratio, w = w2)
+				    }
 			    } else if(directional == -1) {
-			    	d1x = getQuadraticPoints(theta11, theta22, rou1 - arr.length, rou2, h = h, h.ratio = h.ratio, w = w)
-		        	d2x = getQuadraticPoints(theta12, theta21, rou1 - arr.length, rou2, h = h2, h.ratio = h.ratio, w = w2)
+			    	if(inverse) {
+			    		d1x = getQuadraticPoints(theta11, theta21, rou1 - arr.length, rou2, h = h, h.ratio = h.ratio, w = w)
+		        		d2x = getQuadraticPoints(theta12, theta22, rou1 - arr.length, rou2, h = h, h.ratio = h.ratio, w = w)
+			    	} else {
+				    	d1x = getQuadraticPoints(theta11, theta22, rou1 - arr.length, rou2, h = h, h.ratio = h.ratio, w = w)
+			        	d2x = getQuadraticPoints(theta12, theta21, rou1 - arr.length, rou2, h = h2, h.ratio = h.ratio, w = w2)
+			        }
 			    }
 	        	dcenter = getQuadraticPoints((theta11 + theta12)/2, (theta21 + theta22)/2, rou1, rou2, h = (h+h2)/2, h.ratio = h.ratio, w = (w+w2)/2)
 		    } else {
-		    	d1 = getQuadraticPoints(theta11, theta22, rou1, rou2, h = h2, h.ratio = h.ratio, w = w2)
-		        d2 = getQuadraticPoints(theta12, theta21, rou1, rou2, h = h, h.ratio = h.ratio, w = w)
+		    	if(inverse) {
+		    		d1 = getQuadraticPoints(theta11, theta21, rou1, rou2, h = h, h.ratio = h.ratio, w = w)
+		        	d2 = getQuadraticPoints(theta12, theta22, rou1, rou2, h = h, h.ratio = h.ratio, w = w)
+		    	} else {
+			    	d1 = getQuadraticPoints(theta11, theta22, rou1, rou2, h = h2, h.ratio = h.ratio, w = w2)
+			        d2 = getQuadraticPoints(theta12, theta21, rou1, rou2, h = h, h.ratio = h.ratio, w = w)
+			    }
 		        if(directional == 1) {
-		        	d1x = getQuadraticPoints(theta11, theta22, rou1, rou2 - arr.length, h = h2, h.ratio = h.ratio, w = w2)
-			        d2x = getQuadraticPoints(theta12, theta21, rou1, rou2 - arr.length, h = h, h.ratio = h.ratio, w = w)
+		        	if(inverse) {
+			        	d1x = getQuadraticPoints(theta11, theta21, rou1, rou2 - arr.length, h = h, h.ratio = h.ratio, w = w)
+				        d2x = getQuadraticPoints(theta12, theta22, rou1, rou2 - arr.length, h = h, h.ratio = h.ratio, w = w)
+				    } else {
+				    	d1x = getQuadraticPoints(theta11, theta22, rou1, rou2 - arr.length, h = h2, h.ratio = h.ratio, w = w2)
+				        d2x = getQuadraticPoints(theta12, theta21, rou1, rou2 - arr.length, h = h, h.ratio = h.ratio, w = w)
+				    }
 	        	} else if(directional == -1) {
-		        	d1x = getQuadraticPoints(theta11, theta22, rou1 - arr.length, rou2, h = h2, h.ratio = h.ratio, w = w2)
-			        d2x = getQuadraticPoints(theta12, theta21, rou1 - arr.length, rou2, h = h, h.ratio = h.ratio, w = w)
+	        		if(inverse) {
+			        	d1x = getQuadraticPoints(theta11, theta21, rou1 - arr.length, rou2, h = h, h.ratio = h.ratio, w = w)
+				        d2x = getQuadraticPoints(theta12, theta22, rou1 - arr.length, rou2, h = h, h.ratio = h.ratio, w = w)
+				    } else {
+				    	d1x = getQuadraticPoints(theta11, theta22, rou1 - arr.length, rou2, h = h2, h.ratio = h.ratio, w = w2)
+				        d2x = getQuadraticPoints(theta12, theta21, rou1 - arr.length, rou2, h = h, h.ratio = h.ratio, w = w)
+				    }
 			    }
 	        	dcenter = getQuadraticPoints((theta11 + theta12)/2, (theta21 + theta22)/2, rou1, rou2, h = (h+h2)/2, h.ratio = h.ratio, w = (w+w2)/2)
 		    }
 			r2 = arc.points(theta22, theta21, rou2)
 			r1 = arc.points(theta12, theta11, rou1)
+
+			if(inverse) {
+				r2 = revMat(r2)
+			}
 
 			if(arr.type == "big.arrow") {
 				if(directional == 1) {
@@ -608,3 +650,72 @@ line_degree = function(x0, y0, x1, y1) {
 	if(x0 > x1 && y0 < y1) alpha = (alpha + 180) %% 360
 	return(alpha)
 }
+
+
+# == title
+# Arrange links evenly on each sector
+#
+# == param
+# -df A data frame with two columns. The values should only contain sector names.
+# -directional Whether the links are directional.
+#
+# == details
+# This function only deals with single-line links.
+#
+# == value
+# A data frame with four columns of the sectors and the positions of the links.
+#
+# == example
+# sectors = letters[1:20]
+# df = data.frame(from = sample(sectors, 40, replace = TRUE),
+#                 to   = sample(sectors, 40, replace = TRUE),
+#                 stringsAsFactors = FALSE)
+# df = unique(df)
+# df = df[df$from != df$to, ]
+#
+# circos.initialize(sectors, xlim = c(0, 1))
+# circos.track(ylim = c(0, 1), panel.fun = function(x, y) {
+#     circos.text(CELL_META$xcenter, CELL_META$ycenter, CELL_META$sector.index)
+# })
+#
+# df2 = arrange_links_evenly(df, directional = 1)
+#
+# for(i in seq_len(nrow(df2))) {
+#     s1 = df$from[i]
+#     s2 = df$to[i]
+#     circos.link(df2[i, "sector1"], df2[i, "pos1"], 
+#                 df2[i, "sector2"], df2[i, "pos2"],
+#                 directional = 1)
+# }
+#
+arrange_links_evenly = function(df, directional = 0) {
+
+    if(!is.circos.initialized()) {
+        stop_wrap("Circular layout needs to be initialized.")
+    }
+
+    df[, 1] = factor(df[, 1], levels = get.all.sector.index())
+    df[, 2] = factor(df[, 2], levels = get.all.sector.index())
+
+    if(any(is.na(df[, 1])) || any(is.na(df[, 2]))) {
+    	stop_wrap("The two columns in `df` should only contain sector names.")
+    }
+
+    df2 = chordDiagram(df, directional = directional + 0, plot = FALSE)
+
+    link_count = table(unlist(df))
+    
+    for(i in seq_len(nrow(df2))) {
+        s1 = df2[i, 1]
+        s2 = df2[i, 2]
+        
+        xlim1 = get.cell.meta.data("xlim", sector.index = s1)
+        df2[i, "x1"] = (df2[i, "x1"] - 0.5)/(link_count[s1]) * (xlim1[2] - xlim1[1]) + xlim1[1]
+        xlim2 = get.cell.meta.data("xlim", sector.index = s2)
+        df2[i, "x2"] = (df2[i, "x2"] - 0.5)/(link_count[s2]) * (xlim2[2] - xlim2[1]) + xlim2[1]
+    }
+    df2 = df2[, c("rn", "cn", "x1", "x2")]
+    colnames(df2) = c("sector1", "sector2", "pos1", "pos2")
+    return(df2)
+}
+
