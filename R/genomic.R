@@ -84,6 +84,10 @@ circos.initializeWithIdeogram = function(
 	ideogram.height = convert_height(2, "mm"), 
 	...) {
 	
+	if("sector.names" %in% names(list(...))) {
+		stop_wrap("Found argumnet `sector.names` is used. Please use the argument `chromosome.index` instead.")
+	}
+
 	# proper order will be returned depending on cytoband and sort.chr
 	e = try(cytoband <- read.cytoband(cytoband, species = species, sort.chr = sort.chr, chromosome.index = chromosome.index), silent = TRUE)
 	if(class(e) == "try-error" && !is.null(species)) {  # if species is defined
@@ -290,6 +294,11 @@ circos.genomicInitialize = function(
 	circos.par(cell.padding = c(0, 0, 0, 0), points.overflow.warning = FALSE)
 	circos.initialize(factor(fa, levels = fa), xlim = cbind(x1, x2), ...)
 
+	if(circos.par$ring) {
+		op = c(op[1], 0, op[3], 0)
+    	ow = FALSE
+	}
+
 	if(is.null(track.height)) {
 		if(all(c("axis", "labels") %in% plotType)) {
 			track.height = convert_unit_in_canvas_coordinate(1.5, "mm") + strheight("0", cex = axis.labels.cex) + 
@@ -326,6 +335,20 @@ circos.genomicInitialize = function(
 	circos.par("cell.padding" = op, "points.overflow.warning" = ow)
 	return(invisible(NULL))
 }
+
+
+# == title
+# Initialize a layout for circular genome
+#
+# == param
+# -name Name of the genome (or the "chromosome name").
+# -genome_size Size of the genome
+# -plotType Pass to `circos.genomicInitialize`.
+# -... All goes to `circos.genomicInitialize`.
+#
+circos.initializeCircularGenome = function(name, genome_size, plotType = "axis", ...) {
+	circos.genomicInitialize(data.frame(name, 0, genome_size), ..., ring = TRUE, plotType = plotType)
+} 
 
 # == title
 # Add genomic axes
@@ -514,10 +537,22 @@ circos.genomicTrackPlotRegion = function(
 	if(is.dataFrameList(data)) {
 		for(i in seq_along(data)) {
 			data[[i]][[1]] = as.character(data[[i]][[1]])
+			if(circos.par$ring) {
+				l = data[[i]][, 2] > data[[i]][, 3]
+				if(any(l)) {
+					data[[i]][l, 2] = data[[i]][l, 2] - diff(get.sector.data()[c("min.value", "max.value")])
+				}
+			}
 			validate_region(data[[i]], check_chr = FALSE)
 		}
 	} else {
 		data[[1]] = as.character(data[[1]])
+		if(circos.par$ring) {
+			l = data[, 2] > data[, 3]
+			if(any(l)) {
+				data[l, 2] = data[l, 2] - diff(get.sector.data()[c("min.value", "max.value")])
+			}
+		}
 		validate_region(data, check_chr = FALSE)
 	}
 
@@ -648,13 +683,13 @@ circos.genomicTrackPlotRegion = function(
 					if(is.na(numeric.column[i])) {
 						stop_wrap("There is no numeric column in one of your data frame which calculation of `ylim` depends on. Or you can set `ylim` explicitely.")
 					}
-					range(unlist(lapply(gr[-(1:3)][ numeric.column[i] ], range)))
+					range(unlist(lapply(gr[-(1:3)][ numeric.column[i] ], range, na.rm = TRUE)))
 				})))
 			} else {
 				if(length(numeric.column) == 0) {
 					stop_wrap("There is no numeric column in your data frame which calculation of `ylim` depends on. Or you can set `ylim` explicitely.")
 				}
-				ylim = range(unlist(lapply(data[-(1:3)][numeric.column], range)))
+				ylim = range(unlist(lapply(data[-(1:3)][numeric.column], range, na.rm = TRUE)))
 			}
 		}
 
@@ -1482,6 +1517,17 @@ circos.genomicLink = function(
     lty = par("lty"), 
     border = col, 
     ...) {
+
+	if(circos.par$ring) {
+		l = region1[, 2] > region1[, 3]
+		if(any(l)) {
+			region1[l, 2] = region1[l, 2] - diff(get.sector.data()[c("min.value", "max.value")])
+		}
+		l = region2[, 2] > region2[, 3]
+		if(any(l)) {
+			region2[l, 2] = region2[l, 2] - diff(get.sector.data()[c("min.value", "max.value")])
+		}
+	}
 	
 	region1 = validate_data_frame(region1)
 	region2 = validate_data_frame(region2)
@@ -1915,7 +1961,7 @@ genomicDensity = function(
 			s = s[-length(s)]
 			e = s + window.size - 1
 		} else {
-			b = seq(1, max_pos, length = 2*n.window - 1)
+			b = seq(1, max_pos, length.out = 2*n.window - 1)
 			s = b[-length(b)]
 			s = s[-length(s)]
 			e = s + b[3] - b[1] - 1
@@ -1926,7 +1972,7 @@ genomicDensity = function(
 			s = b[-length(b)]
 			e = s + window.size - 1
 		} else {
-			b = seq(1, max_pos, length = n.window)
+			b = seq(1, max_pos, length.out = n.window)
 			s = b[-length(b)]
 			e = s + b[2] - b[1]	
 		}
@@ -2412,7 +2458,7 @@ circos.genomicHeatmap = function(
 
 	side = match.arg(side)
 	if(missing(col)) {
-		col = colorRamp2(seq(min(mat, na.rm = TRUE), max(mat, na.rm = TRUE), length = 3), c("blue", "#EEEEEE", "red"))
+		col = colorRamp2(seq(min(mat, na.rm = TRUE), max(mat, na.rm = TRUE), length.out = 3), c("blue", "#EEEEEE", "red"))
 	}
 	if(is.function(col)) {
 		col = col(mat)
@@ -2557,18 +2603,61 @@ circos.genomicLabels = function(
 	line_lwd = line_lwd[od]
 	line_lty = line_lty[od]
 
-	# map all other chromosomes to the first chromosome
 	chr = get.all.sector.index()[1]
 	sector_data = get.sector.data(chr)
+	
+	## find the largest gap
+	all_chr = unique(bed[, 1])
+	rho = NULL
+	for(cr in all_chr) {
+		sub_bed = bed[bed[, 1] == cr, ]
+		rho = c(rho, circlize(sub_bed[, 2], y = rep(1, nrow(sub_bed)), sector.index = cr)[, 1])
+	}
+	if(length(rho) == 0) {
+		anchor = ((sector_data["start.degree"] + sector_data["end.degree"])/2 + 180) %% 360
+	} else if(length(rho) == 1) {
+		anchor = (rho + 180) %% 360
+	} else {
+		rho = sort(rho)
+		rho = c(rho, rho[1] + 360)
+		i = which.max(diff(rho))
+		anchor = ((rho[i] + rho[i+1])/2) %% 360
+	}
+
+	# map all other chromosomes to the first chromosome
 	chr_width = sector_data["start.degree"] - sector_data["end.degree"]
-	extend = (360 - chr_width)/chr_width
-	extend = c(0, extend)
+	# extend = (360 - chr_width)/chr_width
+	# extend = c(0, extend)
+	extend = numeric(2)
+	s1 = sector_data["start.degree"] %% 360
+	s2 = sector_data["end.degree"] %% 360
+	# if the anchor in inside the first sector
+	if(s1 < s2) { # the first sector go across theta = 0
+		s1 = s1 + 360
+		if(anchor < s2) {
+			anchor = anchor + 360
+		}
+	} 
+	
+	if(anchor >= s2 && anchor <= s1) { # anchor inside sector
+		if(s1 - s2 > 180) {
+			extend[1] = (abs(s1 - anchor) %% 360)/chr_width
+			extend[2] = -(abs(s2 - anchor) %% 360)/chr_width
+		} else {
+			extend = (360 - chr_width)/chr_width
+			extend = c(0, extend)
+		}
+	} else {
+		extend[1] = (abs(s1 - anchor) %% 360)/chr_width
+		extend[2] = (abs(s2 - anchor) %% 360)/chr_width
+	}
 
 	all_chr = unique(bed[, 1])
 	bed2 = NULL
 	for(cr in all_chr) {
 		sub_bed = bed[bed[, 1] == cr, ]
 		if(cr != chr) {
+
 			x1 = reverse.circlize(circlize(sub_bed[, 2], y = rep(1, nrow(sub_bed)), sector.index = cr), sector.index = chr)[, 1]
 			x2 = reverse.circlize(circlize(sub_bed[, 3], y = rep(1, nrow(sub_bed)), sector.index = cr), sector.index = chr)[, 1]
 			sub_bed[, 2:3] = data.frame(start = x1, end = x2)

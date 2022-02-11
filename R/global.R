@@ -219,7 +219,12 @@ circos.par = setGlobalOptions(
 		.private = TRUE,
 		.visible = FALSE),
 	message = TRUE,
-	help = list(.synonymous = "message")
+	help = list(.synonymous = "message"),
+	ring = list(
+		.value = FALSE,
+		.private = TRUE,
+		.visible = FALSE
+	)
 )
 
 # before initialization, .SECTOR.DATA is NULL
@@ -241,6 +246,7 @@ is.circos.initialized = function() {
 #          the vector are relative, and they will be scaled by dividing their summation.
 #          By default, it is ``NULL`` which means the width of sectors correspond to the data
 #          range in sectors.
+# -ring Whether the sector represented as a ring. If yes, there should only be one sector in the circle.
 #
 # == details
 # The function allocates the sectors according to the values on x-axis.
@@ -273,7 +279,8 @@ circos.initialize = function(
 	x = NULL,
 	xlim = NULL,
 	sector.width = NULL,
-	factors = sectors) {
+	factors = sectors,
+	ring = FALSE) {
 
     resetGlobalVariable()
 
@@ -309,6 +316,18 @@ circos.initialize = function(
     }
     factors = factor(as.character(factors), intersect(levels(factors), as.character(factors)))
     le = levels(factors)
+
+    if(ring) {
+    	if(length(le) != 1) {
+    		stop_wrap("There should be only one sector under 'ring' mode.")
+    	}
+    	circos.par$ring = TRUE
+    	circos.par$gap.degree = 0
+    	circos.par$cell.padding = c(circos.par$cell.padding[1], 0, circos.par$cell.padding[3], 0)
+    	circos.par$points.overflow.warning = FALSE
+    } else {
+    	circos.par$ring = FALSE
+    }
 
     if(!is.null(x)) {
     	x = as.numeric(x)
