@@ -118,14 +118,14 @@ circos.arrow = function(
 				                    c(x1, y - width/2),
 				                    c(x1, y + width/2),
 				                    c(x2 - arrow.head.length, y + width/2))
-			arrow.body.coor2 = rbind(lines.expand(arrow.body.coor[1:2, 1], arrow.body.coor[1:2, 2], sector.index, track.index),
-				                    lines.expand(arrow.body.coor[3:4, 1], arrow.body.coor[3:4, 2], sector.index, track.index))
+			arrow.body.coor2 = rbind(lines_expand(arrow.body.coor[1:2, 1], arrow.body.coor[1:2, 2], sector.index, track.index),
+				                    lines_expand(arrow.body.coor[3:4, 1], arrow.body.coor[3:4, 2], sector.index, track.index))
 		} else {
 			arrow.body.coor = rbind(c(x2 - arrow.head.length, y - width/2),
 				                    c(x1, y),
 				                    c(x2 - arrow.head.length, y + width/2))
-			arrow.body.coor2 = rbind(lines.expand(arrow.body.coor[1:2, 1], arrow.body.coor[1:2, 2], sector.index, track.index),
-				                    lines.expand(arrow.body.coor[2:3, 1], arrow.body.coor[2:3, 2], sector.index, track.index))
+			arrow.body.coor2 = rbind(lines_expand(arrow.body.coor[1:2, 1], arrow.body.coor[1:2, 2], sector.index, track.index),
+				                    lines_expand(arrow.body.coor[2:3, 1], arrow.body.coor[2:3, 2], sector.index, track.index))
 		}
 
 		coor = rbind(arrow.body.coor2, arrow.head.coor)
@@ -139,14 +139,14 @@ circos.arrow = function(
 				                    c(x2, y - width/2),
 				                    c(x2, y + width/2),
 				                    c(x1 + arrow.head.length, y + width/2))
-			arrow.body.coor2 = rbind(lines.expand(arrow.body.coor[1:2, 1], arrow.body.coor[1:2, 2], sector.index, track.index),
-				                    lines.expand(arrow.body.coor[3:4, 1], arrow.body.coor[3:4, 2], sector.index, track.index))
+			arrow.body.coor2 = rbind(lines_expand(arrow.body.coor[1:2, 1], arrow.body.coor[1:2, 2], sector.index, track.index),
+				                    lines_expand(arrow.body.coor[3:4, 1], arrow.body.coor[3:4, 2], sector.index, track.index))
 		} else {
 			arrow.body.coor = rbind(c(x1 + arrow.head.length, y - width/2),
 				                    c(x2, y),
 				                    c(x1 + arrow.head.length, y + width/2))
-			arrow.body.coor2 = rbind(lines.expand(arrow.body.coor[1:2, 1], arrow.body.coor[1:2, 2], sector.index, track.index),
-				                    lines.expand(arrow.body.coor[2:3, 1], arrow.body.coor[2:3, 2], sector.index, track.index))
+			arrow.body.coor2 = rbind(lines_expand(arrow.body.coor[1:2, 1], arrow.body.coor[1:2, 2], sector.index, track.index),
+				                    lines_expand(arrow.body.coor[2:3, 1], arrow.body.coor[2:3, 2], sector.index, track.index))
 		}
 		coor = rbind(arrow.body.coor2, arrow.head.coor)
 	}

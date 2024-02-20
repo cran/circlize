@@ -295,7 +295,7 @@ circos.lines = function(
             if(i == 1) {
                 next
             }
-			d = rbind(d, lines.expand(c(x[i-1], x[i]), c(y[i-1], y[i-1]), sector.index, track.index))
+			d = rbind(d, lines_expand(c(x[i-1], x[i]), c(y[i-1], y[i-1]), sector.index, track.index))
 			d = rbind(d, cbind(c(x[i], x[i]), c(y[i-1], y[i])))
         }
 
@@ -322,7 +322,7 @@ circos.lines = function(
     if(straight) {
         d = cbind(x, y)
     } else {
-        d = lines.expand(x, y, sector.index, track.index)
+        d = lines_expand(x, y, sector.index, track.index)
     }
 
 	if(area) {
@@ -693,7 +693,7 @@ circos.polygon = function(
     # whether the points that are out of the plotting region.
     check.points.position(x, y, sector.index, track.index)
 
-    d = lines.expand(x, y, sector.index, track.index)
+    d = lines_expand(x, y, sector.index, track.index)
     d2 = circlize(d, sector.index = sector.index, track.index = track.index)
     polygon(polar2Cartesian(d2), ...)
     return(invisible(NULL))
@@ -796,7 +796,7 @@ circos.segments = function(
 			lwd2 = c(lwd2, lwd[i])
 			lty2 = c(lty2, lty[i])
 		} else {
-			d = lines.expand(c(x0[i], x1[i]), c(y0[i], y1[i]), sector.index, track.index)
+			d = lines_expand(c(x0[i], x1[i]), c(y0[i], y1[i]), sector.index, track.index)
 			x = c(x, c(d[, 1], NA))
 			y = c(y, c(d[, 2], NA))
 			nd = nrow(d)

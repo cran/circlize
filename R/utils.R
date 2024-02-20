@@ -133,7 +133,7 @@ polar2Cartesian = function(d) {
 
 # expand breakpoints in two points to draw an arc
 # x and y are transformed and re-mapped points
-lines.expand = function(x, y, sector.index = get.current.sector.index(), track.index = get.current.track.index()) {
+lines_expand = function(x, y, sector.index = get.current.sector.index(), track.index = get.current.track.index()) {
     sector.data = get.sector.data(sector.index)
 	cell.data = get.cell.data(sector.index, track.index)
     nx = x[1]

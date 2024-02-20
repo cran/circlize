@@ -1,7 +1,6 @@
-citHeader("The methods within the code package can be cited as:")
 
-citEntry(
-   entry="article",
+bibentry(
+   bibtype="Article",
    title = "circlize implements and enhances circular visualization in R",
    author = "Zuguang Gu, Lei Gu, Roland Eils, Matthias Schlesner and Benedikt Brors",
    journal = "Bioinformatics",
@@ -11,9 +10,3 @@ citEntry(
    year = 2014,
    textVersion = "Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics."
 )
-
-citFooter("This free open-source software implements academic
-research by the authors and co-workers. If you use it,
-please support the project by citing the appropriate
-journal articles.")
-
